@@ -19,33 +19,33 @@ Configuring the build process
 
 The following variables can be used to configure the build process:
 
-General:
+### General:
 
-   prefix     : location of the installation, the default is the running
+   `prefix`     : location of the installation, the default is the running
                 GNAT installation root.
 
-   BUILD      : control the build options : PROD (default) or DEBUG
+   `BUILD`      : control the build options : PROD (default) or DEBUG
 
-   PROCESSORS : parallel compilation (default is 0, which uses all available
+   `PROCESSORS` : parallel compilation (default is 0, which uses all available
                 cores)
 
-   TARGET     : for cross-compilation, auto-detected for native platforms
+   `TARGET`     : for cross-compilation, auto-detected for native platforms
 
-   SOURCE_DIR : for out-of-tree build
+   `SOURCE_DIR` : for out-of-tree build
 
-   INTEGRATED : treat prefix as compiler installation (yes/no)
+   `INTEGRATED` : treat prefix as compiler installation (yes/no)
                 this is so that installed gnatcoll project can later be
                 referenced as predefined project of this compiler;
                 this adds a normalized target subdir to prefix
                 default is "no"
 
-Module-specific:
+### Module-specific:
 
    Please refer to individual components.
 
 To use the default options:
 
-   $ make setup
+`$ make setup`
 
 Building
 --------
@@ -53,17 +53,16 @@ Building
 The components of GNATCOLL DB Module are built using standalone GPR
 project files, to build each of them is as simple as:
 
-$ gprbuild gnatcoll-<component>.gpr
+`$ gprbuild gnatcoll-<component>.gpr`
 
 However, to build all versions of the library (static, relocatable and
 static-pic) it is simpler to use the provided Makefiles:
 
-$ make -C <component>
+`$ make -C <component>`
 
 Then, to install it:
 
-$ make -C <component> install
-
+`$ make -C <component> install`
 
 Bug reports
 -----------
