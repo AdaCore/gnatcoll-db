@@ -42,7 +42,13 @@ project GnatColl.Postgres is
       use "lib/" & Project'Library_Kind;
    for Library_Name    use Name;
    for Library_Version use "lib" & Name & Gnatcoll.So_Ext & "." & Version;
-   for Library_Options use ("-lpq");
+
+   case Library_Type is
+      when "relocatable" =>
+         for Library_Options use ("-lpq");
+      when others =>
+         null;
+   end case;
 
    for Languages use ("Ada", "C");
 
