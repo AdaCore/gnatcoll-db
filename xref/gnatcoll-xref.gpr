@@ -22,8 +22,8 @@
 ------------------------------------------------------------------------------
 
 with "gnatcoll";
-with "../../gnatcoll-bindings/iconv/gnatcoll-iconv";
-with "../sqlite/gnatcoll-sqlite";
+with "gnatcoll-iconv";
+with "gnatcoll-sqlite";
 
 project GnatColl.Xref is
 
