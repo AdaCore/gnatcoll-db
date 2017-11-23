@@ -122,18 +122,14 @@ package body GNATCOLL.SQL.Postgres is
    is
       Result : Postgres_Description_Access;
    begin
-      if not GNATCOLL.SQL.Postgres.Builder.Has_Postgresql_Support then
-         return null;
-      end if;
-
       Result := new Postgres_Description
         (Caching => Cache_Support, Errors => Errors);
-      Result.SSL       := SSL;
-      Result.Dbname    := To_XString (Database);
-      Result.User      := To_XString (User);
-      Result.Password  := To_XString (Password);
-      Result.Port      := Port;
-      Result.Host      := To_XString (Host);
+      Result.SSL      := SSL;
+      Result.Dbname   := To_XString (Database);
+      Result.User     := To_XString (User);
+      Result.Password := To_XString (Password);
+      Result.Port     := Port;
+      Result.Host     := To_XString (Host);
 
       return Database_Description (Result);
    end Setup;

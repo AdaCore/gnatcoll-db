@@ -29,9 +29,6 @@ limited with GNATCOLL.SQL.Postgres.Gnade;
 
 private package GNATCOLL.SQL.Postgres.Builder is
 
-   function Has_Postgresql_Support return Boolean;
-   --  Whether PostgreSQL is supported
-
    function Build_Connection
      (Descr : access Postgres_Description'Class) return Database_Connection;
    --  See doc in GNATCOLL.SQL.Postgres

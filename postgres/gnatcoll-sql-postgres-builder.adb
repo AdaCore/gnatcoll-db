@@ -1386,15 +1386,6 @@ package body GNATCOLL.SQL.Postgres.Builder is
       return "NUMERIC (" & K_Digits'Img & "," & K_Decimals'Img & ")";
    end Field_Type_Money;
 
-   ----------------------------
-   -- Has_Postgresql_Support --
-   ----------------------------
-
-   function Has_Postgresql_Support return Boolean is
-   begin
-      return True;
-   end Has_Postgresql_Support;
-
    ------------------
    -- String_Image --
    ------------------

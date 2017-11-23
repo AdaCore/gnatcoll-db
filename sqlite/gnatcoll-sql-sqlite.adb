@@ -42,10 +42,6 @@ package body GNATCOLL.SQL.Sqlite is
    is
       Result : Sqlite_Description_Access;
    begin
-      if not GNATCOLL.SQL.Sqlite.Builder.Has_Sqlite_Support then
-         return null;
-      end if;
-
       Result := new Sqlite_Description
         (Caching => Cache_Support, Errors => Errors);
       Result.Dbname := new String'(Database);

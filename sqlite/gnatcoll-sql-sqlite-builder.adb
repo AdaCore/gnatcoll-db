@@ -1005,15 +1005,6 @@ package body GNATCOLL.SQL.Sqlite.Builder is
       return Self.Processed_Rows + 1;
    end Current;
 
-   ------------------------
-   -- Has_Sqlite_Support --
-   ------------------------
-
-   function Has_Sqlite_Support return Boolean is
-   begin
-      return True;
-   end Has_Sqlite_Support;
-
    ----------------------
    -- Build_Connection --
    ----------------------
