@@ -57,7 +57,7 @@ package GNATCOLL.SQL.Postgres is
       Cache_Support : Boolean := True;
       Errors        : access Error_Reporter'Class := null)
      return Database_Description;
-   --  Return a database connection for PostgreSQL.
+   --  Return a database description for PostgreSQL.
    --  If postgres was not detected at installation time, this function will
    --  return null.
    --  Errors (if specified) will be used to report errors and warnings to the

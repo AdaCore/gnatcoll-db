@@ -26,8 +26,21 @@
 -----------------------------------------------------------------------
 
 with GNATCOLL.SQL.Sqlite.Builder;
+with GNATCOLL.Strings; use GNATCOLL.Strings;
 
 package body GNATCOLL.SQL.Sqlite is
+
+   type Sqlite_Engine is new Database_Engine with null record;
+
+   overriding function Setup
+     (Engine  : Sqlite_Engine;
+      Options : Name_Values.Map;
+      Errors  : access Error_Reporter'Class) return Database_Description;
+
+   DB_Engine : aliased Sqlite_Engine;
+
+   function Get_Database_Engine return Database_Engine_Access
+   is (DB_Engine'Access) with Export, External_Name => "db_engine";
 
    -----------
    -- Setup --
@@ -47,6 +60,35 @@ package body GNATCOLL.SQL.Sqlite is
       Result.Dbname := new String'(Database);
       Result.Is_URI := Is_URI;
       return Database_Description (Result);
+   end Setup;
+
+   -----------
+   -- Setup --
+   -----------
+
+   overriding function Setup
+     (Engine  : Sqlite_Engine;
+      Options : Name_Values.Map;
+      Errors  : access Error_Reporter'Class) return Database_Description
+   is
+      pragma Unreferenced (Engine);
+
+      type Setup_Parameters is (Database, Is_URI, Caching);
+      Params : array (Setup_Parameters) of Name_Values.Cursor;
+
+      function Value (P : Setup_Parameters; Default : String) return String is
+        (if Name_Values.Has_Element (Params (P))
+         then Name_Values.Element (Params (P)) else Default);
+   begin
+      for C in Options.Iterate loop
+         Params (Setup_Parameters'Value (Name_Values.Key (C))) := C;
+      end loop;
+
+      return Setup
+        (Database      => Value (Database, ""),
+         Is_URI        => Boolean'Value (Value (Is_URI, "False")),
+         Cache_Support => Boolean'Value (Value (Caching, "False")),
+         Errors        => Errors);
    end Setup;
 
    ----------------------

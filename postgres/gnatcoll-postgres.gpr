@@ -26,7 +26,7 @@ with "gnatcoll";
 project GnatColl.Postgres is
 
    Version := External ("GNATCOLL_VERSION", "0.0");
-   Name    := "gnatcoll-postgres";
+   Name    := "gnatcoll_postgres";
 
    type Build_Type is ("DEBUG", "PROD");
    Build : Build_Type := External ("BUILD");
@@ -35,17 +35,17 @@ project GnatColl.Postgres is
    Library_Type : Library_Type_Type := External ("LIBRARY_TYPE");
 
    for Library_Kind    use Library_Type;
-   for Source_Dirs use (".");
-   for Object_Dir
-      use "obj/" & Project'Library_Kind;
-   for Library_Dir
-      use "lib/" & Project'Library_Kind;
+   for Source_Dirs     use (".");
+   for Object_Dir      use "obj/" & Project'Library_Kind;
+   for Library_Dir     use "lib/" & Project'Library_Kind;
    for Library_Name    use Name;
    for Library_Version use "lib" & Name & Gnatcoll.So_Ext & "." & Version;
 
    case Library_Type is
       when "relocatable" =>
          for Library_Options use ("-lpq");
+         for Library_Interface use
+           ("gnatcoll.sql.postgres", "gnatcoll.sql.ranges");
       when others =>
          null;
    end case;

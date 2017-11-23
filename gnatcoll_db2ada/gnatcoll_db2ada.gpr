@@ -31,9 +31,19 @@ project gnatcoll_db2ada is
    type Build_Type is ("DEBUG", "PROD");
    Build : Build_Type := External ("BUILD");
 
+   type Yes_No is ("yes", "no");
+   Templates : Yes_No := External ("TEMPLATES", "no");
+
    for Languages use ("Ada");
 
    for Main use ("gnatcoll_db2ada");
+
+   case Templates is
+      when "no" =>
+         for Source_Dirs use Project'Source_Dirs & ("notemplates");
+      when "yes" =>
+         for Source_Dirs use Project'Source_Dirs & ("templates");
+   end case;
 
    package Compiler is
       case Build is
@@ -51,9 +61,9 @@ project gnatcoll_db2ada is
    package Binder is
       case Build is
          when "DEBUG" =>
-            for Switches ("Ada") use ("-E");
+            for Switches ("Ada") use ("-E", "-shared");
          when "PROD" =>
-            null;
+            for Switches ("Ada") use ("-shared");
       end case;
    end Binder;
 

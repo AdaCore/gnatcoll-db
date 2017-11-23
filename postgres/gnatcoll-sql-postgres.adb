@@ -69,6 +69,18 @@ package body GNATCOLL.SQL.Postgres is
       Format : Formatter'Class) return Unbounded_String;
    --  Extensions for SELECT
 
+   type Postgres_Engine is new Database_Engine with null record;
+
+   overriding function Setup
+     (Engine  : Postgres_Engine;
+      Options : Name_Values.Map;
+      Errors  : access Error_Reporter'Class) return Database_Description;
+
+   PG_Engine : aliased Postgres_Engine;
+
+   function Get_Database_Engine return Database_Engine_Access
+   is (PG_Engine'Access) with Export, External_Name => "db_engine";
+
    ----------
    -- Free --
    ----------
@@ -132,6 +144,41 @@ package body GNATCOLL.SQL.Postgres is
       Result.Host     := To_XString (Host);
 
       return Database_Description (Result);
+   end Setup;
+
+   -----------
+   -- Setup --
+   -----------
+
+   overriding function Setup
+     (Engine  : Postgres_Engine;
+      Options : Name_Values.Map;
+      Errors  : access Error_Reporter'Class) return Database_Description
+   is
+      pragma Unreferenced (Engine);
+
+      type Setup_Parameters is
+        (Database, User, Host, Password, Port, SSL, Caching);
+      Params : array (Setup_Parameters) of Name_Values.Cursor;
+
+      function Value (P : Setup_Parameters; Default : String) return String is
+        (if Name_Values.Has_Element (Params (P))
+         then Name_Values.Element (Params (P)) else Default);
+
+   begin
+      for C in Options.Iterate loop
+         Params (Setup_Parameters'Value (Name_Values.Key (C))) := C;
+      end loop;
+
+      return Setup
+        (Database      => Value (Database, ""),
+         User          => Value (User, ""),
+         Host          => Value (Host, ""),
+         Password      => Value (Password, ""),
+         Port          => Integer'Value (Value (Port, "-1")),
+         SSL           => SSL_Mode'Value (Value (SSL, "Allow")),
+         Cache_Support => Boolean'Value (Value (Caching, "True")),
+         Errors        => Errors);
    end Setup;
 
    ----------------------

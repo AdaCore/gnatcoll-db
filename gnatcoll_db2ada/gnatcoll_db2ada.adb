@@ -36,8 +36,6 @@ with GNAT.Strings;
 with GNATCOLL.Arg_Lists;         use GNATCOLL.Arg_Lists;
 with GNATCOLL.SQL.Exec;          use GNATCOLL.SQL, GNATCOLL.SQL.Exec;
 with GNATCOLL.SQL.Inspect;       use GNATCOLL.SQL.Inspect;
-with GNATCOLL.SQL.Postgres;
-with GNATCOLL.SQL.Sqlite;
 with GNATCOLL.Strings;           use GNATCOLL.Strings;
 with GNATCOLL.Traces;            use GNATCOLL.Traces;
 with GNATCOLL.Utils;             use GNATCOLL.Utils;
@@ -483,23 +481,25 @@ procedure GNATCOLL_Db2Ada is
          --  If the user specified the name of a database, we connect to it.
          --  This might be to read the schema, or to create the database
 
-         if DB_Type.all = "postgresql" then
-            Descr := GNATCOLL.SQL.Postgres.Setup
-              (Database      => DB_Name.all,
-               User          => DB_User.all,
-               Host          => DB_Host.all,
-               Password      => DB_Passwd.all,
-               Port          => DB_Port,
-               Cache_Support => False);
-         elsif DB_Type.all = "sqlite" then
-            Descr := GNATCOLL.SQL.Sqlite.Setup
-              (Database      => DB_Name.all,
-               Cache_Support => False);
-         else
-            Ada.Text_IO.Put_Line ("Unknown dbtype: " & DB_Type.all);
-            Set_Exit_Status (Failure);
-            return;
-         end if;
+         declare
+            DB_Args : Name_Values.Map;
+         begin
+            DB_Args.Insert ("Database", DB_Name.all);
+            DB_Args.Insert ("Caching", "False");
+
+            if DB_Type.all /= "sqlite" then
+               DB_Args.Insert ("User", DB_User.all);
+               DB_Args.Insert ("Host", DB_Host.all);
+               DB_Args.Insert ("Password", DB_Passwd.all);
+               DB_Args.Insert ("Port", Image (DB_Port, 0));
+            end if;
+
+            Descr := Setup
+              (Kind    => (if DB_Type.all = "postgresql"
+                           then "postgres" else DB_Type.all),
+               Errors  => null,
+               Options => DB_Args);
+         end;
 
          if Descr = null then
             Ada.Text_IO.Put_Line ("Database not supported: " & DB_Type.all);

@@ -67,7 +67,7 @@ package GNATCOLL.SQL.Sqlite is
       Errors        : access Error_Reporter'Class := null;
       Is_URI        : Boolean := False)
       return Database_Description;
-   --  Return a database connection for sqlite
+   --  Return a database description for sqlite
    --  If sqlite was not detected at installation time, this function will
    --  return null.
    --  Errors (if specified) will be used to report errors and warnings to the

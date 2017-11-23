@@ -26,7 +26,7 @@ with "gnatcoll";
 project GnatColl.Sqlite is
 
    Version := External ("GNATCOLL_VERSION", "0.0");
-   Name    := "gnatcoll-sqlite";
+   Name    := "gnatcoll_sqlite";
 
    type Build_Type is ("DEBUG", "PROD");
    Build : Build_Type := External ("BUILD");
@@ -35,10 +35,8 @@ project GnatColl.Sqlite is
    Library_Type : Library_Type_Type := External ("LIBRARY_TYPE");
 
    for Library_Kind    use Library_Type;
-   for Object_Dir
-      use "obj/" & Project'Library_Kind;
-   for Library_Dir
-      use "lib/" & Project'Library_Kind;
+   for Object_Dir      use "obj/" & Project'Library_Kind;
+   for Library_Dir     use "lib/" & Project'Library_Kind;
    for Library_Name    use Name;
    for Library_Version use "lib" & Name & Gnatcoll.So_Ext & "." & Version;
 
@@ -48,6 +46,13 @@ project GnatColl.Sqlite is
    OS : OS_Kind := External ("GNATCOLL_OS", "unix");
 
    Thread_Lib := ();
+
+   case Library_Type is
+      when "relocatable" =>
+         for Library_Interface use ("gnatcoll.sql.sqlite");
+      when others =>
+         null;
+   end case;
 
    case OS is
       when "windows" =>

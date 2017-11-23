@@ -72,8 +72,10 @@ GNATCOLL_VERSION := $(shell $(CAT) ../version_information)
 BUILD         = PROD
 PROCESSORS    = 0
 BUILD_DIR     =
-ENABLE_SHARED := no
+ENABLE_SHARED = yes
+LIBRARY_TYPE  = relocatable
 INTEGRATED    = no
+TEMPLATES     = no
 
 all: build
 
@@ -96,6 +98,8 @@ GPR_VARS= \
 	 -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
 	 -XXMLADA_BUILD=$(LIBRARY_TYPE) \
 	 -XGNATCOLL_VERSION=$(GNATCOLL_VERSION) \
+	 -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
+	 -XTEMPLATES=$(TEMPLATES) \
 	 -XBUILD=$(BUILD)
 
 # Used to pass extra options to GPRBUILD, like -d for instance
@@ -150,4 +154,5 @@ setup:
 	$(ECHO) "SOURCE_DIR=$(SOURCE_DIR)" >> makefile.setup
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
 	$(ECHO) "LIBRARY_TYPE=$(LIBRARY_TYPE)" >> makefile.setup
+	$(ECHO) "TEMPLATES=$(TEMPLATES)" >> makefile.setup
 
