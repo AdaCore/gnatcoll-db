@@ -46,7 +46,7 @@ CAT := cat
 ECHO  := echo
 WHICH := which
 
-NAME=gnatcoll-xref
+NAME=gnatcoll_xref
 
 # check for out-of-tree build
 SOURCE_DIR := $(dir $(MAKEFILE_LIST))

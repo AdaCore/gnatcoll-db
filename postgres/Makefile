@@ -51,7 +51,7 @@ CAT := cat
 ECHO  := echo
 WHICH := which
 
-NAME=gnatcoll-postgres
+NAME=gnatcoll_postgres
 
 # check for out-of-tree build
 SOURCE_DIR := $(dir $(MAKEFILE_LIST))

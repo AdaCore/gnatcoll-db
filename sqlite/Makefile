@@ -51,7 +51,7 @@ CAT := cat
 ECHO  := echo
 WHICH := which
 
-NAME=gnatcoll-sqlite
+NAME=gnatcoll_sqlite
 
 # check for out-of-tree build
 SOURCE_DIR := $(dir $(MAKEFILE_LIST))

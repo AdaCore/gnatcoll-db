@@ -23,7 +23,7 @@
 
 with "gnatcoll";
 
-project GnatColl.Sqlite is
+project GnatColl_Sqlite is
 
    Version := External ("GNATCOLL_VERSION", "0.0");
    Name    := "gnatcoll_sqlite";
@@ -128,4 +128,4 @@ project GnatColl.Sqlite is
       end case;
    end Linker;
 
-end GnatColl.Sqlite;
+end GnatColl_Sqlite;
