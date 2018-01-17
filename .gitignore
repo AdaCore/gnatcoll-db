@@ -9,7 +9,7 @@ b__*
 *.bexch
 *.a
 *.d
-gnatinspect.*
+gnatinspect.db
 obj/
 lib/
 *.stdout
