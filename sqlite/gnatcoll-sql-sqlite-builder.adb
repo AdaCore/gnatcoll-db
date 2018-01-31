@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2017, AdaCore                     --
+--                     Copyright (C) 2005-2018, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -418,6 +418,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
          else
             Mark_As_Closed (Connection, Closed => False);
             Set_Busy_Timeout (Connection.DB, Max_Ms_On_Busy);
+            Busy_Handler (Connection.DB, On_Busy);
 
             --  Make sure that with appropriate versions of sqlite (>= 3.6.19)
             --  we do enforce foreign keys constraints

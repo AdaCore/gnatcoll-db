@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2017, AdaCore                     --
+--                     Copyright (C) 2005-2018, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -26,6 +26,7 @@
 
 with GNATCOLL.SQL.Exec;   use GNATCOLL.SQL.Exec;
 with GNAT.Strings;        use GNAT.Strings;
+with System;
 
 package GNATCOLL.SQL.Sqlite is
 
@@ -52,6 +53,14 @@ package GNATCOLL.SQL.Sqlite is
    --  busy.
    --  Set this to 0 to disable retries altogether, although this means that
    --  some queries might fail as a result.
+
+   On_Busy : access function
+     (Data : System.Address; Count : Integer) return Integer
+   with Convention => C;
+   --  Callback function that might be invoked whenever an
+   --  attempt is made to open a database table that another thread or process
+   --  has locked. See more information in Busy_Handler routine comment in
+   --  GNATCOLL.SQL.Sqlite.Gnade
 
    type Sqlite_Description (<>)
      is new Database_Description_Record with private;
