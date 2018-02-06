@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2012-2017, AdaCore                     --
+--                     Copyright (C) 2012-2018, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -32,7 +32,6 @@ with GNATCOLL.Xref;              use GNATCOLL.Xref;
 with GNATCOLL.Arg_Lists;         use GNATCOLL.Arg_Lists;
 with GNATCOLL.Paragraph_Filling;
 with GNATCOLL.Projects;          use GNATCOLL.Projects;
-with GNATCOLL.Readline;          use GNATCOLL.Readline;
 with GNATCOLL.SQL.Sqlite;
 with GNATCOLL.Traces;            use GNATCOLL.Traces;
 with GNATCOLL.Utils;             use GNATCOLL.Utils;
@@ -45,14 +44,6 @@ procedure GNATInspect is
    Output_Lead : aliased GNAT.Strings.String_Access := new String'(" ");
    --  Prefix written at the beginning of each response line.
 
-   function Command_Line_Completion
-     (Full_Line, Text : String; Start, Last : Integer)
-      return Possible_Completions;
-   --  Provides interactive command-line completion
-
-   function Complete_Command (Text : String; State : Integer) return String;
-   --  Find all commands starting with Text
-
    Invalid_Command : exception;
    procedure Process_Line (Line : String);
    procedure Process_File (File : String);
@@ -61,11 +52,6 @@ procedure GNATInspect is
 
    procedure On_Exit (Exit_Status : Integer);
    --  Cleanup gnatinspect, and exit
-
-   procedure On_Ctrl_C;
-   pragma Convention (C, On_Ctrl_C);
-   --  Handler for control-c, to make sure that the history is properly
-   --  saved.
 
    function Get_Entity (Arg : String) return Entity_Information;
    --  Return the entity matching the "name:file:[project:]line:column"
@@ -444,11 +430,6 @@ procedure GNATInspect is
             new String'("Whether the documentation appears before entities"
               & " in general")));
 
-   History_File : GNAT.Strings.String_Access;
-
-   Complete_Command_List_Index : Integer;
-   --  Global variable used by Complete_Command
-
    Project_Is_Default : Boolean := True;  --  Whether we have the default prj
    Env     : Project_Environment_Access;
    Tree    : aliased Project_Tree;
@@ -482,67 +463,6 @@ procedure GNATInspect is
    Delete_If_Mismatch    : aliased Boolean := False;
    Look_Before_First_For_Doc : Boolean := True;
    --  The options from the command line
-
-   ----------------------
-   -- Complete_Command --
-   ----------------------
-
-   function Complete_Command (Text : String; State : Integer) return String is
-      C : Integer;
-      Tx : constant String := To_Lower (Text);
-
-   begin
-      if State = 0 then
-         Complete_Command_List_Index := Commands'First;
-      end if;
-
-      while Complete_Command_List_Index <= Commands'Last loop
-         C := Complete_Command_List_Index;
-         Complete_Command_List_Index := Complete_Command_List_Index + 1;
-
-         if Starts_With (Commands (C).Name.all, Tx) then
-            return Commands (C).Name.all;
-         end if;
-      end loop;
-
-      loop
-         C :=
-           Variables'First + Complete_Command_List_Index - Commands'Last - 1;
-         exit when C > Variables'Last;
-         Complete_Command_List_Index := Complete_Command_List_Index + 1;
-
-         if Starts_With (Variables (C).Name.all, Tx) then
-            return Variables (C).Name.all & ":=";
-         end if;
-      end loop;
-
-      return "";
-   end Complete_Command;
-
-   -----------------------------
-   -- Command_Line_Completion --
-   -----------------------------
-
-   function Command_Line_Completion
-     (Full_Line, Text : String; Start, Last : Integer)
-      return Possible_Completions
-   is
-      pragma Unreferenced (Last);
-   begin
-      if Start = 0 then
-         return Completion_Matches
-           (Text, Complete_Command'Unrestricted_Access);
-
-      elsif Ada.Strings.Fixed.Trim
-        (Full_Line (Full_Line'First .. Start - 1 + Full_Line'First),
-         Ada.Strings.Both) = "help"
-      then
-         return Completion_Matches
-           (Text, Complete_Command'Unrestricted_Access);
-      else
-         return null;  --  default completion from readline.
-      end if;
-   end Command_Line_Completion;
 
    -----------
    -- Image --
@@ -1475,26 +1395,13 @@ procedure GNATInspect is
       Dump (Refs);
    end Process_Body;
 
-   ---------------
-   -- On_Ctrl_C --
-   ---------------
-
-   procedure On_Ctrl_C is
-   begin
-      On_Exit (0);
-   end On_Ctrl_C;
-
    -------------
    -- On_Exit --
    -------------
 
    procedure On_Exit (Exit_Status : Integer) is
    begin
-      if History_File /= null then
-         GNATCOLL.Readline.Finalize (History_File => History_File.all);
-      end if;
       Free (Xref);
-      Free (History_File);
       GNAT.OS_Lib.OS_Exit (Exit_Status);
    end On_Exit;
 
@@ -1813,8 +1720,6 @@ begin
       end;
    end if;
 
-   Install_Ctrl_C_Handler (On_Ctrl_C'Unrestricted_Access);
-
    declare
       Error : GNAT.Strings.String_Access;
    begin
@@ -1855,20 +1760,11 @@ begin
       return;
    end if;
 
-   History_File := new String'
-     (Create_From_Dir
-        (Dir       => GNATCOLL.VFS.Get_Home_Directory,
-         Base_Name => +".gnatinspect_hist").Display_Full_Name);
-
-   GNATCOLL.Readline.Initialize
-     (Appname      => "gnatcollxref",
-      History_File => History_File.all,
-      Completer    => Command_Line_Completion'Unrestricted_Access);
-
    Put_Line ("Type 'help' for more information");
    loop
+      Put (">>> ");
       declare
-         Input : constant String := GNATCOLL.Readline.Get_Line (">>> ");
+         Input : constant String := Get_Line;
       begin
          exit when Input = "exit";
          Process_Line (Input);

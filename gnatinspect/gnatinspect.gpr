@@ -23,7 +23,6 @@
 
 with "gnatcoll";
 with "gnatcoll_xref";
-with "gnatcoll_readline";
 with "gnatcoll_sqlite";
 
 project Gnatinspect is
@@ -63,10 +62,6 @@ project Gnatinspect is
             null;
       end case;
    end Builder;
-
-   package Linker is
-      for Switches ("Ada") use ("-ldl");
-   end Linker;
 
    package Ide is
       for VCS_Kind use "Git";

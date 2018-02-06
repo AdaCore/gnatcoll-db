@@ -42,8 +42,7 @@ project GnatColl_Sqlite is
 
    for Languages use ("Ada", "C");
 
-   type OS_Kind is ("windows", "unix", "osx");
-   OS : OS_Kind := External ("GNATCOLL_OS", "unix");
+   OS : gnatcoll.OS_Kind := gnatcoll.OS;
 
    Thread_Lib := ();
 
