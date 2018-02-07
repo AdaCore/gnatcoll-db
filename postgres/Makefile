@@ -120,7 +120,8 @@ UNINSTALLER=$(INSTALLER) -p -f --install-name=$(NAME) --uninstall
 build: $(LIBRARY_TYPES:%=build-%)
 
 build-%:
-	$(BUILDER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* $(GNATCOLL_GPR)
+	$(BUILDER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
+		$(GNATCOLL_GPR)
 
 ###########
 # Install #
@@ -134,7 +135,7 @@ endif
 install: uninstall $(LIBRARY_TYPES:%=install-%)
 
 install-%:
-	$(INSTALLER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* \
+	$(INSTALLER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
 		--build-name=$* --build-var=LIBRARY_TYPE $(GNATCOLL_GPR)
 
 ###########
@@ -144,7 +145,8 @@ install-%:
 clean: $(LIBRARY_TYPES:%=clean-%)
 
 clean-%:
-	-$(CLEANER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* $(GNATCOLL_GPR)
+	-$(CLEANER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
+		$(GNATCOLL_GPR)
 
 #########
 # setup #
