@@ -21,41 +21,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with GNATCOLL.DB2Ada.Main;
-with GNATCOLL.SQL.Exec; use GNATCOLL.SQL.Exec;
-
-procedure GNATCOLL_DB2Ada is
-
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description;
-
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description
-   is
-      pragma Unreferenced (DB_Type);
-      pragma Unreferenced (Database);
-      pragma Unreferenced (User);
-      pragma Unreferenced (Host);
-      pragma Unreferenced (Password);
-      pragma Unreferenced (Port);
-   begin
-      return null;
-   end No_Backend_Description;
-
-begin
-   GNATCOLL.DB2Ada.Main
-      ("",
-       No_Backend_Description'Unrestricted_Access);
-end GNATCOLL_DB2Ada;
+procedure GNATCOLL.Db2Ada.Main
+   (Default_DB_Type : String;
+    Description     : Db2Ada_Description);
+--  Gnatcoll_db2ada main
+--
+--  Default_DB_Type is the default backend database name (-dbtype option
+--  default). Description is a function that return a Database_Description
+--  instance (See GNATCOLL.Db2Ada).

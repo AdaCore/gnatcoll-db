@@ -23,39 +23,40 @@
 
 with GNATCOLL.DB2Ada.Main;
 with GNATCOLL.SQL.Exec; use GNATCOLL.SQL.Exec;
+with GNATCOLL.SQL.Sqlite;
 
-procedure GNATCOLL_DB2Ada is
+procedure GNATCOLL_Sqlite2Ada is
 
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description;
-
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description
+   function Sqlite_Description (DB_Type  : String;
+                                Database : String;
+                                User     : String;
+                                Host     : String;
+                                Password : String;
+                                Port     : Integer)
+                                 return Database_Description;
+   function Sqlite_Description (DB_Type  : String;
+                                Database : String;
+                                User     : String;
+                                Host     : String;
+                                Password : String;
+                                Port     : Integer)
+                                 return Database_Description
    is
-      pragma Unreferenced (DB_Type);
-      pragma Unreferenced (Database);
       pragma Unreferenced (User);
       pragma Unreferenced (Host);
       pragma Unreferenced (Password);
       pragma Unreferenced (Port);
    begin
-      return null;
-   end No_Backend_Description;
+      if DB_Type /= "sqlite" then
+         return null;
+      end if;
+      return GNATCOLL.SQL.Sqlite.Setup
+                 (Database      => Database,
+                  Cache_Support => False);
+   end Sqlite_Description;
 
 begin
-   GNATCOLL.DB2Ada.Main
-      ("",
-       No_Backend_Description'Unrestricted_Access);
-end GNATCOLL_DB2Ada;
+   GNATCOLL.DB2Ada.Main (
+      "sqlite",
+      Sqlite_Description'Unrestricted_Access);
+end GNATCOLL_Sqlite2Ada;

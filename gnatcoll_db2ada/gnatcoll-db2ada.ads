@@ -21,41 +21,28 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with GNATCOLL.DB2Ada.Main;
 with GNATCOLL.SQL.Exec; use GNATCOLL.SQL.Exec;
 
-procedure GNATCOLL_DB2Ada is
+package GNATCOLL.DB2Ada is
 
-   function No_Backend_Description
+   type Db2Ada_Description is access function
       (DB_Type  : String;
        Database : String;
        User     : String;
        Host     : String;
        Password : String;
        Port     : Integer)
-      return Database_Description;
+   return Database_Description;
+   --  Given access parameter return a Database_Description.
+   --
+   --  DB_Type is the database backend name. Function should return null if the
+   --  given backend is not supported.
+   --
+   --  Db2Ada_Description received the following connection parameters:
+   --  * Database: the database name
+   --  * User:     user name
+   --  * Host:     host name
+   --  * Password: password to access the database
+   --  * Port:     port number
 
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description
-   is
-      pragma Unreferenced (DB_Type);
-      pragma Unreferenced (Database);
-      pragma Unreferenced (User);
-      pragma Unreferenced (Host);
-      pragma Unreferenced (Password);
-      pragma Unreferenced (Port);
-   begin
-      return null;
-   end No_Backend_Description;
-
-begin
-   GNATCOLL.DB2Ada.Main
-      ("",
-       No_Backend_Description'Unrestricted_Access);
-end GNATCOLL_DB2Ada;
+end GNATCOLL.DB2Ada;

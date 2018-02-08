@@ -23,27 +23,18 @@
 
 with "gnatcoll";
 
-project gnatcoll_db2ada is
-
+project GNATCOLL_DB2Ada is
    Version := External ("GNATCOLL_VERSION", "0.0");
    Name    := "gnatcoll_db2ada";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD");
-
-   type Yes_No is ("yes", "no");
-   Templates : Yes_No := External ("TEMPLATES", "no");
+   Build : Build_Type := External ("BUILD", "PROD");
 
    for Languages use ("Ada");
 
    for Main use ("gnatcoll_db2ada");
-
-   case Templates is
-      when "no" =>
-         for Source_Dirs use Project'Source_Dirs & ("notemplates");
-      when "yes" =>
-         for Source_Dirs use Project'Source_Dirs & ("templates");
-   end case;
+   for Object_Dir use "obj";
+   for Source_Dirs use (".");
 
    package Compiler is
       case Build is
@@ -61,9 +52,9 @@ project gnatcoll_db2ada is
    package Binder is
       case Build is
          when "DEBUG" =>
-            for Switches ("Ada") use ("-E", "-shared");
+            for Switches ("Ada") use ("-E");
          when "PROD" =>
-            for Switches ("Ada") use ("-shared");
+            for Switches ("Ada") use ();
       end case;
    end Binder;
 
@@ -80,4 +71,7 @@ project gnatcoll_db2ada is
       for VCS_Kind use "Git";
    end Ide;
 
-end gnatcoll_db2ada;
+   package Install is
+      for Artifacts ("share/gnatcoll/dborm.py") use ("dborm.py");
+   end Install;
+end GNATCOLL_DB2Ada;

@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2008-2017, AdaCore                     --
+--                     Copyright (C) 2008-2018, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -25,7 +25,6 @@ pragma Ada_2012;
 
 with Ada.Containers;          use Ada.Containers;
 with Ada.Containers.Indefinite_Ordered_Sets;
-with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
 with Ada.Strings.Maps;        use Ada.Strings.Maps;
 with Ada.Text_IO;             use Ada.Text_IO;
 with GNATCOLL.Utils;          use GNATCOLL.Utils;
@@ -35,7 +34,7 @@ pragma Warnings (Off, "no entities of * are referenced");
 with GNATCOLL.SQL_Fields;     use GNATCOLL.SQL_Fields;
 pragma Warnings (On, "no entities of * are referenced");
 
-separate (GNATCOLL_Db2Ada)
+separate (GNATCOLL.Db2Ada.Main)
 procedure Generate
   (Generated : String; Include_Database_Create : Boolean)
 is

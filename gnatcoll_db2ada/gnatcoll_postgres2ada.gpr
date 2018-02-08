@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                    Copyright (C) 2015-2017, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,41 +21,58 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with GNATCOLL.DB2Ada.Main;
-with GNATCOLL.SQL.Exec; use GNATCOLL.SQL.Exec;
+with "gnatcoll";
+with "gnatcoll_postgres";
 
-procedure GNATCOLL_DB2Ada is
+project gnatcoll_Postgres2ada is
 
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description;
+   Version := External ("GNATCOLL_VERSION", "0.0");
+   Name    := "gnatcoll_postgres2ada";
 
-   function No_Backend_Description
-      (DB_Type  : String;
-       Database : String;
-       User     : String;
-       Host     : String;
-       Password : String;
-       Port     : Integer)
-      return Database_Description
-   is
-      pragma Unreferenced (DB_Type);
-      pragma Unreferenced (Database);
-      pragma Unreferenced (User);
-      pragma Unreferenced (Host);
-      pragma Unreferenced (Password);
-      pragma Unreferenced (Port);
-   begin
-      return null;
-   end No_Backend_Description;
+   type Build_Type is ("DEBUG", "PROD");
+   Build : Build_Type := External ("BUILD");
 
-begin
-   GNATCOLL.DB2Ada.Main
-      ("",
-       No_Backend_Description'Unrestricted_Access);
-end GNATCOLL_DB2Ada;
+   for Languages use ("Ada");
+
+   for Main use ("gnatcoll_postgres2ada");
+   for Object_Dir use "obj";
+
+   package Compiler is
+      case Build is
+         when "DEBUG" =>
+            for Switches ("Ada") use
+              ("-g", "-O0", "-gnata", "-gnatVa", "-gnatQ", "-gnaty", "-gnateE",
+               "-gnatwaCJe", "-fstack-check");
+
+         when "PROD" =>
+            --  Do not use -gnatwe for production mode
+            for Switches ("Ada") use ("-O2", "-gnatn", "-gnatwaCJ");
+      end case;
+   end Compiler;
+
+   package Binder is
+      case Build is
+         when "DEBUG" =>
+            for Switches ("Ada") use ("-E");
+         when "PROD" =>
+            for Switches ("Ada") use ();
+      end case;
+   end Binder;
+
+   package Builder is
+      case Build is
+         when "DEBUG" =>
+            for Global_Configuration_Pragmas use "../gnat_debug.adc";
+         when "PROD" =>
+            null;
+      end case;
+   end Builder;
+
+   package Ide is
+      for VCS_Kind use "Git";
+   end Ide;
+
+   package Install is
+      for Artifacts ("share/gnatcoll/dborm.py") use ("dborm.py");
+   end Install;
+end gnatcoll_Postgres2ada;
