@@ -34,12 +34,9 @@
 # General:
 #
 #   prefix        : root install directory
-#   ENABLE_SHARED : yes / no (or empty)
 #   BUILD         : DEBUG PROD
 #   PROCESSORS    : nb parallel compilations (0 to use all cores)
 #   TARGET        : target triplet for cross-compilation
-#   INTEGRATED    : installs the project as part of the compiler installation;
-#                   this adds NORMALIZED_TARGET subdir to prefix
 
 # helper programs
 CAT := cat
@@ -72,8 +69,6 @@ GNATCOLL_VERSION := $(shell $(CAT) ../version_information)
 BUILD         = PROD
 PROCESSORS    = 0
 BUILD_DIR     =
-ENABLE_SHARED := no
-INTEGRATED    = no
 
 all: build
 
@@ -82,15 +77,7 @@ all: build
 
 GTARGET=--target=$(NORMALIZED_TARGET)
 
-ifeq ($(ENABLE_SHARED), yes)
-   LIBRARY_TYPE=relocatable
-else
-   LIBRARY_TYPE=static
-endif
-
-ifeq ($(INTEGRATED), yes)
-   integrated_install=/$(NORMALIZED_TARGET)
-endif
+LIBRARY_TYPE=static
 
 GPR_VARS= \
 	 -XLIBRARY_TYPE=$(LIBRARY_TYPE) \
@@ -143,12 +130,8 @@ clean:
 
 setup:
 	$(ECHO) "prefix=$(prefix)" > makefile.setup
-	$(ECHO) "ENABLE_SHARED=$(ENABLE_SHARED)" >> makefile.setup
-	$(ECHO) "INTEGRATED=$(INTEGRATED)" >> makefile.setup
 	$(ECHO) "BUILD=$(BUILD)" >> makefile.setup
 	$(ECHO) "PROCESSORS=$(PROCESSORS)" >> makefile.setup
 	$(ECHO) "TARGET=$(TARGET)" >> makefile.setup
 	$(ECHO) "SOURCE_DIR=$(SOURCE_DIR)" >> makefile.setup
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
-	$(ECHO) "LIBRARY_TYPE=$(LIBRARY_TYPE)" >> makefile.setup
-
