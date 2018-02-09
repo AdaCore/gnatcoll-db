@@ -26,10 +26,11 @@ with "gnatcoll";
 project GnatColl_Sqlite is
 
    Version := External ("GNATCOLL_VERSION", "0.0");
+   OS      := External ("OS", "unix");
    Name    := "gnatcoll_sqlite";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD");
+   Build : Build_Type := External ("BUILD", "PROD");
 
    type Library_Type_Type is ("relocatable", "static", "static-pic");
    Library_Type : Library_Type_Type := External ("LIBRARY_TYPE");
@@ -42,8 +43,6 @@ project GnatColl_Sqlite is
 
    for Languages use ("Ada", "C");
 
-   OS : gnatcoll.OS_Kind := gnatcoll.OS;
-
    Thread_Lib := ();
 
    case Library_Type is
@@ -54,7 +53,7 @@ project GnatColl_Sqlite is
    end case;
 
    case OS is
-      when "windows" =>
+      when "Windows_NT" =>
          null;
       when others =>
          Thread_Lib := ("-lpthread");
