@@ -72,6 +72,6 @@ project GNATCOLL_DB2Ada is
    end Ide;
 
    package Install is
-      for Artifacts ("share/gnatcoll/dborm.py") use ("dborm.py");
+      for Artifacts ("share/gnatcoll") use ("dborm.py");
    end Install;
 end GNATCOLL_DB2Ada;
