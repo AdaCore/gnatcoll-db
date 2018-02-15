@@ -74,6 +74,6 @@ project gnatcoll_sqlite2ada is
    end Ide;
 
    package Install is
-      for Artifacts ("share/gnatcoll/dborm.py") use ("dborm.py");
+      for Artifacts ("share/gnatcoll") use ("dborm.py");
    end Install;
 end gnatcoll_sqlite2ada;
