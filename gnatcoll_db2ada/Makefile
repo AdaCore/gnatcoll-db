@@ -136,4 +136,5 @@ setup:
 	$(ECHO) "TARGET=$(TARGET)" >> makefile.setup
 	$(ECHO) "SOURCE_DIR=$(SOURCE_DIR)" >> makefile.setup
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
+	$(ECHO) "DB_BACKEND=$(DB_BACKEND)" >> makefile.setup
 
