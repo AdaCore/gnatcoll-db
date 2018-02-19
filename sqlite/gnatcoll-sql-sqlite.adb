@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------
 --                               G N A T C O L L                     --
 --                                                                   --
---                 Copyright (C) 2009-2017, AdaCore                  --
+--                 Copyright (C) 2009-2018, AdaCore                  --
 --                                                                   --
 -- GPS is free  software;  you can redistribute it and/or modify  it --
 -- under the terms of the GNU General Public License as published by --
@@ -36,11 +36,6 @@ package body GNATCOLL.SQL.Sqlite is
      (Engine  : Sqlite_Engine;
       Options : Name_Values.Map;
       Errors  : access Error_Reporter'Class) return Database_Description;
-
-   DB_Engine : aliased Sqlite_Engine;
-
-   function Get_Database_Engine return Database_Engine_Access
-   is (DB_Engine'Access) with Export, External_Name => "db_engine";
 
    -----------
    -- Setup --

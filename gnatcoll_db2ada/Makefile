@@ -37,7 +37,8 @@
 #   BUILD         : DEBUG PROD
 #   PROCESSORS    : nb parallel compilations (0 to use all cores)
 #   TARGET        : target triplet for cross-compilation
-#   DB_BACKEND    : either db (no backend), sqlite, or postgres
+#   DB_BACKEND    : either db (no backend), sqlite, postgres or all
+#                   (all available backends)
 
 # helper programs
 CAT := cat

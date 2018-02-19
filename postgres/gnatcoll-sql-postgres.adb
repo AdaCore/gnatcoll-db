@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2017, AdaCore                     --
+--                     Copyright (C) 2005-2018, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -75,11 +75,6 @@ package body GNATCOLL.SQL.Postgres is
      (Engine  : Postgres_Engine;
       Options : Name_Values.Map;
       Errors  : access Error_Reporter'Class) return Database_Description;
-
-   PG_Engine : aliased Postgres_Engine;
-
-   function Get_Database_Engine return Database_Engine_Access
-   is (PG_Engine'Access) with Export, External_Name => "db_engine";
 
    ----------
    -- Free --
