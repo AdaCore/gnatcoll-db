@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                       Copyright (C) 2018, AdaCore                        --
+--                     Copyright (C) 2016-2018, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,61 +21,40 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "gnatcoll";
-with "gnatcoll_sql";
-with "gnatcoll_sqlite";
-with "gnatcoll_postgres";
+with Ada.Strings.Fixed;       use Ada.Strings.Fixed;
 
-project gnatcoll_all2ada is
+package body GNATCOLL.SQL_Fields is
 
-   Version := External ("GNATCOLL_VERSION", "0.0");
-   Name    := "gnatcoll_all2ada";
+   -----------------
+   -- Json_To_SQL --
+   -----------------
 
-   type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD", "PROD");
+   function Json_To_SQL
+     (Self : Formatter'Class; Value : String; Quote : Boolean) return String is
+   begin
+      if Trim (Value, Ada.Strings.Both) = "" then
+         return "null";
+         --  Json null, not to be confused with SQL NULL.
+      else
+         return String_Image (Self, Value, Quote);
+      end if;
+   end Json_To_SQL;
 
-   for Languages use ("Ada");
+   -----------------
+   -- XML_To_SQL --
+   -----------------
 
-   for Main use (Name);
-   for Object_Dir use "obj";
-   for Source_Dirs use (".");
+   function XML_To_SQL
+     (Self : Formatter'Class; Value : String; Quote : Boolean) return String
+   is
+      pragma Unreferenced (Self, Quote);
+   begin
+      if Trim (Value, Ada.Strings.Both) = "" then
+         return "<null/>";
+         --  XML null, not to be confused with SQL NULL.
+      else
+         return Value;
+      end if;
+   end XML_To_SQL;
 
-   package Compiler is
-      case Build is
-         when "DEBUG" =>
-            for Switches ("Ada") use
-              ("-g", "-O0", "-gnata", "-gnatVa", "-gnatQ", "-gnaty", "-gnateE",
-               "-gnatwaCJe", "-fstack-check");
-
-         when "PROD" =>
-            --  Do not use -gnatwe for production mode
-            for Switches ("Ada") use ("-O2", "-gnatn", "-gnatwaCJ");
-      end case;
-   end Compiler;
-
-   package Binder is
-      case Build is
-         when "DEBUG" =>
-            for Switches ("Ada") use ("-E");
-         when "PROD" =>
-            for Switches ("Ada") use ();
-      end case;
-   end Binder;
-
-   package Builder is
-      case Build is
-         when "DEBUG" =>
-            for Global_Configuration_Pragmas use "../gnat_debug.adc";
-         when "PROD" =>
-            null;
-      end case;
-   end Builder;
-
-   package Ide is
-      for VCS_Kind use "Git";
-   end Ide;
-
-   package Install is
-      for Artifacts ("share/gnatcoll") use ("dborm.py");
-   end Install;
-end gnatcoll_all2ada;
+end GNATCOLL.SQL_Fields;

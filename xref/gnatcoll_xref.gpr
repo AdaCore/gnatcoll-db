@@ -23,6 +23,7 @@
 
 with "gnatcoll";
 with "gnatcoll_iconv";
+with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 
 project GnatColl_Xref is

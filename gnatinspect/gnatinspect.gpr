@@ -23,6 +23,7 @@
 
 with "gnatcoll";
 with "gnatcoll_xref";
+with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 
 project Gnatinspect is
