@@ -67,7 +67,7 @@ ifeq ($(NORMALIZED_TARGET),)
 endif
 
 prefix := $(dir $(shell $(WHICH) gnatls))..
-GNATCOLL_VERSION := $(shell $(CAT) ../version_information)
+GNATCOLL_VERSION := $(shell $(CAT) $(SOURCE_DIR)/../version_information)
 
 BUILD         = PROD
 PROCESSORS    = 0
@@ -103,7 +103,7 @@ BUILDER=gprbuild -p -m $(GTARGET) $(RBD) -j$(PROCESSORS) $(GPR_VARS) \
 	$(GPRBUILD_OPTIONS)
 INSTALLER=gprinstall -p -f --target=$(TARGET) $(GPR_VARS) \
 	$(RBD) --sources-subdir=include/$(NAME) --prefix=$(prefix)$(integrated_install)
-CLEANER=gprclean -q $(RBD)
+CLEANER=gprclean -q $(RBD) $(GPR_VARS)
 UNINSTALLER=$(INSTALLER) -p -f --install-name=$(NAME) --uninstall
 
 #########
@@ -114,7 +114,7 @@ build: $(LIBRARY_TYPES:%=build-%)
 
 build-%:
 	$(BUILDER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
-		$(GPR_VARS) $(GNATCOLL_GPR)
+		$(GNATCOLL_GPR)
 
 ###########
 # Install #
@@ -129,7 +129,7 @@ install: uninstall $(LIBRARY_TYPES:%=install-%)
 
 install-%:
 	$(INSTALLER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
-		--build-name=$* --build-var=LIBRARY_TYPE $(GPR_VARS) $(GNATCOLL_GPR)
+		--build-name=$* --build-var=LIBRARY_TYPE $(GNATCOLL_GPR)
 
 ###########
 # Cleanup #
@@ -139,7 +139,7 @@ clean: $(LIBRARY_TYPES:%=clean-%)
 
 clean-%:
 	-$(CLEANER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
-		$(GPR_VARS) $(GNATCOLL_GPR)
+		$(GNATCOLL_GPR)
 
 #########
 # setup #
@@ -156,3 +156,4 @@ setup:
 	$(ECHO) "TARGET=$(TARGET)" >> makefile.setup
 	$(ECHO) "SOURCE_DIR=$(SOURCE_DIR)" >> makefile.setup
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
+
