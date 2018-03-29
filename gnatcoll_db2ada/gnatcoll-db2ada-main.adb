@@ -81,8 +81,6 @@ is
    use String_Lists;
 
    type Dumped_Enums is record
-      Table     : XString;
-      Id        : XString;
       Base_Type : XString;
       Type_Name : XString;
       Prefix    : XString;
@@ -634,8 +632,6 @@ is
       R    : GNATCOLL.SQL.Exec.Forward_Cursor;
 
    begin
-      Enum.Table  := To_XString (Table);
-      Enum.Id     := To_XString (Id);
       Enum.Prefix := To_XString (Prefix);
 
       if Base_Type = "" then
@@ -649,9 +645,8 @@ is
       if Name /=  "" then
          R.Fetch
            (DB,
-            "SELECT """ & Id
-            & """, """ & Name & """ FROM """
-            & Table & """ ORDER BY lower(" & Name & ")");
+            "SELECT """ & Id & """, """ & Name & """ FROM """ & Table
+            & """ ORDER BY lower(""" & Name & """)");
          while Has_Row (R) loop
             Append (Enum.Values, Value (R, 0));
             Append (Enum.Names,  Quote (Value (R, 1)));
