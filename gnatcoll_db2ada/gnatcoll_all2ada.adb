@@ -24,7 +24,7 @@
 with GNATCOLL.DB2Ada.Main;
 with GNATCOLL.SQL.Exec; use GNATCOLL.SQL.Exec;
 with GNATCOLL.SQL.Postgres;
-with GNATCOLL.SQL.SQLite;
+with GNATCOLL.SQL.Sqlite;
 
 procedure GNATCOLL_All2Ada is
 
@@ -64,6 +64,6 @@ procedure GNATCOLL_All2Ada is
    end Create_Description;
 
 begin
-   GNATCOLL.DB2ADA.Main
+   GNATCOLL.DB2Ada.Main
      ("postgresql",  Create_Description'Unrestricted_Access);
 end GNATCOLL_All2Ada;
