@@ -2519,9 +2519,9 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
 
                 if fields[1] == "FK:":
                     pairs = []
-                    to = fields[4].strip().split(" ")
+                    to = fields[4].strip().split()
 
-                    for index, f in enumerate(fields[3].split(" ")):
+                    for index, f in enumerate(fields[3].split()):
                         pairs.append((f, to[index]))
 
                     table.fk.append(
