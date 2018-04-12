@@ -34,6 +34,7 @@ with GNAT.Strings;                use GNAT.Strings;
 with GNATCOLL.Mmap;               use GNATCOLL.Mmap;
 with GNATCOLL.Traces;             use GNATCOLL.Traces;
 with GNATCOLL.VFS;                use GNATCOLL.VFS;
+with GNATCOLL.Utils;              use GNATCOLL.Utils;
 
 package body GNATCOLL.SQL.Inspect is
    Me : constant Trace_Handle := Create ("SQL.INSPECT");
@@ -133,6 +134,20 @@ package body GNATCOLL.SQL.Inspect is
       begin
          return Dummy;
       end Parameter_Type;
+
+      -----------------
+      -- Type_To_SQL --
+      -----------------
+
+      overriding function Type_To_SQL
+        (Self         : Simple_Field_Mapping;
+         Format       : access Formatter'Class := null;
+         For_Database : Boolean := True) return String
+      is
+         pragma Unreferenced (Self, Format);
+      begin
+         return (if For_Database then SQL_Type else Ada_Field_Mapping);
+      end Type_To_SQL;
 
    begin
       Register_Field_Mapping
@@ -700,6 +715,65 @@ package body GNATCOLL.SQL.Inspect is
 
       return False;
    end Type_From_SQL;
+
+   -----------------
+   -- Type_To_SQL --
+   -----------------
+
+   overriding function Type_To_SQL
+     (Self         : Field_Mapping_Text;
+      Format       : access Formatter'Class := null;
+      For_Database : Boolean := True) return String
+   is
+      pragma Unreferenced (Format);
+   begin
+      return (if not For_Database then "SQL_Field_Text"
+              elsif Self.Max_Length = Integer'Last then "Text"
+              else "Character(" & Image (Self.Max_Length, 1) & ')');
+   end Type_To_SQL;
+
+   -----------------
+   -- Type_To_SQL --
+   -----------------
+
+   overriding function Type_To_SQL
+     (Self         : Field_Mapping_Float;
+      Format       : access Formatter'Class := null;
+      For_Database : Boolean := True) return String
+   is
+      pragma Unreferenced (Self, Format);
+   begin
+      return (if For_Database then "Float" else "SQL_Field_Float");
+   end Type_To_SQL;
+
+   -----------------
+   -- Type_To_SQL --
+   -----------------
+
+   overriding function Type_To_SQL
+     (Self         : Field_Mapping_Integer;
+      Format       : access Formatter'Class := null;
+      For_Database : Boolean := True) return String
+   is
+      pragma Unreferenced (Self, Format);
+   begin
+      return (if For_Database then "Integer" else "SQL_Field_Integer");
+   end Type_To_SQL;
+
+   -----------------
+   -- Type_To_SQL --
+   -----------------
+
+   overriding function Type_To_SQL
+     (Self         : Field_Mapping_Timestamp;
+      Format       : access Formatter'Class := null;
+      For_Database : Boolean := True) return String
+   is
+      pragma Unreferenced (Self, Format);
+   begin
+      return (if For_Database then "timestamp with time zone"
+              else "SQL_Field_Time");
+   end Type_To_SQL;
 
    --------------
    -- From_SQL --

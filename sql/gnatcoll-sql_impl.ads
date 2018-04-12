@@ -103,7 +103,7 @@ package GNATCOLL.SQL_Impl is
    function Parameter_String
      (Self       : Formatter;
       Index      : Positive;
-      Type_Descr : String) return String is ("?");
+      Type_Descr : String) return String;
    --  Return the character to put before a parameter in a SQL statement, when
    --  the value will be substituted at run time.
    --  Typ describes the type of the parameter, and is returned by the
@@ -162,7 +162,7 @@ package GNATCOLL.SQL_Impl is
 
    function Internal_Image
       (Self   : SQL_Parameter_Type;
-       Format : Formatter'Class) return String is ("<none>");
+       Format : Formatter'Class) return String with Inline;
    --  Marshall the parameter to a string, to pass it to the DBMS.
    --  Use the formatter's primitives to encode basic types when possible.
 
@@ -228,8 +228,7 @@ package GNATCOLL.SQL_Impl is
       is (Format.Parameter_String (Index, "text"));
    overriding function Internal_Image
       (Self   : SQL_Parameter_Text;
-       Format : Formatter'Class) return String
-      is (To_String (Self));
+       Format : Formatter'Class) return String with Inline;
 
    type SQL_Parameter_Character is new SQL_Parameter_Type with record
       Char_Val   : Character;
@@ -241,8 +240,7 @@ package GNATCOLL.SQL_Impl is
       is (Format.Parameter_String (Index, "text"));
    overriding function Internal_Image
       (Self   : SQL_Parameter_Character;
-       Format : Formatter'Class) return String
-      is (String'(1 .. 1 => Self.Char_Val));
+       Format : Formatter'Class) return String with Inline;
 
    -------------------------------------
    -- General declarations for tables --

@@ -40,7 +40,6 @@ with Ada.Containers.Indefinite_Hashed_Sets;
 with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Hash_Case_Insensitive;
 with GNATCOLL.SQL.Exec;           use GNATCOLL.SQL.Exec;
-with GNATCOLL.Utils;              use GNATCOLL.Utils;
 with GNATCOLL.VFS;
 with GNATCOLL.Strings;            use GNATCOLL.Strings;
 with GNAT.Regexp;                 use GNAT.Regexp;
@@ -104,12 +103,7 @@ package GNATCOLL.SQL.Inspect is
    overriding function Type_To_SQL
      (Self         : Field_Mapping_Text;
       Format       : access Formatter'Class := null;
-      For_Database : Boolean := True) return String
-     is (if not For_Database
-         then "SQL_Field_Text"
-         elsif Self.Max_Length = Integer'Last
-         then "Text"
-         else "Character(" & Image (Self.Max_Length, 1) & ')');
+      For_Database : Boolean := True) return String with Inline;
    overriding function Type_From_SQL
      (Self : in out Field_Mapping_Text; Str : String) return Boolean;
    overriding function Parameter_Type
@@ -135,8 +129,7 @@ package GNATCOLL.SQL.Inspect is
       overriding function Type_To_SQL
         (Self         : Simple_Field_Mapping;
          Format       : access Formatter'Class := null;
-         For_Database : Boolean := True) return String
-        is (if For_Database then SQL_Type else Ada_Field_Mapping);
+         For_Database : Boolean := True) return String with Inline;
       overriding function Type_From_SQL
         (Self : in out Simple_Field_Mapping; Str : String) return Boolean
         is (Str = SQL_Type);
@@ -148,8 +141,7 @@ package GNATCOLL.SQL.Inspect is
    overriding function Type_To_SQL
      (Self         : Field_Mapping_Integer;
       Format       : access Formatter'Class := null;
-      For_Database : Boolean := True) return String
-     is (if For_Database then "Integer" else "SQL_Field_Integer");
+      For_Database : Boolean := True) return String with Inline;
    overriding function Type_From_SQL
      (Self : in out Field_Mapping_Integer; Str : String) return Boolean;
    overriding function Parameter_Type
@@ -176,11 +168,7 @@ package GNATCOLL.SQL.Inspect is
    overriding function Type_To_SQL
      (Self         : Field_Mapping_Timestamp;
       Format       : access Formatter'Class := null;
-      For_Database : Boolean := True)
-     return String
-     is (if For_Database
-         then "timestamp with time zone"
-         else "SQL_Field_Time");
+      For_Database : Boolean := True) return String with Inline;
    overriding function Type_From_SQL
      (Self : in out Field_Mapping_Timestamp; Str : String) return Boolean
      is (Str = "timestamp without time zone"
@@ -194,10 +182,7 @@ package GNATCOLL.SQL.Inspect is
    overriding function Type_To_SQL
      (Self         : Field_Mapping_Float;
       Format       : access Formatter'Class := null;
-      For_Database : Boolean := True) return String
-     is (if For_Database
-         then "Float"
-         else "SQL_Field_Float");
+      For_Database : Boolean := True) return String with Inline;
    overriding function Type_From_SQL
      (Self : in out Field_Mapping_Float; Str : String) return Boolean;
    overriding function Parameter_Type

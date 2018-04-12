@@ -1805,4 +1805,57 @@ package body GNATCOLL.SQL_Impl is
       Self.Free;
    end Free_Dispatch;
 
+   ----------------------
+   -- Parameter_String --
+   ----------------------
+
+   function Parameter_String
+     (Self       : Formatter;
+      Index      : Positive;
+      Type_Descr : String) return String
+   is
+      pragma Unreferenced (Self, Index, Type_Descr);
+   begin
+      return "?";
+   end Parameter_String;
+
+   --------------------
+   -- Internal_Image --
+   --------------------
+
+   function Internal_Image
+     (Self   : SQL_Parameter_Type;
+      Format : Formatter'Class) return String
+   is
+      pragma Unreferenced (Self, Format);
+   begin
+      return "<none>";
+   end Internal_Image;
+
+   --------------------
+   -- Internal_Image --
+   --------------------
+
+   overriding function Internal_Image
+     (Self   : SQL_Parameter_Text;
+      Format : Formatter'Class) return String
+   is
+      pragma Unreferenced (Format);
+   begin
+      return To_String (Self);
+   end Internal_Image;
+
+   --------------------
+   -- Internal_Image --
+   --------------------
+
+   overriding function Internal_Image
+      (Self   : SQL_Parameter_Character;
+       Format : Formatter'Class) return String
+   is
+      pragma Unreferenced (Format);
+   begin
+      return String'(1 .. 1 => Self.Char_Val);
+   end Internal_Image;
+
 end GNATCOLL.SQL_Impl;

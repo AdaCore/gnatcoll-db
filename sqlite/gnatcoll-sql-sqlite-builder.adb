@@ -68,8 +68,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
    overriding function Parameter_String
      (Self       : Sqlite_Connection_Record;
       Index      : Positive;
-      Type_Descr : String) return String
-     is ('?' & Image (Index, 0));
+      Type_Descr : String) return String with Inline;
    overriding procedure Close
      (Connection : access Sqlite_Connection_Record);
    overriding function Field_Type_Autoincrement
@@ -1101,6 +1100,20 @@ package body GNATCOLL.SQL.Sqlite.Builder is
          return Img;
       end if;
    end Money_Image;
+
+   ----------------------
+   -- Parameter_String --
+   ----------------------
+
+   overriding function Parameter_String
+     (Self       : Sqlite_Connection_Record;
+      Index      : Positive;
+      Type_Descr : String) return String
+   is
+      pragma Unreferenced (Self, Type_Descr);
+   begin
+      return '?' & Image (Index, 0);
+   end Parameter_String;
 
    ---------------------------------
    -- Can_Alter_Table_Constraints --
