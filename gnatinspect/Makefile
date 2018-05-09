@@ -135,3 +135,7 @@ setup:
 	$(ECHO) "TARGET=$(TARGET)" >> makefile.setup
 	$(ECHO) "SOURCE_DIR=$(SOURCE_DIR)" >> makefile.setup
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
+
+# Let gprbuild handle parallelisation. In general, we don't support parallel
+# runs in this Makefile, as concurrent gprinstall processes may crash.
+.NOTPARALLEL:

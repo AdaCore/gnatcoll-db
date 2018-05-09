@@ -165,3 +165,6 @@ setup:
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
 	$(ECHO) "GNATCOLL_HASPQPREPARE=$(GNATCOLL_HASPQPREPARE)" >> makefile.setup
 
+# Let gprbuild handle parallelisation. In general, we don't support parallel
+# runs in this Makefile, as concurrent gprinstall processes may crash.
+.NOTPARALLEL:
