@@ -153,6 +153,12 @@ package GNATCOLL.SQL is
    Empty_Table_List : constant SQL_Table_List;
    --  A list of tables, as used in a SELECT query ("a, b")
 
+   package Table_List is new Ada.Containers.Indefinite_Vectors
+     (Natural, SQL_Single_Table'Class);
+
+   function Get_Tables (List : SQL_Table_List) return Table_List.Vector;
+   --  Returns list of the tables
+
    type SQL_Table (Table_Name, Instance : GNATCOLL.SQL_Impl.Cst_String_Access;
                    Instance_Index : Integer)
       is abstract new SQL_Single_Table with private;
@@ -1005,9 +1011,6 @@ private
    -- Tables lists --
    ------------------
 
-   package Table_List is new Ada.Containers.Indefinite_Vectors
-     (Natural, SQL_Single_Table'Class);
-
    package Table_List_Pointers is
      new Refcount.Shared_Pointers (Table_List.Vector);
    --  Store the actual data for a SQL_Table_List in a different block (using
@@ -1029,6 +1032,9 @@ private
 
    Empty_Table_List : constant SQL_Table_List :=
      (SQL_Table_Or_List with Data => Table_List_Pointers.Null_Ref);
+
+   function Get_Tables (List : SQL_Table_List) return Table_List.Vector is
+     (if List.Data.Is_Null then Table_List.Empty_Vector else List.Data.Get);
 
    -----------
    -- Field --
