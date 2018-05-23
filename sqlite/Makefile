@@ -80,6 +80,7 @@ PROCESSORS    = 0
 BUILD_DIR     =
 ENABLE_SHARED := yes
 INTEGRATED    = no
+GPR_OPTIONS   =
 
 all: build
 
@@ -121,7 +122,7 @@ build: $(LIBRARY_TYPES:%=build-%)
 
 build-%:
 	$(BUILDER) -XLIBRARY_TYPE=$* -XXMLADA_BUILD=$* -XGPR_BUILD=$* \
-		$(GPR_VARS) $(GNATCOLL_GPR)
+		$(GPR_VARS) $(GNATCOLL_GPR) $(GPR_OPTIONS)
 
 ###########
 # Install #
