@@ -588,46 +588,6 @@ is
      (DB : access Database_Connection_Record'Class;
       Table, Id, Name, Prefix, Base_Type : String)
    is
-      function Quote (Str : String) return String;
-      --  Replace characters that are not acceptable in an Ada
-      --  identifier
-
-      -----------
-      -- Quote --
-      -----------
-
-      function Quote (Str : String) return String is
-         S : XString;
-      begin
-         for C in Str'Range loop
-            if not Is_Alphanumeric (Str (C)) then
-               --  Some special cases to try and keep meaningful
-               --  identifiers.
-
-               if Str (C) = '+' then
-                  Append (S, "plus");
-               elsif Str (C) = '?' then
-                  Append (S, "question");
-               else
-                  Append (S, '_');
-               end if;
-            else
-               Append (S, Str (C));
-            end if;
-         end loop;
-
-         declare
-            S2 : constant String := To_String (S);
-         begin
-            for C in reverse S2'Range loop
-               if S2 (C) /= '_' then
-                  return S2 (S2'First .. C);
-               end if;
-            end loop;
-            return "";
-         end;
-      end Quote;
-
       Enum : Dumped_Enums;
       R    : GNATCOLL.SQL.Exec.Forward_Cursor;
 
@@ -649,7 +609,7 @@ is
             & """ ORDER BY lower(""" & Name & """)");
          while Has_Row (R) loop
             Append (Enum.Values, Value (R, 0));
-            Append (Enum.Names,  Quote (Value (R, 1)));
+            Append (Enum.Names,  Value (R, 1));
             Next (R);
          end loop;
       end if;

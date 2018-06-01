@@ -644,11 +644,51 @@ begin
 
    if Output (Output_Ada_Enums) then
       declare
-         C      : Enumeration_Lists.Cursor := First (Enumerations);
-         Enum   : Dumped_Enums;
-         C2, C3 : String_Lists.Cursor;
+         C          : Enumeration_Lists.Cursor := First (Enumerations);
+         Enum       : Dumped_Enums;
+         C2, C3, C4 : String_Lists.Cursor;
 
          Max_Name_Len, Max_Value_Len : Integer;
+
+         function Quote (Str : String) return String;
+         --  Replace characters that are not acceptable in an Ada
+         --  identifier
+
+         -----------
+         -- Quote --
+         -----------
+
+         function Quote (Str : String) return String is
+            S : XString;
+         begin
+            for C in Str'Range loop
+               if not Is_Alphanumeric (Str (C)) then
+                  --  Some special cases to try and keep meaningful
+                  --  identifiers.
+
+                  if Str (C) = '+' then
+                     Append (S, "plus");
+                  elsif Str (C) = '?' then
+                     Append (S, "question");
+                  else
+                     Append (S, '_');
+                  end if;
+               else
+                  Append (S, Str (C));
+               end if;
+            end loop;
+
+            declare
+               S2 : constant String := To_String (S);
+            begin
+               for C in reverse S2'Range loop
+                  if S2 (C) /= '_' then
+                     return S2 (S2'First .. C);
+                  end if;
+               end loop;
+               return "";
+            end;
+         end Quote;
 
       begin
          while Has_Element (C) loop
@@ -661,6 +701,9 @@ begin
                  Capitalize (Enum.Base_Type);
                Is_String : constant Boolean :=
                  Base_Type = "String";
+
+               Quoted_Names : String_Lists.List;
+
             begin
                New_Line (Spec_File);
                Put_Line (Spec_File, "   subtype " & Type_Name
@@ -668,9 +711,14 @@ begin
 
                Max_Name_Len  := 0;
                for N of Enum.Names loop
-                  if N'Length > Max_Name_Len then
-                     Max_Name_Len := N'Length;
-                  end if;
+                  declare
+                     QN : constant String := Quote (N);
+                  begin
+                     Quoted_Names.Append (QN);
+                     if QN'Length > Max_Name_Len then
+                        Max_Name_Len := QN'Length;
+                     end if;
+                  end;
                end loop;
 
                Max_Value_Len := 6; --  "others"
@@ -680,7 +728,7 @@ begin
                   end if;
                end loop;
 
-               C2 := First (Enum.Names);
+               C2 := First (Quoted_Names);
                C3 := First (Enum.Values);
                while Has_Element (C2) loop
                   Put_Line (Spec_File,
@@ -707,14 +755,16 @@ begin
                      & Capitalize (Enum.Type_Name) & ") return String");
                   Put_Line (Spec_File, "   is (case X is");
 
-                  C2 := First (Enum.Names);
+                  C2 := First (Quoted_Names);
                   C3 := First (Enum.Values);
+                  C4 := First (Enum.Names);
                   while Has_Element (C2) loop
                      Put_Line (Spec_File,
                        "          when " & Head (Element (C3), Max_Value_Len)
-                       & " => """ & Element (C2) & """,");
+                       & " => """ & Element (C4) & """,");
                      Next (C2);
                      Next (C3);
+                     Next (C4);
                   end loop;
                   Put_Line (Spec_File,
                     "          when others =>");
