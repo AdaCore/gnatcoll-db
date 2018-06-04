@@ -260,6 +260,15 @@ package body GNATCOLL.SQL_Impl is
       return List.List.Is_Empty;
    end Is_Empty;
 
+   ------------
+   -- Length --
+   ------------
+
+   function Length (List : SQL_Field_List) return Natural is
+   begin
+      return Natural (List.List.Length);
+   end Length;
+
    ---------------
    -- To_String --
    ---------------

@@ -319,6 +319,10 @@ package GNATCOLL.SQL_Impl is
    --  A list of fields, as used in a SELECT query ("field1, field2");
 
    function Is_Empty (List : SQL_Field_List) return Boolean;
+   --  Returns true when field list is empty
+
+   function Length (List : SQL_Field_List) return Natural;
+   --  Returns number of elements in field list
 
    overriding function To_String
      (Self   : SQL_Field_List;
