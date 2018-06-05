@@ -82,6 +82,18 @@ package body Test_Assert is
    ------------
 
    procedure Assert
+      (Left, Right : Integer;
+       Msg         : String := "";
+       Location    : String := SI.Source_Location) is
+   begin
+      Assert (Left'Img, Right'Img, Msg, Location);
+   end Assert;
+
+   ------------
+   -- Assert --
+   ------------
+
+   procedure Assert
       (Left, Right : VFS.Virtual_File;
        Msg         : String := "";
        Location    : String := SI.Source_Location)

@@ -49,6 +49,11 @@ package Test_Assert is
    --  the test status is FAILED and Final_Status set to 1.
 
    procedure Assert
+      (Left, Right : Integer;
+       Msg         : String := "";
+       Location    : String := SI.Source_Location);
+
+   procedure Assert
       (Left, Right : VFS.Virtual_File;
        Msg         : String := "";
        Location    : String := SI.Source_Location);
