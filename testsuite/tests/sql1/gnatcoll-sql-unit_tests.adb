@@ -188,6 +188,17 @@ package body GNATCOLL.SQL.Unit_Tests is
         "COALESCE (action_item.who_done || ' done'," &
         " action_item.date_done)",
         "Nesting coalesce in concat");
+
+      declare
+         Fields : SQL_Field_List;
+      begin
+         Assert (Fields.Is_Empty, "Field list Is_Empty");
+         Assert (Fields.Length, 0, "Field list zero length");
+         Fields := +Action_Item.Who_Done;
+         Assert (Fields.Length, 1, "Field list length 1");
+         Fields.Append (Action_Item.Date_Done);
+         Assert (Fields.Length, 2, "Field list length 2");
+      end;
    end Do_Fields;
 
    -----------------
