@@ -172,10 +172,10 @@ class Pretty_Printer(object):
         self.private_after = ""        # Private part of the spec
         self.body_code = ""    # Goes in body before subprograms
         self.sections = []  # Sections in the specs. Contains tuples:
-                            #    0 => section name
-                            #    1 => types declaration for the section
-                            #    2 => list of subprograms:
-                            #     (name, params, body, returns, comment)
+        #                     0 => section name
+        #                     1 => types declaration for the section
+        #                     2 => list of subprograms:
+        #                          (name, params, body, returns, comment)
         self.sections.append(("", "", [], ""))  # Default subprograms
 
     def add_with(self, pkg, specs=True, do_use=True):
@@ -290,29 +290,30 @@ class Pretty_Printer(object):
     def _output_withs(self, list):
         if list:
             self.out.write("pragma Warnings (Off);\n")
-            l = max_length(list)
+            ml = max_length(list)
             for w, do_use in sorted(list):
                 if do_use:
-                    self.out.write("with %-*s use %s;\n" % (l + 1, w + ";", w))
+                    self.out.write(
+                        "with %-*s use %s;\n" % (ml + 1, w + ";", w))
                 else:
-                    self.out.write("with %-*s;\n" % (l, w))
+                    self.out.write("with %-*s;\n" % (ml, w))
             self.out.write("pragma Warnings (On);\n")
 
     def _format_decl(self, list):
         """List has the same format as params and local_vars for a subprogram
         """
-        l = max_length([p[0] for p in list])
+        ml = max_length([p[0] for p in list])
         result = []
         for p in list:
             if len(p) == 3:
                 name, type, default = p
                 result.append(
                     "%-*s : %s := %s"
-                    % (l, self._title(name), self._title(type), default))
+                    % (ml, self._title(name), self._title(type), default))
             elif len(p) == 2:
                 name, type = p
                 result.append(
-                    "%-*s : %s" % (l, self._title(name), self._title(type)))
+                    "%-*s : %s" % (ml, self._title(name), self._title(type)))
             else:
                 result.append(p[0])
 
@@ -418,21 +419,21 @@ class Pretty_Printer(object):
 
         parent_count = 0
 
-        for l in body.splitlines():
-            l = l.strip()
-            if l.startswith("end") \
-               or l.startswith("elsif")  \
-               or l.startswith("else")  \
-               or l.startswith("exception")  \
-               or l.startswith("begin"):
+        for ln in body.splitlines():
+            ln = ln.strip()
+            if ln.startswith("end") \
+               or ln.startswith("elsif")  \
+               or ln.startswith("else")  \
+               or ln.startswith("exception")  \
+               or ln.startswith("begin"):
                 indent -= 3
 
             old_parent = parent_count
-            parent_count = parent_count + l.count("(") - l.count(")")
+            parent_count = parent_count + ln.count("(") - ln.count(")")
 
-            if not l:
+            if not ln:
                 pass
-            elif l[0] == '(':
+            elif ln[0] == '(':
                 self.out.write(" " * (indent + 2))
                 if parent_count > old_parent:
                     indent += (parent_count - old_parent) * 3
@@ -448,15 +449,15 @@ class Pretty_Printer(object):
             if old_parent > parent_count:
                 indent -= (old_parent - parent_count) * 3
 
-            self.out.write(l)
+            self.out.write(ln)
             self.out.write("\n")
 
-            if ((l.endswith("then") and not l.endswith("and then"))
-               or l.endswith("loop")
-               or(l.endswith("else") and not l.endswith("or else"))
-               or l.endswith("begin")
-               or l.endswith("exception")
-               or l.endswith("declare")):
+            if ((ln.endswith("then") and not ln.endswith("and then"))
+               or ln.endswith("loop")
+               or(ln.endswith("else") and not ln.endswith("or else"))
+               or ln.endswith("begin")
+               or ln.endswith("exception")
+               or ln.endswith("declare")):
                 indent += 3
 
     def _output_subprogram_bodies(self):
@@ -739,18 +740,18 @@ class Schema(object):
         """List of Unchecked_Free instantiations needed for TABLE"""
 
         d = self.details[table]
-        l = set()
+        ml = set()
 
         for f in d.fk:
             if f.show():
-                l.add(
+                ml.add(
                     ("procedure Unchecked_Free is "
                      + "new Ada.Unchecked_Deallocation\n"
                      + "     (Detached_%(row)s'Class, Detached_%(row)s_Access)"
                         % {"row": f.foreign.row}, ))
 
         # The call to set() is to uniquify the elements in the list
-        return list(l)
+        return list(ml)
 
     ###############
     # free_fields
@@ -1126,13 +1127,13 @@ with this primary key. If not, the returned value will be a null element
   %(tests)s %(aggregate)s
   %(traces)sSession.Persist (Result);
   return Result;
- """ % {
-     "cap":       table.name,
-     "tests":     tests,
-     "row":       translate["row"],
-     "field_count": translate["field_count"],
-     "traces":    debug_msg(table, "Creating", "Result.all"),
-     "aggregate": "\n            ".join(sorted(aggregate))})
+""" % {
+            "cap":       table.name,
+            "tests":     tests,
+            "row":       translate["row"],
+            "field_count": translate["field_count"],
+            "traces":    debug_msg(table, "Creating", "Result.all"),
+            "aggregate": "\n            ".join(sorted(aggregate))})
 
 
 ##########################
@@ -1189,6 +1190,7 @@ def order_sections(schema, pretty, all_tables):
     # types.
 
     pretty.add_section("Managers", "")
+
 
 #########################
 # debug trace
@@ -1476,7 +1478,7 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                            %(self_check)s
                            declare
                               D2 : constant %(fkrow)s_Data :=
-                                 %(fkrow)s_data (D.ORM_FK_%(name)s.Unchecked_Get);
+                              %(fkrow)s_data (D.ORM_FK_%(name)s.Unchecked_Get);
                            begin
                               if D2.ORM_%(fk)s = %(default)s then
                                  Self.Session.Insert_Or_Update
@@ -2119,7 +2121,7 @@ class Field_Type(object):
 
         try:
             return Field_Type.__all_types[sql]
-        except:
+        except Exception:
             sys.stderr.write("Unsupported SQL type: %s\n" % sql)
             raise
 
@@ -2519,9 +2521,9 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
 
                 if fields[1] == "FK:":
                     pairs = []
-                    to = fields[4].strip().split(" ")
+                    to = fields[4].strip().split()
 
-                    for index, f in enumerate(fields[3].split(" ")):
+                    for index, f in enumerate(fields[3].split()):
                         pairs.append((f, to[index]))
 
                     table.fk.append(
