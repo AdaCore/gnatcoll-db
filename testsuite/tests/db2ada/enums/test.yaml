@@ -1,0 +1,5 @@
+description: Do not quote original names in enum image function
+sqlite_db: "db.sql"
+db2ada: ["-enum", "colors,value,name,Color,Integer",
+         "-enum-image", "-api-enums", "colorspkg"]
+driver: db2ada

@@ -22,10 +22,15 @@ class DB2AdaTestDriver(TestDriver):
     Example of test.yaml:
 
         description: SQL test 1
+        sqlite_db: db.sql
         db2ada:
           - "-api=DB"
           - "-dbmodel=descr.txt"
         driver: db2ada
+
+    if sqlite_db is set then a sql file is loaded into a sqlite database and
+    then gnatcoll_sqlite2ada is used instead of gnatcoll_db2ada with the
+    resulting database (no need to specify -dbname in the db2ada arguments)
     """
 
     def add_test(self, dag):
@@ -49,6 +54,19 @@ class DB2AdaTestDriver(TestDriver):
         """Run db2ada."""
         mkdir(self.test_env['working_dir'])
         db2ada_args = []
+        db2ada = 'gnatcoll_db2ada'
+
+        # If necessary initialize an sqlite database
+        if 'sqlite_db' in self.test_env:
+            check_call(self,
+                       ['sqlite3', 'db.db', '-cmd',
+                        ".read %s" % os.path.join(self.test_env['test_dir'],
+                                                  self.test_env['sqlite_db'])],
+                       input="|")
+            db2ada = 'gnatcoll_sqlite2ada'
+            db2ada_args.append(
+                '-dbname=%s' % os.path.join(self.test_env['working_dir'],
+                                            'db.db'))
 
         # Compute db2ada arguments
         for value in self.test_env.get('db2ada', []):
@@ -59,7 +77,7 @@ class DB2AdaTestDriver(TestDriver):
             else:
                 db2ada_args.append(value)
 
-        check_call(self, ['gnatcoll_db2ada'] + db2ada_args)
+        check_call(self, [db2ada] + db2ada_args)
 
     def build(self, previous_values):
         """Build fragment."""

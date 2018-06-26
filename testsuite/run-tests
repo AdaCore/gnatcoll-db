@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-from drivers import make_gnatcoll_for_gcov, TESTSUITE_ROOT_DIR, COMPONENTS
+from drivers import (make_gnatcoll_for_gcov,
+                     TESTSUITE_ROOT_DIR, COMPONENTS,
+                     COMPONENT_PROPERTIES, get_components_closure)
 from drivers.basic import BasicTestDriver
 from drivers.db2ada import DB2AdaTestDriver
 from e3.testsuite import Testsuite
@@ -25,14 +27,17 @@ class MyTestsuite(Testsuite):
             action="store_true")
         self.main.argument_parser.add_argument(
             '--components',
-            help="list of component to test",
+            help="list of component to test in %s (default: %s)"
+            % (",".join(COMPONENT_PROPERTIES.keys()),
+               ",".join(COMPONENTS)),
             default=','.join(COMPONENTS))
 
     def tear_up(self):
         logging.info('running testsuite for components: %s' %
                      self.main.args.components)
         self.env.gcov = self.main.args.gcov
-        self.env.components = self.main.args.components.split(',')
+        self.env.components = get_components_closure(
+            self.main.args.components.split(','))
         self.env.enable_cleanup = self.main.args.enable_cleanup
         if self.main.args.gcov:
             work_dir = os.path.join(TESTSUITE_ROOT_DIR, 'gcov')
