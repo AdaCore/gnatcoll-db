@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                                  G P S                                   --
 --                                                                          --
---                     Copyright (C) 2011-2017, AdaCore                     --
+--                     Copyright (C) 2011-2018, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -4258,6 +4258,33 @@ package body GNATCOLL.Xref is
       R          : Forward_Cursor;
       Current_DB : Virtual_File;
       Success    : Boolean;
+
+      procedure Recreate;
+      --  Recreates the database
+
+      --------------
+      -- Recreate --
+      --------------
+
+      procedure Recreate is
+      begin
+         if not Delete_If_Mismatch then
+            return;
+         end if;
+
+         Trace (Me_Error, "Recreate the database file");
+
+         Self.DB.Close;
+         Current_DB.Delete (Success);
+         Free (Error);
+         if not Success then
+            Error := new String'("Database cannot be recreated");
+         else
+            Self.DB := DB.Build_Connection;
+            Create_Database (Self.DB);
+         end if;
+      end Recreate;
+
    begin
       Error := null;
 
@@ -4268,44 +4295,34 @@ package body GNATCOLL.Xref is
 
       Current_DB := Create (+SQL.Sqlite.DB_Name (Self.DB));
 
-      if SQL.Sqlite.Is_Sqlite (Self.DB)
-        and then Current_DB.Is_Regular_File
+      if Current_DB.Is_Regular_File
+        and then SQL.Sqlite.Is_Sqlite (Self.DB)
       then
          R.Fetch (Self.DB, "PRAGMA user_version;");
 
-         if not Self.DB.Success
-            or else
-            (R.Integer_Value (0) /= Schema_Version
+         if not Self.DB.Success then
+            Trace (Me_Error, "database seems to be corrupted");
+            Error := new String'("Database seems to be corrupted");
+            Recreate;
 
-             --  0 means "no schema created"
-             and then R.Integer_Value (0) /= 0)
-         then
-            if not Self.DB.Success then
-               Trace (Me_Error, "database seems to be corrupted");
-            else
-               Trace (Me_Error, "Version mismatch : "
-                      & R.Value (0) & " /=" & Schema_Version'Img);
-            end if;
+         elsif R.Integer_Value (0) = 0 then
+            Trace (Me_Error, "Schema is not created");
+            Create_Database (Self.DB);
 
+         elsif R.Integer_Value (0) /= Schema_Version then
+            Trace (Me_Error, "Version mismatch : "
+                   & R.Value (0) & " /=" & Schema_Version'Img);
             Error := new String'
               ("Database schema version is "
                & R.Value (0) & ", expecting" & Schema_Version'Img);
 
-            if Delete_If_Mismatch then
-               Self.DB.Close;
-               Current_DB.Delete (Success);
-               if not Success then
-                  Free (Error);
-                  Error := new String'
-                    ("Database schema version is "
-                     & R.Value (0) & ", expecting"
-                     & Schema_Version'Img
-                     & " and could not delete the database");
-               else
-                  Self.DB := DB.Build_Connection;
-               end if;
-            end if;
+            Recreate;
          end if;
+
+      else
+         Trace (Me_Error, "The database file is incorrect");
+         Error := new String'("The database file is incorrect");
+         Recreate;
       end if;
 
       Self.DB.Execute ("PRAGMA mmap_size=268435456;");
