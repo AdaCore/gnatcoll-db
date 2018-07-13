@@ -4295,41 +4295,46 @@ package body GNATCOLL.Xref is
 
       Current_DB := Create (+SQL.Sqlite.DB_Name (Self.DB));
 
-      if Current_DB.Is_Regular_File
-        and then SQL.Sqlite.Is_Sqlite (Self.DB)
-      then
-         R.Fetch (Self.DB, "PRAGMA user_version;");
-
-         if not Self.DB.Success then
-            Trace (Me_Error, "database seems to be corrupted");
-            Error := new String'("Database seems to be corrupted");
-            Recreate;
-
-         elsif R.Integer_Value (0) = 0 then
-            Trace (Me_Error, "Schema is not created");
+      if SQL.Sqlite.Is_Sqlite (Self.DB) then
+         if SQL.Sqlite.DB_Name (Self.DB) = ":memory:" then
+            Trace (Me_Debug, "Use in memory database");
             Create_Database (Self.DB);
 
-         elsif R.Integer_Value (0) /= Schema_Version then
-            Trace (Me_Error, "Version mismatch : "
-                   & R.Value (0) & " /=" & Schema_Version'Img);
-            Error := new String'
-              ("Database schema version is "
-               & R.Value (0) & ", expecting" & Schema_Version'Img);
+         elsif not Current_DB.Is_Regular_File then
+            Trace (Me_Debug, "Database file is not exists");
+            Create_Database (Self.DB);
 
-            Recreate;
+         else
+            R.Fetch (Self.DB, "PRAGMA user_version;");
+
+            if not Self.DB.Success then
+               Trace (Me_Error, "database seems to be corrupted");
+               Error := new String'("Database seems to be corrupted");
+               Recreate;
+
+            elsif R.Integer_Value (0) = 0 then
+               Trace (Me_Error, "Schema is not created");
+               Create_Database (Self.DB);
+
+            elsif R.Integer_Value (0) /= Schema_Version then
+               Trace (Me_Error, "Version mismatch : "
+                      & R.Value (0) & " /=" & Schema_Version'Img);
+               Error := new String'
+                 ("Database schema version is "
+                  & R.Value (0) & ", expecting" & Schema_Version'Img);
+
+               Recreate;
+            end if;
          end if;
 
       else
-         Trace (Me_Error, "The database file is incorrect");
-         Error := new String'("The database file is incorrect");
-         Recreate;
+         Trace (Me_Error, "Database engine is not supported");
+         Error := new String'("Database engine is not supported");
+
+         return;
       end if;
 
       Self.DB.Execute ("PRAGMA mmap_size=268435456;");
-
-      if SQL.Sqlite.DB_Name (Self.DB) = ":memory:" then
-         Create_Database (Self.DB);
-      end if;
 
       --  Do not use automatic transactions, to avoid being stuck with an
       --  unfinished BEGIN, which would lock the database and prevents
