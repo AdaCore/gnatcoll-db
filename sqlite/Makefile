@@ -71,6 +71,8 @@ ifeq ($(NORMALIZED_TARGET),)
   $(error No toolchain found for target "$(TARGET)")
 endif
 
+GNATCOLL_OS := $(if $(findstring darwin,$(NORMALIZED_TARGET)),osx,$(if $(findstring windows,$(NORMALIZED_TARGET)),windows,unix))
+
 prefix := $(dir $(shell $(WHICH) gnatls))..
 GNATCOLL_VERSION := $(shell $(CAT) $(SOURCE_DIR)/../version_information)
 GNATCOLL_SQLITE := embedded
@@ -102,6 +104,7 @@ endif
 GPR_VARS= \
 	 -XGNATCOLL_SQLITE=$(GNATCOLL_SQLITE) \
 	 -XGNATCOLL_VERSION=$(GNATCOLL_VERSION) \
+	 -XGNATCOLL_OS=$(GNATCOLL_OS) \
 	 -XBUILD=$(BUILD)
 
 # Used to pass extra options to GPRBUILD, like -d for instance
@@ -162,6 +165,7 @@ setup:
 	$(ECHO) "BUILD=$(BUILD)" >> makefile.setup
 	$(ECHO) "PROCESSORS=$(PROCESSORS)" >> makefile.setup
 	$(ECHO) "TARGET=$(TARGET)" >> makefile.setup
+	$(ECHO) "GNATCOLL_OS=$(GNATCOLL_OS)" >> makefile.setup
 	$(ECHO) "SOURCE_DIR=$(SOURCE_DIR)" >> makefile.setup
 	$(ECHO) "GNATCOLL_VERSION=$(GNATCOLL_VERSION)" >> makefile.setup
 	$(ECHO) "GNATCOLL_SQLITE=$(GNATCOLL_SQLITE)" >> makefile.setup
