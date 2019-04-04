@@ -62,10 +62,6 @@ else
 endif
 
 TARGET := $(shell gcc -dumpmachine)
-NORMALIZED_TARGET := $(subst normalized_target:,,$(wordlist 6,6,$(shell gprconfig  --config=ada --target=$(TARGET) --mi-show-compilers)))
-ifeq ($(NORMALIZED_TARGET),)
-  $(error No toolchain found for target "$(TARGET)")
-endif
 
 prefix := $(dir $(shell $(WHICH) gnatls))..
 GNATCOLL_VERSION := $(shell $(CAT) $(SOURCE_DIR)/../version_information)
@@ -78,6 +74,11 @@ all: build
 
 # Load current setup if any
 -include makefile.setup
+
+NORMALIZED_TARGET := $(subst normalized_target:,,$(wordlist 6,6,$(shell gprconfig  --config=ada --target=$(TARGET) --mi-show-compilers)))
+ifeq ($(NORMALIZED_TARGET),)
+  $(error No toolchain found for target "$(TARGET)")
+endif
 
 GTARGET=--target=$(NORMALIZED_TARGET)
 
