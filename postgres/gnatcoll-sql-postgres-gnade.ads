@@ -3,7 +3,7 @@
 --                      GNADE  : GNu Ada Database Environment                --
 --                                                                           --
 --  Copyright (C) 2000-2003, Juergen Pfeifer <juergen.pfeifer@gmx.net>       --
---  Copyright (C) 2004-2017, AdaCore                                         --
+--  Copyright (C) 2004-2019, AdaCore                                         --
 --                                                                           --
 --  GNADE is free software;  you can redistribute it  and/or modify it under --
 --  terms of the  GNU General Public License as published  by the Free Soft- --
@@ -12,9 +12,8 @@
 --  OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
 --  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 --  for  more details.  You should have  received  a copy of the GNU General --
---  Public License  distributed with GNAT;  see file COPYING.  If not, write --
---  to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
---  MA 02111-1307, USA.                                                      --
+--  Public License along with this program;  see file COPYING. If not, see   --
+-- <http://www.gnu.org/licenses/>.                                           --
 --                                                                           --
 --  As a special exception,  if other files  instantiate  generics from this --
 --  unit, or you link  this unit with other files  to produce an executable, --
