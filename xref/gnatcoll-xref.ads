@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                                  G P S                                   --
 --                                                                          --
---                     Copyright (C) 2011-2017, AdaCore                     --
+--                     Copyright (C) 2011-2019, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -38,7 +38,7 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Unbounded;       use Ada.Strings.Unbounded;
 
-with GNAT.Regpat;       use GNAT.Regpat;
+with GNAT.Expect;
 with GNAT.Strings;      use GNAT.Strings;
 
 with GNATCOLL.Iconv;    use GNATCOLL.Iconv;
@@ -425,7 +425,7 @@ package GNATCOLL.Xref is
       --  How comments start. These comments end on the next newline
       --  character. If null, use New_Line_Comment_Start_Regexp instead.
 
-      New_Line_Comment_Start_Regexp : access GNAT.Regpat.Pattern_Matcher;
+      New_Line_Comment_Start_Regexp : GNAT.Expect.Pattern_Matcher_Access;
       --  How comments start. These comments end on the next newline
       --  character. If null, use New_Line_Comment_Start instead.
    end record;

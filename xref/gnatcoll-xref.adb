@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                                  G P S                                   --
 --                                                                          --
---                     Copyright (C) 2011-2018, AdaCore                     --
+--                     Copyright (C) 2011-2019, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -26,6 +26,7 @@ with Ada.Strings.Maps;
 with Ada.Unchecked_Deallocation;
 
 with GNAT.Calendar.Time_IO;   use GNAT.Calendar.Time_IO;
+with GNAT.Regpat;
 with GNAT.OS_Lib;
 
 with GNATCOLL.Xref.Database;  use GNATCOLL.Xref.Database;
@@ -6524,7 +6525,10 @@ package body GNATCOLL.Xref is
    function Looking_At_Start_Of_Comment
      (Context : Language_Syntax;
       Buffer  : String;
-      Index   : Natural) return Comment_Type is
+      Index   : Natural) return Comment_Type
+   is
+      use type GNAT.Expect.Pattern_Matcher_Access;
+
    begin
       if Context.New_Line_Comment_Start /= null
         and then Index + Context.New_Line_Comment_Start'Length <= Buffer'Last
@@ -6536,8 +6540,8 @@ package body GNATCOLL.Xref is
       end if;
 
       if Context.New_Line_Comment_Start_Regexp /= null
-        and then Match (Context.New_Line_Comment_Start_Regexp.all,
-                        Buffer, Data_First => Index)
+        and then GNAT.Regpat.Match (Context.New_Line_Comment_Start_Regexp.all,
+                                    Buffer, Data_First => Index)
       then
          return Comment_Single_Line;
       end if;
