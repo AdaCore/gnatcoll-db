@@ -2024,7 +2024,7 @@ def create_orm(setup, pkg_name, indir, tables=[], omit=[]):
                      omit=omit,  # omit circular deps
                      out=out)
         out.close()
-        exec_or_fail(["gnatchop", "-q", "-w", "-gnat05", "tmp_orm"])
+        exec_or_fail(["gnatchop", "-q", "-w", "tmp_orm"])
 
     except Cannot_Parse_Schema:
         return 1
