@@ -68,6 +68,15 @@ package body GNATCOLL.SQL.Exec is
    --  Return the display for Query (or Prepared, if specified).
    --  This is for debug purposes only.
 
+   function Prepared_Statement_Name
+     (Name : String; Cache : Cache_Id) return XString
+   is
+     (To_XString
+        (if Name = "" then "stmt" & Image (Natural (Cache), 0)
+         else Name));
+   --  Create prepared statement name either from Name parameter or from
+   --  Cache_Id if Name is empty.
+
    procedure Execute_And_Log
      (Result     : in out Forward_Cursor'Class;
       Connection : access Database_Connection_Record'Class;
@@ -268,7 +277,7 @@ package body GNATCOLL.SQL.Exec is
       procedure Set_Id (Stmt : Prepared_Statement'Class) is
       begin
          if not Stmt.Is_Null
-            and then Stmt.Get.Cached_Result = No_Cache_Id
+           and then Stmt.Get.Cached_Result = No_Cache_Id
          then
             Stmt.Get.Cached_Result := Current_Cache_Id;
             Current_Cache_Id := Current_Cache_Id + 1;
@@ -1611,35 +1620,28 @@ package body GNATCOLL.SQL.Exec is
       Name          : String := "") return Prepared_Statement
    is
       Stmt : Prepared_Statement;
-      Data : Prepared_Statement_Data;
-      Ptr  : access Prepared_Statement_Data;
+      Ptr  : Prepared_Statements.Element_Access;
    begin
-      Data := Prepared_Statement_Data'
-        (Query         => Query,
-         Query_Str     => null,   --  Computed later
-         Is_Select     => False,  --  Computed later
-         Use_Cache     => Use_Cache,
-         Cached_Result => No_Cache_Id,
-         Index_By      => Index_By,
-         On_Server     => On_Server,
-         Name          => Null_XString,
-         Prepared      => null);
-
-      if Auto_Complete then
-         GNATCOLL.SQL.Auto_Complete (Data.Query);
-      end if;
-
-      Stmt.Set (Data);
+      Stmt.Set
+        (Prepared_Statement_Data'
+           (Query         => Query,
+            Query_Str     => null,  -- Computed later
+            Is_Select     => False, -- Computed later
+            Use_Cache     => Use_Cache,
+            Cached_Result => No_Cache_Id,
+            Index_By      => Index_By,
+            On_Server     => On_Server,
+            Name          => Null_XString,
+            Prepared      => null));
 
       Query_Cache.Set_Id (Stmt);
 
       Ptr := Stmt.Unchecked_Get;
 
-      if Name = "" then
-         Ptr.Name := To_XString
-           ("stmt" & Image (Integer (Ptr.Cached_Result), 0));
-      else
-         Ptr.Name := To_XString (Name);
+      Ptr.Name := Prepared_Statement_Name (Name, Ptr.Cached_Result);
+
+      if Auto_Complete then
+         GNATCOLL.SQL.Auto_Complete (Ptr.Query);
       end if;
 
       return Stmt;
@@ -1657,31 +1659,30 @@ package body GNATCOLL.SQL.Exec is
       Name      : String := "") return Prepared_Statement
    is
       Stmt : Prepared_Statement;
-      Data : Prepared_Statement_Data :=
-        (Query         => No_Query,
-         Query_Str     => new String'(Query),
-         Is_Select     => Is_Select_Query (Query),
-         Use_Cache     => Use_Cache,
-         Cached_Result => No_Cache_Id,
-         Index_By      => Index_By,
-         On_Server     => On_Server,
-         Name          => Null_XString,
-         Prepared      => null);
+      Ptr  : Prepared_Statements.Element_Access;
    begin
       if Active (Me_Query) then
          Trace (Me_Query, "compute (" & Name & "): " & Query);
       end if;
 
+      Stmt.Set
+        (Prepared_Statement_Data'
+           (Query         => No_Query,
+            Query_Str     => new String'(Query),
+            Is_Select     => Is_Select_Query (Query),
+            Use_Cache     => Use_Cache,
+            Cached_Result => No_Cache_Id,
+            Index_By      => Index_By,
+            On_Server     => On_Server,
+            Name          => Null_XString,
+            Prepared      => null));
+
       Query_Cache.Set_Id (Stmt);
 
-      if Name = "" then
-         Data.Name :=
-           To_XString ("stmt" & Image (Integer (Data.Cached_Result), 0));
-      else
-         Data.Name := To_XString (Name);
-      end if;
+      Ptr := Stmt.Unchecked_Get;
 
-      Stmt.Set (Data);
+      Ptr.Name := Prepared_Statement_Name (Name, Ptr.Cached_Result);
+
       return Stmt;
    end Prepare;
 
