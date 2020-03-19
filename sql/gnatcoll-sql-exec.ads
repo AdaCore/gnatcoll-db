@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -778,6 +778,14 @@ package GNATCOLL.SQL.Exec is
    --  Find routine to set cursor position to the record with defined field
    --  value. If the field value is not unique, the index would contain
    --  position to only first from the records with same field values.
+
+   function Is_Prepared_On_Server (Stmt : Prepared_Statement) return Boolean;
+   --  True if the statement was prepared on server side. Even if the On_Server
+   --  was True on call to Prepare, the statement might not be prepared on
+   --  server because not all databases support it or in case when user chooses
+   --  duplicated Name on call to Prepare. See Is_Prepared_On_Server_Supported
+   --  call. Note that the "prepare on server" happens on the first call to
+   --  Execute or Fetch with the prepared statement.
 
    procedure Clear_Cache (Stmt : Prepared_Statement);
    --  Clear cached data related to this statement

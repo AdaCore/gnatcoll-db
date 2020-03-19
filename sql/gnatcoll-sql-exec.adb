@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -2115,5 +2115,17 @@ package body GNATCOLL.SQL.Exec is
    begin
       return True;
    end Is_Prepared_On_Server_Supported;
+
+   ---------------------------
+   -- Is_Prepared_On_Server --
+   ---------------------------
+
+   function Is_Prepared_On_Server (Stmt : Prepared_Statement) return Boolean is
+      use type Prepared_Statements.Element_Access;
+      Ref : constant Prepared_Statements.Element_Access := Stmt.Unchecked_Get;
+   begin
+      return Ref /= null and then Ref.Prepared /= null
+        and then Ref.Prepared.Stmt /= No_DBMS_Stmt;
+   end Is_Prepared_On_Server;
 
 end GNATCOLL.SQL.Exec;
