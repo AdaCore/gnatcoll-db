@@ -3,7 +3,7 @@
 --                      GNADE  : GNu Ada Database Environment                --
 --                                                                           --
 --                     Copyright (C) 2000-2003 Juergen Pfeifer               --
---                        Copyright (C) 2004-2019, AdaCore                   --
+--                        Copyright (C) 2004-2020, AdaCore                   --
 --                                                                           --
 --  GNADE is free software;  you can redistribute it  and/or modify it under --
 --  terms of the  GNU General Public License as published  by the Free Soft- --
@@ -35,6 +35,10 @@ package body GNATCOLL.SQL.Postgres.Gnade is
 
    subtype char_array is C.char_array;
    subtype chars_ptr  is CS.chars_ptr;
+
+   function PQexec (Conn : PGconnection; Qry  : String) return PGresult
+     with Import, Convention => C, External_Name => "PQexec";
+   --  Postgres API routine. Qry parameter has to be ended with ASCII.NUL.
 
    --------------
    -- Finalize --
@@ -174,12 +178,9 @@ package body GNATCOLL.SQL.Postgres.Gnade is
       Format : GNATCOLL.SQL_Impl.Formatter'Class;
       Params : SQL_Parameters := No_Parameters)
    is
-      function PQexec (Conn : PGconnection; Qry  : chars_ptr) return PGresult;
-      pragma Import (C, PQexec, "PQexec");
-
       function PQexecParams
         (Conn         : PGconnection;
-         Command      : chars_ptr;
+         Command      : String;
          nParams      : Interfaces.C.int;
          paramTypes   : System.Address := System.Null_Address;  --  Oid*
          paramValues  : CS.chars_ptr_array;  --  const char* const *
@@ -217,12 +218,12 @@ package body GNATCOLL.SQL.Postgres.Gnade is
       --  obtain different result columns in different formats, although
       --  that is possible in the underlying protocol.)
 
-      P : chars_ptr := CS.New_String (Query);
+      Q : constant String := Query & ASCII.NUL;
       R : PGresult;
 
    begin
       if Params'Length = 0 then
-         R := PQexec (DB.Connection, P);
+         R := PQexec (DB.Connection, Q);
       else
          declare
             Vals : CS.chars_ptr_array (0 .. Params'Length - 1);
@@ -233,9 +234,9 @@ package body GNATCOLL.SQL.Postgres.Gnade is
             end loop;
 
             R := PQexecParams
-              (Conn    => DB.Connection,
-               Command => P,
-               nParams => C.int (Vals'Length),
+              (Conn        => DB.Connection,
+               Command     => Q,
+               nParams     => C.int (Vals'Length),
                paramValues => Vals);
 
             for P in Vals'Range loop
@@ -244,7 +245,6 @@ package body GNATCOLL.SQL.Postgres.Gnade is
          end;
       end if;
 
-      CS.Free (P);
       Clear (Res); --  Free previous results
       Res.Res := R;
    end Execute;
@@ -259,19 +259,25 @@ package body GNATCOLL.SQL.Postgres.Gnade is
       Stmt_Name : String;
       Query     : String)
    is
-      function PQprepare
+      PQprepare : access function
         (Conn    : PGconnection;
          Name    : String;
          Query   : String;
          nParams : Natural := 0;
-         Types   : System.Address := System.Null_Address)
-         return PGresult;
-      pragma Import (C, PQprepare, "gnatcoll_pqprepare");
+         Types   : System.Address := System.Null_Address) return PGresult
+        with Import, Convention => C, External_Name => "gnatcoll_pqprepare";
 
    begin
-      Clear (Res); --  Free previous results
-      Res.Res :=
-        PQprepare (DB.Connection, Stmt_Name & ASCII.NUL, Query & ASCII.NUL);
+      Clear (Res); -- Free previous results
+
+      if PQprepare = null then
+         Res.Res := PQexec
+           (DB.Connection,
+            "PREPARE """ & Stmt_Name & """ AS " & Query & ASCII.NUL);
+      else
+         Res.Res := PQprepare
+           (DB.Connection, Stmt_Name & ASCII.NUL, Query & ASCII.NUL);
+      end if;
    end Prepare;
 
    -------------------

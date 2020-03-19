@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2017, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -662,6 +662,7 @@ package body GNATCOLL.SQL.Postgres.Builder is
          Stmt   : DBMS_Stmt;
          Params : SQL_Parameters := No_Parameters)
       is
+         pragma Unreferenced (Params);
          pragma Assert (Stmt = No_DBMS_Stmt);
 
          CName : constant String := To_String (P_Stmt.Cursor);
@@ -682,10 +683,7 @@ package body GNATCOLL.SQL.Postgres.Builder is
             Trace (Me_Query, "PREPARE " & CName & " AS " & Query);
          end if;
 
-         Execute (Res, Connection.Postgres.all,
-                  "PREPARE " & CName & " AS " & Query, Connection.all,
-                  Params);
-         --  Prepare (Res, Connection.Postgres.all, CName, Query);
+         Prepare (Res, Connection.Postgres.all, CName, Query);
       end Perform;
 
       procedure Do_Perform is new Connect_And_Do (Perform);
