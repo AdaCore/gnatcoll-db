@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                       Copyright (C) 2018, AdaCore                        --
+--                     Copyright (C) 2018-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -20,6 +20,9 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+with Ada.Command_Line;  use Ada.Command_Line;
+with Ada.Strings.Fixed; use Ada.Strings;
 
 with GNATCOLL.DB2Ada.Main;
 with GNATCOLL.SQL.Exec; use GNATCOLL.SQL.Exec;
@@ -65,5 +68,8 @@ procedure GNATCOLL_All2Ada is
 
 begin
    GNATCOLL.DB2Ada.Main
-     ("postgresql",  Create_Description'Unrestricted_Access);
+     (Default_DB_Type => (if Fixed.Index (Command_Name, "sqlite") > 0
+                          then "sqlite"
+                          else "postgresql"),
+      Description     => Create_Description'Unrestricted_Access);
 end GNATCOLL_All2Ada;
