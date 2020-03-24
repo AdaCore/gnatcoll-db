@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2011-2018, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -2488,13 +2488,17 @@ package body GNATCOLL.SQL.Inspect is
       Fields_Count : Natural;  --  Number of fields on current line
 
       Table     : Table_Description;
-      Is_Xref : array (1 .. Max_Fields_Per_Line) of Boolean;
-      --  Whether a given column must be an xref
 
       DB_Fields       : String_List (1 .. Max_Fields_Per_Line);
       DB_Fields_Count : Natural := DB_Fields'First - 1;
       Xref       : String_List (1 .. Max_Fields_Per_Line);
       Xref_Count : Natural := Xref'First - 1;
+      Xref_Type  : array (1 .. Max_Fields_Per_Line) of Field_Mapping_Access;
+
+      function Is_Xref (Index : Positive) return Boolean is
+        (Xref_Type (Index) /= null);
+      --  Whether a given column must be an xref
+
       Paren      : Natural;
       DB_Field_Mappings : array (Line'First .. Max_Fields_Per_Line)
         of Field_Mapping_Access;
@@ -2575,17 +2579,23 @@ package body GNATCOLL.SQL.Inspect is
                exit when Line (L).all = "";
 
                Paren := Ada.Strings.Fixed.Index (Line (L).all, "(&");
-               Is_Xref (DB_Fields_Count + 1) := Paren >= Line (L)'First;
 
-               if Is_Xref (DB_Fields_Count + 1) then
+               if Paren >= Line (L)'First then
+                  --  Reference to another table.column
+
                   declare
                      Name : constant String :=
-                       Line (L) (Line (L)'First .. Paren - 1);
+                              Line (L) (Line (L)'First .. Paren - 1);
+                     Refn : constant String :=
+                              Line (L)
+                                (Paren + 2 .. Index (Line (L).all, ")") - 1);
                   begin
                      Append (DB_Fields, DB_Fields_Count, Quote_Keyword (Name));
                      Append (Xref, Xref_Count,
                              Line (L) (Paren + 2 .. Line (L)'Last - 1));
                      FK := Table.Field_From_Name (Name).Is_FK;
+                     Xref_Type (L) := Get_Table (Schema, FK.Get_Table.Name)
+                                      .Field_From_Name (Refn).Get_Type;
                      Has_Xref_Column := True;
                      Tables (L) := new String'
                        (FK.Get_Table.Name & " t" & Image (L, 0));
@@ -2595,6 +2605,9 @@ package body GNATCOLL.SQL.Inspect is
                           Quote_Keyword (Line (L).all));
                   Append (Xref, Xref_Count, "");
                end if;
+
+               pragma Assert (L = DB_Fields_Count);
+               pragma Assert (L = Xref_Count); -- Xref_Count can be removed
             end loop;
 
             declare
@@ -2626,14 +2639,14 @@ package body GNATCOLL.SQL.Inspect is
                     DB_Field_Mappings (L).Parameter_Type;
                   P     : constant String :=
                     Param.Type_String (Index => L, Format => DB.all);
-
                begin
                   if Is_Xref (Tmp_DB_Fields_Count + 1) then
                      Select_Values (L) :=
                        new String'("t" & Image (L, 0) & "." & FK.Name);
                      Where (L) := new String'
                        ("t" & Image (L, 0) & "." & Xref (L).all
-                        & "=" & P);
+                        & "=" & Xref_Type (L).Parameter_Type.Type_String
+                                  (Index => L, Format => DB.all));
                   else
                      Select_Values (L) := new String'(P);
                   end if;
