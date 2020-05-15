@@ -1,0 +1,21 @@
+
+library project Module is
+
+   IncludeDir_Server := "/usr/include/pgsql/server";
+
+   for Languages use ("C", "Ada");
+   for Object_Dir use "../.objs/module";
+   for Source_Dirs use (".", "../source", "../testsuite");
+
+   for Library_Name use "adamodule";
+   for Library_Kind use "relocatable";
+   for Library_Dir use "../.libs";
+   for Library_Options use ("-Wl,--version-script=../../source/pgxs.sym");
+   for Library_Interface use ("Sample", "Test_PGXS", "PGXS", "PGXS.Generic_Bytea");
+
+   package Compiler is
+      for Switches ("Ada") use ("-g", "-fPIC");
+      for Switches ("C") use ("-g", "-fPIC", "-I" & IncludeDir_Server);
+   end Compiler;
+
+end Module;

@@ -1,0 +1,4 @@
+PGXSSYMS {
+   global:
+Pg_magic_func;
+};
