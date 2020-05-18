@@ -22,8 +22,9 @@
 ------------------------------------------------------------------------------
 --  Subprograms to obtain and to construct values of composite types.
 
-with Interfaces.C;
+with Interfaces.C.Extensions;
 
+private with PGXS.Pools;
 with PGXS.Types;
 
 package PGXS.Composites is
@@ -32,6 +33,29 @@ package PGXS.Composites is
      new PGXS.Types.Int_16 range 0 .. PGXS.Types.Int_16'Last;
 
    subtype Attribute_Number is Attribute_Count range 1 .. Attribute_Count'Last;
+
+   type Attributes is private;
+
+   function Allocate
+     (Descriptor : PGXS.Tuple_Desc;
+      Size       : Attribute_Count) return Attributes;
+   --  Allocate memory to store given number of values.
+
+   procedure Set_Value
+     (Self  : in out Attributes;
+      Index : Attribute_Number;
+      To    : PGXS.Datum);
+   --  Set value of the attribute at givent index to given value.
+
+   procedure Set_Null
+     (Self  : in out Attributes;
+      Index : Attribute_Number);
+   --  Set value of the attribute at given index to null.
+
+   function Return_Value
+     (Args : Function_Call_Info; Item : Attributes) return PGXS.Datum;
+   --  Creates internal representation of the given set of attributes and
+   --  converts them to be returned from the user defined function.
 
    function Get_Attribute_By_Name
      (Item    : PGXS.Heap_Tuple_Header;
@@ -47,5 +71,29 @@ package PGXS.Composites is
       Is_Null : out PGXS.Types.Bool) return PGXS.Datum
      with Import, Convention => C, Link_Name => "GetAttributeByNum";
    --  Return value of the attribute by number. Attribute numbers start at 1.
+
+   function Bless_Tuple_Desc (Item : PGXS.Tuple_Desc) return PGXS.Tuple_Desc
+     with Import, Convention => C, Link_Name => "BlessTupleDesc";
+   --  Complete tuple descriptor by initially missing information to return
+   --  values from the user defined extension function.
+
+private
+
+   type Datum_Array is array (Attribute_Number range <>) of aliased PGXS.Datum;
+
+   type Bool_Array is
+     array (Attribute_Number range <>) of aliased PGXS.Types.Bool;
+
+   type Attributes_Arrays (Size : Attribute_Count) is record
+      Descriptor : PGXS.Tuple_Desc;
+      Datums     : Datum_Array (1 .. Size);
+      Nulls      : Bool_Array (1 .. Size) :=
+        (others => Interfaces.C.Extensions.True);
+   end record;
+
+   Default_Pool : PGXS.Pools.Memory_Context_Pool;
+
+   type Attributes is access all Attributes_Arrays
+     with Storage_Pool => Default_Pool;
 
 end PGXS.Composites;

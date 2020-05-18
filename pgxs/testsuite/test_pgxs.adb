@@ -158,4 +158,31 @@ package body Test_PGXS is
       end if;
    end Overpaid;
 
+   ---------------
+   -- Composite --
+   ---------------
+
+   function Composite
+     (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
+   is
+      X : PGXS.Types.Int_32 := PGXS.Call_Info.Get_Arg (Args, 0);
+      Y : PGXS.Types.Int_32 := PGXS.Call_Info.Get_Arg (Args, 1);
+      T : PGXS.Types.Oid;
+      D : PGXS.Tuple_Desc;
+      C : PGXS.Call_Info.Func_Type_Class;
+
+      A : PGXS.Composites.Attributes;
+      --    PGXS.Composites.Allocate
+      --      (PGXS.Composites.Bless_Tuple_Desc
+
+   begin
+      C := PGXS.Call_Info.Get_Call_Result_Type (Args, T, D);
+
+      A := PGXS.Composites.Allocate (PGXS.Composites.Bless_Tuple_Desc (D), 2);
+      PGXS.Composites.Set_Value (A, 1, PGXS.Datums.To_Datum (X));
+      PGXS.Composites.Set_Value (A, 2, PGXS.Datums.To_Datum (Y));
+
+      return PGXS.Composites.Return_Value (Args, A);
+   end Composite;
+
 end Test_PGXS;

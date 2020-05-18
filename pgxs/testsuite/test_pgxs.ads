@@ -87,4 +87,12 @@ package Test_PGXS is
    is (PGXS.ABI.Ada_Function_Info_1)
      with Export, Convention => C, Link_Name => "pg_finfo_apgxs_overpaid";
 
+   function Composite
+     (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
+     with Export, Convention => C, Link_Name => "apgxs_composite";
+   function Composite_Info
+     return not null access PGXS.ABI.Function_Info_Record
+   is (PGXS.ABI.Ada_Function_Info_1)
+     with Export, Convention => C, Link_Name => "pg_finfo_apgxs_composite";
+
 end Test_PGXS;

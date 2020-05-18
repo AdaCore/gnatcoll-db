@@ -141,4 +141,5 @@ Datum __ada_PG_BpCharPGetDatum(BpChar* x) { return PointerGetDatum(x); }
 VarChar* __ada_PG_DatumGetVarCharP(Datum x) { return DatumGetVarCharP(x); }
 Datum __ada_PG_VarCharPGetDatum(VarChar* x) { return PointerGetDatum(x); }
 
+Datum __ada_PG_HeapTupleGetDatum(HeapTuple x) { return HeapTupleGetDatum(x); }
 

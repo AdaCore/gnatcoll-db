@@ -20,38 +20,26 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Type declarations for data types of PostgreSQL server extension modules
---  API not directly related to SQL data types.
 
-private with Interfaces.C.Extensions;
-private with System;
+package body PGXS.Pools is
 
-package PGXS is
+   --------------
+   -- Allocate --
+   --------------
 
-   pragma Preelaborate;
+   overriding procedure Allocate
+     (Pool                     : in out Memory_Context_Pool;
+      Storage_Address          : out System.Address;
+      Size_In_Storage_Elements : System.Storage_Elements.Storage_Count;
+      Alignment                : System.Storage_Elements.Storage_Count)
+   is
+      pragma Unreferenced (Alignment);
 
-   type Function_Call_Info is limited private;
-   --  Function call information: arguments and return value.
+      function palloc (Size : PGXS.Types.Int_32) return System.Address
+        with Import, Convention => C, Link_Name => "__ada_palloc";
 
-   type Datum is private;
-   --  Generic container of the value for some SQL data type.
+   begin
+      Storage_Address := palloc (PGXS.Types.Int_32 (Size_In_Storage_Elements));
+   end Allocate;
 
-   type Heap_Tuple_Header is private;
-   --  Container of the composite object
-
-   type Tuple_Desc is private;
-   --  Tuple descriptor
-
-private
-
-   type Function_Call_Info is limited null record with Convention => C;
-
-   type Datum is new Interfaces.C.Extensions.void_ptr;
-
-   type Heap_Tuple_Header is new Interfaces.C.Extensions.void_ptr;
-
-   type Heap_Tuple is new Interfaces.C.Extensions.void_ptr;
-
-   type Tuple_Desc is new Interfaces.C.Extensions.void_ptr;
-
-end PGXS;
+end PGXS.Pools;

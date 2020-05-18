@@ -20,38 +20,42 @@
 -- <http://www.gnu.org/licenses/>.                                          --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Type declarations for data types of PostgreSQL server extension modules
---  API not directly related to SQL data types.
+--  Memory pool on top of PostgreSQL memory allocator.
+--
+--  Allocated memory is not need to be freed manually, all allocated chunks
+--  freed when memory context is freed.
 
-private with Interfaces.C.Extensions;
-private with System;
+with System.Storage_Elements;
+with System.Storage_Pools;
 
-package PGXS is
+private with PGXS.Types;
 
-   pragma Preelaborate;
+package PGXS.Pools is
 
-   type Function_Call_Info is limited private;
-   --  Function call information: arguments and return value.
-
-   type Datum is private;
-   --  Generic container of the value for some SQL data type.
-
-   type Heap_Tuple_Header is private;
-   --  Container of the composite object
-
-   type Tuple_Desc is private;
-   --  Tuple descriptor
+   type Memory_Context_Pool is
+     new System.Storage_Pools.Root_Storage_Pool with private;
 
 private
 
-   type Function_Call_Info is limited null record with Convention => C;
+   type Memory_Context_Pool is
+     new System.Storage_Pools.Root_Storage_Pool with null record;
 
-   type Datum is new Interfaces.C.Extensions.void_ptr;
+   overriding procedure Allocate
+     (Pool                     : in out Memory_Context_Pool;
+      Storage_Address          : out System.Address;
+      Size_In_Storage_Elements : System.Storage_Elements.Storage_Count;
+      Alignment                : System.Storage_Elements.Storage_Count);
 
-   type Heap_Tuple_Header is new Interfaces.C.Extensions.void_ptr;
+   overriding procedure Deallocate
+     (Pool                     : in out Memory_Context_Pool;
+      Storage_Address          : System.Address;
+      Size_In_Storage_Elements : System.Storage_Elements.Storage_Count;
+      Alignment                : System.Storage_Elements.Storage_Count)
+   is null;
 
-   type Heap_Tuple is new Interfaces.C.Extensions.void_ptr;
+   overriding function Storage_Size
+     (Pool : Memory_Context_Pool)
+      return System.Storage_Elements.Storage_Count is
+     (System.Storage_Elements.Storage_Count (PGXS.Types.Int_32'Last));
 
-   type Tuple_Desc is new Interfaces.C.Extensions.void_ptr;
-
-end PGXS;
+end PGXS.Pools;

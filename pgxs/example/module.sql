@@ -50,3 +50,7 @@ CREATE OR REPLACE FUNCTION apgxs_add_one_float8(float8) RETURNS float8
 CREATE OR REPLACE FUNCTION apgxs_overpaid(emp, integer) RETURNS boolean
     AS '/home/godunko/AdaCore/SC06-078.pgsql/gnatcoll-db/pgxs/.libs/libadamodule', 'apgxs_overpaid'
     LANGUAGE C STRICT;
+
+CREATE OR REPLACE FUNCTION apgxs_composite(integer, integer) RETURNS apgxs_composite_type
+    AS '/home/godunko/AdaCore/SC06-078.pgsql/gnatcoll-db/pgxs/.libs/libadamodule', 'apgxs_composite'
+    LANGUAGE C STRICT;

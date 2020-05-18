@@ -16,3 +16,5 @@ SELECT name, apgxs_overpaid(emp, 10) FROM emp WHERE name = 'Bill' OR name = 'Sam
 SELECT to_bytea(2, 5);
 SELECT get_x(to_bytea(3, 7));
 SELECT get_y(to_bytea(4, 8));
+
+SELECT apgxs_composite(5, 10);
