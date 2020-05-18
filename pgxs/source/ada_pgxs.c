@@ -102,6 +102,7 @@ HeapTupleHeader __ada_PG_GETARG_HEAPTUPLEHEADER(PG_FUNCTION_ARGS, int32 n) { ret
 
 void *__ada_palloc(int32 size) { return palloc(size); }
 void *__ada_palloc_varlena(int32 size) { return palloc(VARHDRSZ + size); }
+MemoryContext __ada_MemoryContextSwitchTo(MemoryContext c) { return MemoryContextSwitchTo(c); }
 
 /* Datum Utilities */
 
@@ -142,6 +143,23 @@ VarChar* __ada_PG_DatumGetVarCharP(Datum x) { return DatumGetVarCharP(x); }
 Datum __ada_PG_VarCharPGetDatum(VarChar* x) { return PointerGetDatum(x); }
 
 Datum __ada_PG_HeapTupleGetDatum(HeapTuple x) { return HeapTupleGetDatum(x); }
+
+/* Multi row Utilities */
+
+bool __ada_SRF_IS_FIRSTCALL(PG_FUNCTION_ARGS) { return SRF_IS_FIRSTCALL(); }
+FuncCallContext *__ada_SRF_FIRSTCALL_INIT(PG_FUNCTION_ARGS) { return SRF_FIRSTCALL_INIT(); }
+FuncCallContext *__ada_SRF_PERCALL_SETUP(PG_FUNCTION_ARGS) { return SRF_PERCALL_SETUP(); }
+Datum __ada_SRF_RETURN_NEXT(PG_FUNCTION_ARGS, FuncCallContext *c, Datum x) { SRF_RETURN_NEXT(c, x); }
+Datum __ada_SRF_RETURN_NEXT_NULL(PG_FUNCTION_ARGS, FuncCallContext *c) { SRF_RETURN_NEXT_NULL(c); }
+Datum __ada_SRF_RETURN_DONE(PG_FUNCTION_ARGS, FuncCallContext *c) { SRF_RETURN_DONE(c); }
+
+void *__ada_PG_FuncCallContext_get_user_fctx(FuncCallContext *c) { return c->user_fctx; }
+void __ada_PG_FuncCallContext_set_user_fctx(FuncCallContext *c, void *d) { c->user_fctx = d; }
+
+MemoryContext __ada_PG_FuncCallContext_get_multi_call_memory_ctx(FuncCallContext *c) { return c->multi_call_memory_ctx; }
+uint64 __ada_PG_FuncCallContext_call_cntr(FuncCallContext *c) { return c->call_cntr; }
+TupleDesc __ada_PG_FuncCallContext_get_tuple_desc(FuncCallContext *c) { return c->tuple_desc; }
+void __ada_PG_FuncCallContext_set_tuple_desc(FuncCallContext *c, TupleDesc d) { c->tuple_desc = d; }
 
 /* Error reporting and logging */
 

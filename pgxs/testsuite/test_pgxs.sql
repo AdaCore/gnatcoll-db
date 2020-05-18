@@ -18,3 +18,4 @@ SELECT get_x(to_bytea(3, 7));
 SELECT get_y(to_bytea(4, 8));
 
 SELECT apgxs_composite(5, 10);
+SELECT apgxs_set_simple(3);

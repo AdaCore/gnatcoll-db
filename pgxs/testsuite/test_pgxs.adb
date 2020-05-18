@@ -26,6 +26,8 @@ with Interfaces.C;
 with PGXS.Call_Info;
 with PGXS.Composites;
 with PGXS.Datums;
+with PGXS.Pools.Defaults;
+with PGXS.Return_Sets;
 with PGXS.Logs;
 with PGXS.Types;
 
@@ -195,5 +197,87 @@ package body Test_PGXS is
 
       return PGXS.Composites.Return_Value (Args, A);
    end Composite;
+
+   -----------------
+   -- Simple_Sets --
+   -----------------
+
+   package Simple_Sets is
+
+      type Simple_Set_Context is record
+         Amount  : PGXS.Types.Int_32;
+         Counter : PGXS.Types.Int_32 := 0;
+      end record;
+
+      type Simple_Set_Context_Access is access all Simple_Set_Context
+        with Storage_Pool => PGXS.Pools.Defaults.Default_Pool;
+
+      procedure First_Initialize
+        (Args    : PGXS.Function_Call_Info;
+         Context : PGXS.Func_Call_Context;
+         Data    : out Simple_Set_Context_Access);
+
+      function Step
+        (Args    : PGXS.Function_Call_Info;
+         Context : PGXS.Func_Call_Context;
+         Data    : Simple_Set_Context_Access) return PGXS.Datum;
+
+      function Set_Simple is
+        new PGXS.Return_Sets.Generic_Set_Return_Function
+          (User_Data        => Simple_Set_Context,
+           User_Data_Access => Simple_Set_Context_Access,
+           First_Initialize => First_Initialize,
+           Step             => Step);
+
+   end Simple_Sets;
+
+   -----------------
+   -- Simple_Sets --
+   -----------------
+
+   package body Simple_Sets is
+
+      ----------------------
+      -- First_Initialize --
+      ----------------------
+
+      procedure First_Initialize
+        (Args    : PGXS.Function_Call_Info;
+         Context : PGXS.Func_Call_Context;
+         Data    : out Simple_Set_Context_Access) is
+      begin
+         Data := new Simple_Set_Context;
+         Data.Amount := PGXS.Call_Info.Get_Arg (Args, 0);
+      end First_Initialize;
+
+      ----------
+      -- Step --
+      ----------
+
+      function Step
+        (Args    : PGXS.Function_Call_Info;
+         Context : PGXS.Func_Call_Context;
+         Data    : Simple_Set_Context_Access) return PGXS.Datum
+      is
+         use type PGXS.Types.Int_32;
+
+      begin
+         if Data.Counter < Data.Amount then
+            Data.Counter := Data.Counter + 1;
+
+            return
+              PGXS.Return_Sets.Return_Next_Value
+                (Args, Context, PGXS.Datums.To_Datum (Data.Counter));
+
+         else
+            return PGXS.Return_Sets.Return_Done (Args, Context);
+         end if;
+      end Step;
+
+   end Simple_Sets;
+
+   function Set_Simple
+     (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
+      renames Simple_Sets.Set_Simple;
 
 end Test_PGXS;

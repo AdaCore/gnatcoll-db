@@ -54,3 +54,7 @@ CREATE OR REPLACE FUNCTION apgxs_overpaid(emp, integer) RETURNS boolean
 CREATE OR REPLACE FUNCTION apgxs_composite(integer, integer) RETURNS apgxs_composite_type
     AS '/home/godunko/AdaCore/SC06-078.pgsql/gnatcoll-db/pgxs/.libs/libadamodule', 'apgxs_composite'
     LANGUAGE C STRICT;
+
+CREATE OR REPLACE FUNCTION apgxs_set_simple(integer) RETURNS SETOF integer
+    AS '/home/godunko/AdaCore/SC06-078.pgsql/gnatcoll-db/pgxs/.libs/libadamodule', 'apgxs_set_simple'
+    LANGUAGE C STRICT;

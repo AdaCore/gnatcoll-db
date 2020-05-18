@@ -54,4 +54,8 @@ private
 
    type Tuple_Desc is new Interfaces.C.Extensions.void_ptr;
 
+   type Func_Call_Context is new Interfaces.C.Extensions.void_ptr;
+
+   type Memory_Context is new Interfaces.C.Extensions.void_ptr;
+
 end PGXS;

@@ -24,7 +24,7 @@
 
 with Interfaces.C.Extensions;
 
-private with PGXS.Pools;
+private with PGXS.Pools.Defaults;
 with PGXS.Types;
 
 package PGXS.Composites is
@@ -91,9 +91,7 @@ private
         (others => Interfaces.C.Extensions.True);
    end record;
 
-   Default_Pool : PGXS.Pools.Memory_Context_Pool;
-
    type Attributes is access all Attributes_Arrays
-     with Storage_Pool => Default_Pool;
+     with Storage_Pool => PGXS.Pools.Defaults.Default_Pool;
 
 end PGXS.Composites;
