@@ -143,3 +143,7 @@ Datum __ada_PG_VarCharPGetDatum(VarChar* x) { return PointerGetDatum(x); }
 
 Datum __ada_PG_HeapTupleGetDatum(HeapTuple x) { return HeapTupleGetDatum(x); }
 
+/* Error reporting and logging */
+
+void __ada_PG_ereport(int32 l, char *m) { ereport(l, (errmsg(m))); }
+

@@ -26,6 +26,7 @@ with Interfaces.C;
 with PGXS.Call_Info;
 with PGXS.Composites;
 with PGXS.Datums;
+with PGXS.Logs;
 with PGXS.Types;
 
 package body Test_PGXS is
@@ -165,6 +166,9 @@ package body Test_PGXS is
    function Composite
      (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
    is
+      use type Interfaces.C.char_array;
+      use all type PGXS.Call_Info.Func_Type_Class;
+
       X : PGXS.Types.Int_32 := PGXS.Call_Info.Get_Arg (Args, 0);
       Y : PGXS.Types.Int_32 := PGXS.Call_Info.Get_Arg (Args, 1);
       T : PGXS.Types.Oid;
@@ -177,6 +181,13 @@ package body Test_PGXS is
 
    begin
       C := PGXS.Call_Info.Get_Call_Result_Type (Args, T, D);
+
+      if C /= Typefunc_Composite then
+         PGXS.Logs.Report
+           (PGXS.Logs.Error,
+            "function returning record called in context that cannot accept"
+            & " type record" & Interfaces.C.nul);
+      end if;
 
       A := PGXS.Composites.Allocate (PGXS.Composites.Bless_Tuple_Desc (D), 2);
       PGXS.Composites.Set_Value (A, 1, PGXS.Datums.To_Datum (X));
