@@ -1269,7 +1269,7 @@ package body GNATCOLL.Xref is
 
       --  Various cases are possible, depending where the range low..high
       --  occurs compared to the data we already know. We could take the naive
-      --  approach of always reseting the array when we grow it, and always
+      --  approach of always resetting the array when we grow it, and always
       --  comparing the full Low..High range, but this is slower in practice.
       --
       --   |1-------max|

@@ -307,7 +307,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
 
             Status := Reset (Self.Stmt);
             if Status /= Sqlite_OK then
-               Trace (Me, "Error when reseting cursor to free LOCKS: "
+               Trace (Me, "Error when resetting cursor to free LOCKS: "
                       & Status'Img);
             end if;
          end if;

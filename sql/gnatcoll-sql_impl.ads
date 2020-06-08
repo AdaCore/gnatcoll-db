@@ -90,7 +90,7 @@ package GNATCOLL.SQL_Impl is
      (Self : Formatter) return String is abstract;
    --  Return the SQL type to use for auto-incremented fields.
    --  Such a field is always a primary key, so this information is also
-   --  returend as part of the type (this is mandatory for sqlite in
+   --  returned as part of the type (this is mandatory for sqlite in
    --  particular).
 
    function Field_Type_Money
