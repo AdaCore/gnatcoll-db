@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2012-2018, AdaCore                     --
+--                     Copyright (C) 2012-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -65,7 +65,7 @@ procedure GNATInspect is
       File    : GNATCOLL.VFS.Virtual_File;
       Project : Project_Type;
    end record;
-   --  information extracted from teh command line.
+   --  information extracted from the command line.
    --  File will be No_File if there are ambiguities (for instance when using
    --  aggregate projects).
 

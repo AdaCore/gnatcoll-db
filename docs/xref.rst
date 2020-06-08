@@ -255,13 +255,13 @@ useful:
 * *--exit*: if this switch is specified, gnatinspect updates the xref database
   and exits immediately.
 
-* *--project=ARG* or *-P ARG* specifes the name of the project to load. This
+* *--project=ARG* or *-P ARG* specifies the name of the project to load. This
   switch is mandatory.
 
 * *-X VAR=VALUE* is used to specify the value of scenario variables used in
   your project. This is similar to the homonym switch in gprbuild.
 
-* *--symlinks* should be specified if your projet uses symbolic links for
+* *--symlinks* should be specified if your project uses symbolic links for
   files. This will ensure that the links are fully resolved as stored in the
   database, and thus that when a file is visible through different links, the
   information is appropriately coalesced in the database for that file.

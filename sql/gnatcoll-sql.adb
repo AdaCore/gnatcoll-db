@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -103,9 +103,9 @@ package body GNATCOLL.SQL is
       Is_Aggregate : in out Boolean);
    overriding procedure Free (Self : in out Multiple_Args_Field_Internal);
 
-   -----------------------
-   -- Aggregrate fields --
-   -----------------------
+   ----------------------
+   -- Aggregate fields --
+   ----------------------
    --  Representing an sql aggregate function.
 
    type Aggregate_Field_Internal is new SQL_Field_Internal with record
@@ -1740,7 +1740,7 @@ package body GNATCOLL.SQL is
       end if;
 
       --  Need to output LIMIT before OFFSET for sqlite. This seems to be
-      --  compatible with other backends
+      --  compatible with other backends.
 
       if Self.Limit >= 0 or else Self.Offset >= 0 then
          Append (Result, " LIMIT" & Integer'Image (Self.Limit));
@@ -1807,7 +1807,7 @@ package body GNATCOLL.SQL is
       end if;
 
       --  Need to output LIMIT before OFFSET for sqlite. This seems to be
-      --  compatible with other backends
+      --  compatible with other backends.
 
       if Self.Limit >= 0 or else Self.Offset >= 0 then
          Append (Result, " LIMIT" & Integer'Image (Self.Limit));

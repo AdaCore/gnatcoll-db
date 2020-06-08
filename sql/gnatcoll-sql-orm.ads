@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
---                             M O D E L I N G                              --
+--                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2010-2018, AdaCore                     --
+--                     Copyright (C) 2010-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -78,7 +78,7 @@ package GNATCOLL.SQL.Orm is
    --  This reuse gives a more efficient API, since we can prepare in advance
    --  (possibly at elaboration time) a series of managers and reuse them if
    --  needed.
-   --  ??? When we have prepared parameterized statements in GNATCOLL.SQL, we
+   --  ??? When we have prepared parametrized statements in GNATCOLL.SQL, we
    --  could take advantage of them here as well, and replace the actual values
    --  only at the last moment.
    --
@@ -148,7 +148,7 @@ package GNATCOLL.SQL.Orm is
    --  Fields are the list of fields that should be retrieved by the
    --  query.
    --  From is the list of JOIN and LEFT JOIN that should be performed for
-   --  the query. The query is autocompleted, so technically only the
+   --  the query. The query is auto-completed, so technically only the
    --  LEFT JOIN are needed.
    --  ??? Result should be cached, but making Self "in out" is not convenient
 
@@ -273,7 +273,7 @@ package GNATCOLL.SQL.Orm is
 
    function Follow_LJ (Self : Manager'Class) return Boolean;
    pragma Inline (Follow_LJ);
-   --  Whether the m anager follows LEFT JOIN
+   --  Whether the manager follows LEFT JOIN
 
 private
    type Manager is abstract tagged record

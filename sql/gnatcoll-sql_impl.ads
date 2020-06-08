@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -90,7 +90,7 @@ package GNATCOLL.SQL_Impl is
      (Self : Formatter) return String is abstract;
    --  Return the SQL type to use for auto-incremented fields.
    --  Such a field is always a primary key, so this information is also
-   --  returend as part of the type (this is mandatory for sqlite in
+   --  returned as part of the type (this is mandatory for sqlite in
    --  particular).
 
    function Field_Type_Money
@@ -106,7 +106,7 @@ package GNATCOLL.SQL_Impl is
       Type_Descr : String) return String;
    --  Return the character to put before a parameter in a SQL statement, when
    --  the value will be substituted at run time.
-   --  Typ describes the type of the parameter, and is returned by the
+   --  Type_Descr describes the type of the parameter, and is returned by the
    --  SQL_Parameter primitive operation Describe_Type;
 
    generic
@@ -138,7 +138,7 @@ package GNATCOLL.SQL_Impl is
    --  If Quote is False, these functions provide quotes around the values. For
    --  instance, the image for a string contains the string itself, unquoted,
    --  and with special characters unprotected. As a result, this is only
-   --  suitable for use with parameterized queries.
+   --  suitable for use with parametrized queries.
 
    ----------------
    -- Parameters --
@@ -337,7 +337,7 @@ package GNATCOLL.SQL_Impl is
       is abstract new SQL_Field_Or_List with null record;
    --  A field that comes directly from the database. It can be within a
    --  specific table instance, but we still need to know the name of the table
-   --  itself for the autocompletion.
+   --  itself for the auto-completion.
    --  (Table,Instance) might be null if the field is a constant.
    --  The discriminants are used to get the name of the table when displaying
    --  the field, while permitting static constructs like:
@@ -370,7 +370,7 @@ package GNATCOLL.SQL_Impl is
       To           : in out SQL_Field_List'Class;
       Is_Aggregate : in out Boolean);
    --  Append all fields referenced by Self if Self is not the result of an
-   --  aggregate function. This is used for autocompletion of "group by".
+   --  aggregate function. This is used for auto-completion of "group by".
    --  Is_Aggregate is set to True if Self is an aggregate, untouched otherwise
 
    procedure Append (List : in out SQL_Field_List; Field : SQL_Field'Class);
@@ -471,7 +471,7 @@ package GNATCOLL.SQL_Impl is
          To           : in out SQL_Field_List'Class;
          Is_Aggregate : in out Boolean);
    end Data_Fields;
-   --  Mixin inheritand for a field, to add specific user data to them. This
+   --  Mixin inheritance for a field, to add specific user data to them. This
    --  user data is refcounted. Field just acts as a proxy for Data, and
    --  delegates all its operations to Data.
 
@@ -631,7 +631,7 @@ package GNATCOLL.SQL_Impl is
       function Param (Index : Positive) return Field'Class;
       --  Return a special string that will be inserted in the query, and
       --  can be substituted with an actual value when the query is executed.
-      --  This is used to parameterize queries. In particular, this allows you
+      --  This is used to parametrize queries. In particular, this allows you
       --  to prepare a general form of the query, as in:
       --      SELECT * FROM table WHERE table.field1 = ?1
       --  and execute this several times, substituting a different value

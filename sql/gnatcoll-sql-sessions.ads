@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
---                             M O D E L I N G                              --
+--                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2010-2018, AdaCore                     --
+--                     Copyright (C) 2010-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -67,7 +67,7 @@ package GNATCOLL.SQL.Sessions is
    --      --  changes in M2 are also visible in M1, since they are the same.
    --
    --  This ensures consistency when objects can be modified in memory before
-   --  writting to the database, and also ensures that local caches for complex
+   --  writing to the database, and also ensures that local caches for complex
    --  data can be properly reused (for instance if M1.Super_Classes is complex
    --  to compute, the result is automatically reused for M2.Super_Classes).
    --
@@ -141,7 +141,7 @@ package GNATCOLL.SQL.Sessions is
    --  unmodified will be removed from the session cache.
    --  If False, objects will be kept in the session cache for as long as
    --  the session exists. This uses more memory, but can save a few
-   --  roundtrips to the database (retrieving an element by id will reuse
+   --  round-trips to the database (retrieving an element by id will reuse
    --  the element from the cache if it exists, instead of querying).
    --
    --  Flush_Before_Query:
@@ -161,7 +161,7 @@ package GNATCOLL.SQL.Sessions is
    procedure Set_Default_User_Data
      (Default_User_Data  : User_Data'Class := No_User_Data;
       Pool               : Session_Pool := Default_Pool);
-   --  Override the default user data. This will affect all sesssions retrieved
+   --  Override the default user data. This will affect all sessions retrieved
    --  via Get_New_Session from now on.
    --  This must be called from a protected region where a single thread has
    --  access, since it modifies shared data.
@@ -196,7 +196,7 @@ package GNATCOLL.SQL.Sessions is
 
    procedure Free;
    --  Free the sessions pool.
-   --  Get_New_Session must no longer be called afterward.
+   --  Get_New_Session must no longer be called afterwards.
 
    --------------
    -- Elements --

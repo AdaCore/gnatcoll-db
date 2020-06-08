@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2011-2018, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -241,7 +241,7 @@ package GNATCOLL.SQL.Inspect is
 
    procedure Set_Active (Self : in out Field; Active : Boolean);
    function Is_Active (Self : Field) return Boolean;
-   --  A special marker that indicates whether special treatement should be
+   --  A special marker that indicates whether special treatment should be
    --  done on a field.
    --  By default, all fields are marked as active, but you could use this
    --  marker to filter out some fields. See Is_Active for tables.
@@ -277,7 +277,7 @@ package GNATCOLL.SQL.Inspect is
 
    function Name (Self : Table_Description) return String;
    --  The name of the table (normalized).
-   --  We recommand that this name be a plural (like "Objects"), and reserve
+   --  We recommend that this name be a plural (like "Objects"), and reserve
    --  the use of singular names for rows.
 
    function Row_Name (Self : Table_Description) return String;
@@ -303,7 +303,7 @@ package GNATCOLL.SQL.Inspect is
 
    procedure Set_Active (Self : in out Table_Description; Active : Boolean);
    function Is_Active (Self : Table_Description) return Boolean;
-   --  A special marker that indicates whether special treatement should be
+   --  A special marker that indicates whether special treatment should be
    --  done on a table.
    --  By default, all tables are marked as active, but you could use this
    --  marker to filter out some tables. For instance, when you generate code

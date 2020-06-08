@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -307,7 +307,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
 
             Status := Reset (Self.Stmt);
             if Status /= Sqlite_OK then
-               Trace (Me, "Error when reseting cursor to free LOCKS: "
+               Trace (Me, "Error when resetting cursor to free LOCKS: "
                       & Status'Img);
             end if;
          end if;
@@ -1079,7 +1079,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
       pragma Unreferenced (Self);
    begin
       --  Note : As SQLite does not support fixed point real, Money type is
-      --  represented as an integer that modelize cents.
+      --  represented as an integer that models cents.
       return "Integer";
    end Field_Type_Money;
 

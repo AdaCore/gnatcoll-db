@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
---                                  G P S                                   --
+--                            G N A T C O L L                               --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -1108,11 +1108,11 @@ package body GNATCOLL.Xref is
    --  from 'U' lines that have already been processed. In general, the files
    --  will occur only once since they have a single associated LI file.
    --  However, in the case of multi-unit source files in Ada, the file might
-   --  already be in Visited_ALI_Units, in which case we need to do fewer
-   --  cleanup prio to parsing the file.
+   --  already be in Visited_ALI_Units, in which case we need to do less
+   --  cleanup prior to parsing the file.
    --
    --  Visited_GLI_Files is a subset of VFS_To_Id, containing C/C++ include
-   --  files that have already been processed (ie. files from 'D' lines in
+   --  files that have already been processed (i.e. files from 'D' lines in
    --  GLI files).
 
    function Single_Entity_From_E2e
@@ -1269,7 +1269,7 @@ package body GNATCOLL.Xref is
 
       --  Various cases are possible, depending where the range low..high
       --  occurs compared to the data we already know. We could take the naive
-      --  approach of always reseting the array when we grow it, and always
+      --  approach of always resetting the array when we grow it, and always
       --  comparing the full Low..High range, but this is slower in practice.
       --
       --   |1-------max|
@@ -1308,8 +1308,8 @@ package body GNATCOLL.Xref is
       end if;
 
       for Line in Test_From .. Test_To loop
-         --  Override only if we have a more narrow scope (ie we are a child of
-         --  the entity known at that line).
+         --  Override only if we have a more narrow scope (i.e. we are a child
+         --  of the entity known at that line).
 
          if Lines.Lines (Line).Scope > Scope then
             Lines.Lines (Line) :=
@@ -1710,7 +1710,7 @@ package body GNATCOLL.Xref is
          end if;
 
          --  Within the extra entity information (parent type, index type,...)
-         --  there can be information as to where an entity is instanciated.
+         --  there can be information as to where an entity is instantiated.
          --  For instance, gtk-containers.ads contains:
          --     function Children return Gtk.Widget.Widget_List.GList;
          --  and the ALI file contains:
@@ -1780,7 +1780,7 @@ package body GNATCOLL.Xref is
          else
             --  Only insert if we have the detailed info for an entity in one
             --  of the units associated with the current LI (for instance
-            --  parent type info is only taken into account for these entites,
+            --  parent type info is only taken into account for these entities,
             --  for entities in other units we'll have to parse the
             --  corresponding LI). This avoids duplicates.
 
@@ -2494,7 +2494,7 @@ package body GNATCOLL.Xref is
               and then not Instances_Provide_Column
             then
                --  No candidate found, perhaps there is a forward declaration
-               --  coming from a generic instantiation, ie without column
+               --  coming from a generic instantiation, i.e. without column
                --  information.
 
                R.Fetch
@@ -3652,13 +3652,13 @@ package body GNATCOLL.Xref is
       --  Recreate the indexes if needed
 
       procedure Finalize_DB (DB : Database_Connection);
-      --  After parsing LI files, do the last post-processings in the database
+      --  After parsing LI files, do the last post-processing in the database
       --  (recreate indexes, analyze,...)
 
       procedure Start_Transaction
         (DB : Database_Connection;
          Destroy_Indexes : Boolean);
-      --  Preparate the database for editing, once we have detected some LI
+      --  Prepare the database for editing, once we have detected some LI
       --  files need to be updated.
 
       procedure Create_Project_Entries (DB : Database_Connection);
@@ -4612,7 +4612,7 @@ package body GNATCOLL.Xref is
       --  in some cases, if we connected to the database while gnatinspect was
       --  doing its work, sqlite might have cached some data in memory and
       --  incorrectly update the cache when gnatinspect commits the
-      --  transation. Closing and reconnecting forces a flush of the cache.
+      --  transaction. Closing and reconnecting forces a flush of the cache.
 
       if False   --  ??? Temporary
          and then Best_Ref = No_Entity_Reference

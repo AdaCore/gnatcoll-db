@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2009-2017, AdaCore                     --
+--                     Copyright (C) 2009-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -160,7 +160,7 @@ package body GNATCOLL.SQL.Sqlite.Gnade is
       pragma Import (C, Internal_Close, "sqlite3_close_v2");
       --  If there are still unfinalized prepared statement, actual
       --  deallocation will be deferred. This is intended for use with garbage
-      --  collected programmation languages, which is the case for the
+      --  collected programming languages, which is the case for the
       --  GNATCOLL.SQL package.
 
       function Next_Stmt

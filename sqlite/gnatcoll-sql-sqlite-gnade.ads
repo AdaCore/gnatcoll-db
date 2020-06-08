@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2009-2018, AdaCore                     --
+--                     Copyright (C) 2009-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 --  This file provides a very low-level interface to sqlite.
---  It is not intented for end users
+--  It is not intended for end users
 
 with Interfaces.C.Strings;
 with System;
@@ -339,7 +339,7 @@ package GNATCOLL.SQL.Sqlite.Gnade is
       SQL    : String;  --  UTF-8 encoded
       Stmt   : out Statement;
       Status : out Result_Codes);
-   --  Prepare (ie precompile) the SQL statement
+   --  Prepare (i.e. precompile) the SQL statement
 
    procedure Step
      (Stmt   : in out Statement;
@@ -370,8 +370,8 @@ package GNATCOLL.SQL.Sqlite.Gnade is
                          Sqlite_Null);
 
    function Column_Type (Stmt : Statement; Col : Natural) return Sqlite_Types;
-   --  Return the initial type of the column (hower, if you query it with one
-   --  of the functiond above this might change the actual type of the column)
+   --  Return the initial type of the column (however, if you query it with one
+   --  of the functions above this might change the actual type of the column)
 
    function Column_Count (Stmt : Statement) return Natural;
    --  Return the number of columns in the result, 0 for an UPDATE, INSERT or

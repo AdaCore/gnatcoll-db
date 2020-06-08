@@ -24,7 +24,7 @@
 --  This package provides subprograms to interact with a database. It provides
 --  a DBMS-agnostic API, which is further specialized in children packages for
 --  each supported DBMS system.
---  There are various reasons to use this package preferrably to the low-level
+--  There are various reasons to use this package preferably to the low-level
 --  package specific to each DBMS:
 --    - your code is not specialized for a specific system, and can therefore
 --      more easily be moved from one system to another
@@ -48,7 +48,7 @@
 --      All sql queries that are executed are traced through GNATCOLL.Traces
 --
 --  There are various ways to execute queries and get their results:
---    - two types of cursors (forward_cursor or direct_cursor) dependeing on
+--    - two types of cursors (forward_cursor or direct_cursor) depending on
 --      whether you want to keep all results in memory or not. Using direct
 --      cursors is more flexible, but slower since there is a need for a lot
 --      more memory allocations. Examples of timing (executing 10_000 times a
@@ -233,7 +233,7 @@ package GNATCOLL.SQL.Exec is
    --  A thread-specific access to a database. Each thread, in an application,
    --  should have its own access to the database, so that transactions really
    --  are thread-specific. This also stores the result of the last query
-   --  executed, and takes care of creating and cancelling transactions when
+   --  executed, and takes care of creating and canceling transactions when
    --  needed.
    --  This type is really an access to some data, so that all subprograms
    --  below can take IN parameters. This simplifies user-code, which can
@@ -319,7 +319,7 @@ package GNATCOLL.SQL.Exec is
    --  SQL_Query (which is encouraged, since it provides additional safety).
    --
    --  We used procedures instead of functions here for several reasons: that
-   --  allows you to extend the Cursor type without overridding these
+   --  allows you to extend the Cursor type without overriding these
    --  procedures, this is slightly more efficient (since Cursor is a
    --  controlled type), and that forces the user to declare a local variable,
    --  rather than use Value (Execute (...), ...), which might have
@@ -411,7 +411,7 @@ package GNATCOLL.SQL.Exec is
 
    function Last_Error_Message
      (Connection : access Database_Connection_Record'Class) return String;
-   --  Reports the last error message on this connection (ie the one that
+   --  Reports the last error message on this connection (i.e. the one that
    --  made the transaction fail)
 
    procedure Automatic_Transactions
@@ -447,7 +447,7 @@ package GNATCOLL.SQL.Exec is
 
    function In_Transaction
      (Connection : access Database_Connection_Record'Class) return Boolean;
-   --  Return True if a transaction is taking place (ie at least one
+   --  Return True if a transaction is taking place (i.e. at least one
    --  modification to the database took place, and was not COMMIT'd or
    --  ROLLBACK'd.
 
@@ -716,7 +716,7 @@ package GNATCOLL.SQL.Exec is
    --  of a previous execution of that query will be reused rather than
    --  executed again. If it was never executed, it will be cached for later
    --  use (no caching takes place if Use_Cache is False). This should mostly
-   --  be used for queries to tables that almost never change, ie that store
+   --  be used for queries to tables that almost never change, i.e. that store
    --  "enumeration types". The cache must be specifically invalidated (see
    --  Invalidate_Cache and Clear_Cache) to reset it, although it will also
    --  expire automatically and be refreshed after a while.
@@ -877,9 +877,9 @@ package GNATCOLL.SQL.Exec is
    --------------------------------------------
    -- Getting info about the database schema --
    --------------------------------------------
-   --  The following subprograms will provide a view of the database schema (ie
-   --  the set of tables and their fields, and the relationships between the
-   --  tables).
+   --  The following subprograms will provide a view of the database schema
+   --  (i.e. the set of tables and their fields, and the relationships between
+   --  the tables).
 
    type Relation_Kind is (Kind_Table, Kind_View);
 

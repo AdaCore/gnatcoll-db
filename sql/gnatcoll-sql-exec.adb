@@ -672,7 +672,7 @@ package body GNATCOLL.SQL.Exec is
 
       elsif Is_Select then
          --  ??? Should use the local mirror database when doing a select,
-         --  to speed up queries. Are we garanteed, with the mirror, that
+         --  to speed up queries. Are we guaranteed, with the mirror, that
          --  doing a INSERT on the master, and immediately a SELECT on the
          --  slave will return the newly inserted values ?
          Connection.Success := Is_Success (DBMS_Forward_Cursor'Class (R.all));

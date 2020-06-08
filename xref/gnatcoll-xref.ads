@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
---                                  G P S                                   --
+--                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2011-2019, AdaCore                     --
+--                     Copyright (C) 2011-2020, AdaCore                     --
 --                                                                          --
 -- This is free software;  you can redistribute it  and/or modify it  under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -199,7 +199,7 @@ package GNATCOLL.Xref is
    --  might end up being reused later (although it is highly unlikely).
    --  These two subprograms should be used with care and very rarely in
    --  practice. They are provided so that you can store an entity in a
-   --  GtkAda tree model easil.y
+   --  GtkAda tree model easily.
 
    type Entity_Reference is record
       Entity  : Entity_Information;
@@ -263,7 +263,7 @@ package GNATCOLL.Xref is
    --  When the file is passed as a string, it is permissible to pass only the
    --  basename (or a string like "partial/path/basename") that will be matched
    --  against all known files in the database.
-   --  File names must be normalized in Unix format (ie using '/' as a
+   --  File names must be normalized in Unix format (i.e. using '/' as a
    --  separator, and resolving symbolic links) when you pass a string. This is
    --  done automatically if you pass a Virtual_File.
    --
@@ -341,7 +341,7 @@ package GNATCOLL.Xref is
 
    function Is_Predefined_Entity
      (Decl : Entity_Declaration) return Boolean;
-   --  Returns True if the corresponding entity is a predefined entity, ie
+   --  Returns True if the corresponding entity is a predefined entity, i.e.
    --  the location of the declaration is irrelevant (only the name should be
    --  taken into account)
 
@@ -699,7 +699,7 @@ package GNATCOLL.Xref is
    function Overrides
      (Self   : Xref_Database'Class;
       Entity : Entity_Information) return Entity_Information;
-   --  The entity that is overridden by Entity (ie the method in
+   --  The entity that is overridden by Entity (i.e. the method in
    --  the parent class that is overridden by Entity).
    --  If Entity is a parameter of a subprogram, this procedure will return
    --  the list of homonym parameters in overridden subprograms, as an

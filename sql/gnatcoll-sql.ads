@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -47,8 +47,8 @@
 --  =============================================
 --
 --  This package depends on having types and subprograms that describe the
---  structure of the database. Writting such packages manually is tedious and
---  error prone. Instead, you should use the gnatcoll_db2ada tool to
+--  structure of the database. Writing such packages manually is tedious and
+--  error-prone. Instead, you should use the gnatcoll_db2ada tool to
 --  automatically generate this description before each compilation. This
 --  ensures that any SQL query in your application only references fields that
 --  do exist in the database, and therefore helps detect at compilation time a
@@ -79,7 +79,7 @@
 --      Table : T_Table.Table (null, -1);
 --
 --  FK is a subprogram to retrieve the foreign keys between two tables, to
---  simplify the writting of the sql queries. This is optional, and if you are
+--  simplify the writing of the sql queries. This is optional, and if you are
 --  maintaining this package by hand you might not want to generate these.
 --
 --  The reason to use a package like the above is to avoid naming conflicts
@@ -170,7 +170,7 @@ package GNATCOLL.SQL is
    --        SELECT ... FROM Table_Name Instance, ...
    --  Otherwise, if Instance_Index is not -1, the FROM clause will include:
    --        SELECT ... FROM Table_Name T<index>, ...
-   --        ie a generic name for the table.
+   --        i.e. a generic name for the table.
    --  Otherwise, the FROM clause will include:
    --        SELECT ... FROM Table_Name, ...
    --
@@ -198,7 +198,7 @@ package GNATCOLL.SQL is
 
    type SQL_Table_Access is access all SQL_Table'Class;
    procedure Free (A : in out SQL_Table_Access);
-   --  Needs to be freed explicitely
+   --  Needs to be freed explicitly
 
    function "&" (Left, Right : SQL_Table_List) return SQL_Table_List;
    function "&" (Left, Right : SQL_Single_Table'Class) return SQL_Table_List;
@@ -324,7 +324,7 @@ package GNATCOLL.SQL is
    Null_Field_Time : constant SQL_Field_Time;
    function Time_Param (Index : Positive) return Time_Fields.Field'Class
                         renames Time_Fields.Param;
-   --  A timestamp, ie date + time
+   --  A timestamp, i.e. date + time
 
    package Date_Parameters is new Scalar_Parameters
       (Ada.Calendar.Time, "date", Date_To_SQL);
@@ -570,7 +570,7 @@ package GNATCOLL.SQL is
    --     "prefix " || foo.bar || "suffix"
 
    function Tuple (Fields : SQL_Field_List) return SQL_Field'Class;
-   --  Return the list of fields as a tuple, ie (field1, field2)
+   --  Return the list of fields as a tuple, i.e. (field1, field2)
 
    function Coalesce (Fields : SQL_Field_List) return SQL_Field'Class;
    --  Returns the first of its arguments that is not null
@@ -670,7 +670,7 @@ package GNATCOLL.SQL is
      (Left : SQL_Field'Class; Right : Boolean) return SQL_Criteria
       renames Boolean_Fields.Equal;
    --  Same as ">" and ">=", but usable for instance for aggregate fields
-   --  resulting from the use of Apply
+   --  resulting from the use of Apply.
 
    function "and" (Left, Right : SQL_Criteria) return SQL_Criteria;
    function "or"  (Left, Right : SQL_Criteria) return SQL_Criteria;
@@ -683,11 +683,11 @@ package GNATCOLL.SQL is
      (Left : SQL_Criteria; Right : Boolean_Fields.Field'Class)
       return SQL_Criteria;
    --  Combine two criterias, one of which is for a boolean test. This is just
-   --  to simplify the writting
+   --  to simplify the writing.
 
    function "not" (Left : Boolean_Fields.Field'Class) return SQL_Criteria;
    --  Test that Left is False. This can also be done with an explicit call to
-   --  "=" above
+   --  "=" above.
 
    function "not" (Self : SQL_Criteria) return SQL_Criteria;
    --  Return the opposite of Self
@@ -741,7 +741,7 @@ package GNATCOLL.SQL is
 
    function Is_Null     (Self : SQL_Field'Class) return SQL_Criteria;
    function Is_Not_Null (Self : SQL_Field'Class) return SQL_Criteria;
-   --  Test whether a field is null or not (ie unset or set)
+   --  Test whether a field is null or not (i.e. unset or set)
 
    function Overlaps (Left, Right : SQL_Field'Class) return SQL_Criteria
       with Obsolescent => "See GNATCOLL.SQL.Ranges.Overlap instead";
