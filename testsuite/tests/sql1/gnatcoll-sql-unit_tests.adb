@@ -21,13 +21,17 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Test_Assert;              use Test_Assert;
-with Database;                 use Database;
-with Ada.Calendar.Formatting;
+with Ada.Calendar;
+with Ada.Strings.Fixed;
+with Ada.Strings.Maps;
 with Ada.Text_IO;              use Ada.Text_IO;
-with GNATCOLL.SQL.Postgres;
+with Database;                 use Database;
+with GNAT.Calendar.Time_IO;
 with GNATCOLL.SQL.Exec;
+with GNATCOLL.SQL.Postgres;
 with GNATCOLL.SQL.Sqlite;
+with GNATCOLL.Utils;
+with Test_Assert;              use Test_Assert;
 
 package body GNATCOLL.SQL.Unit_Tests is
    --  use T_Action_Item;
@@ -589,7 +593,12 @@ package body GNATCOLL.SQL.Unit_Tests is
    -------------------
 
    procedure Do_Parameters is
-      use GNATCOLL.SQL, GNATCOLL.SQL.Exec, Ada.Calendar;
+      use GNATCOLL.SQL, GNATCOLL.SQL.Exec, Ada.Calendar, GNAT.Calendar.Time_IO;
+      use Ada.Strings.Fixed, Ada.Strings.Maps, GNATCOLL.Utils;
+
+      function No_Trailing_Dot (Value : String) return String is
+        (if Value /= "" and then Value (Value'Last) = '.'
+         then Value (Value'First .. Value'Last - 1) else Value);
 
       Now    : constant Time := Clock;
       Value  : constant Float := 5.25;
@@ -603,8 +612,12 @@ package body GNATCOLL.SQL.Unit_Tests is
    begin
       Assert
          (Image (Memory.all, Params),
-          ", string, 2, 3, 1, 5.25000E+00, 6.12500000000000E+00, U,"
-          & " 2456717, NULL, " & Formatting.Image (Now));
+          ", string, 2, 3, 1, 5.25000E+00, 6.12500000000000E+00, U, 2456717,"
+          & " NULL, "
+          & No_Trailing_Dot
+              (Trim
+                 (Image (Now - UTC_Time_Offset (Now), "%Y-%m-%d %H:%M:%S.%e"),
+                  Left => Null_Set, Right => To_Set ("0"))));
    end Do_Parameters;
 
    --------------

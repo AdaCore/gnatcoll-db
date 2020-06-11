@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2018, AdaCore                     --
+--                     Copyright (C) 2005-2020, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,10 +22,11 @@
 ------------------------------------------------------------------------------
 
 with Ada.Calendar;               use Ada.Calendar;
-with Ada.Calendar.Formatting;    use Ada.Calendar.Formatting;
 with Ada.Strings.Fixed;          use Ada.Strings.Fixed;
-with Ada.Strings.Hash;
+with Ada.Strings.Hash;           use Ada.Strings;
+with Ada.Strings.Maps;           use Ada.Strings.Maps;
 with Ada.Unchecked_Deallocation;
+with GNAT.Calendar.Time_IO;      use GNAT.Calendar.Time_IO;
 with GNAT.Strings;               use GNAT.Strings;
 with GNATCOLL.Utils;             use GNATCOLL.Utils;
 
@@ -1666,8 +1667,20 @@ package body GNATCOLL.SQL_Impl is
 
       if Value /= No_Time then
          declare
-            Value_Str : constant String := Image (Value, Time_Zone => 0)
-              & (if Supports_Timezone (Self) then " +00:00" else "");
+            function No_Trailing_Dot (Value : String) return String is
+              (if Value /= "" and then Value (Value'Last) = '.'
+               then Value (Value'First .. Value'Last - 1)
+               else Value);
+
+            Value_Str : constant String :=
+                          No_Trailing_Dot
+                            (Trim
+                               (GNAT.Calendar.Time_IO.Image
+                                  (Value - UTC_Time_Offset (Value),
+                                   "%Y-%m-%d %H:%M:%S.%e"),
+                                Left => Null_Set, Right => To_Set ("0")))
+                          & (if Supports_Timezone (Self) then " +00:00"
+                             else "");
          begin
             return (if Quote then ''' & Value_Str & ''' else Value_Str);
          end;
@@ -1689,9 +1702,8 @@ package body GNATCOLL.SQL_Impl is
    begin
       if Value /= No_Time then
          declare
-            Value_Str : constant String := Image (Value, Time_Zone => 0);
-            Date_Str  : String
-              renames Value_Str (Value_Str'First .. Value_Str'First + 9);
+            Date_Str : constant String :=
+                         Image (Value - UTC_Time_Offset (Value), ISO_Date);
          begin
             return (if Quote then ''' & Date_Str & ''' else Date_Str);
          end;
