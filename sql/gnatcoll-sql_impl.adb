@@ -1677,7 +1677,7 @@ package body GNATCOLL.SQL_Impl is
                             (Trim
                                (GNAT.Calendar.Time_IO.Image
                                   (Value - UTC_Time_Offset (Value),
-                                   "%Y-%m-%d %H:%M:%S.%e"),
+                                   "%Y-%m-%d %H:%M:%S.%o"),
                                 Left => Null_Set, Right => To_Set ("0")))
                           & (if Supports_Timezone (Self) then " +00:00"
                              else "");
