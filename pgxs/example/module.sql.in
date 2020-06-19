@@ -1,0 +1,12 @@
+
+CREATE OR REPLACE FUNCTION to_bytea(integer, integer) RETURNS bytea
+    AS '@MODULEDIR@/libadamodule', 'to_bytea'
+    LANGUAGE C STRICT;
+
+CREATE OR REPLACE FUNCTION get_x(bytea) RETURNS integer
+    AS '@MODULEDIR@/libadamodule', 'get_x'
+    LANGUAGE C STRICT;
+
+CREATE OR REPLACE FUNCTION get_y(bytea) RETURNS integer
+    AS '@MODULEDIR@/libadamodule', 'get_y'
+    LANGUAGE C STRICT;
