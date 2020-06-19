@@ -1,7 +1,11 @@
 
 library project Module is
 
-   IncludeDir_Server := "/usr/include/pgsql/server";
+   IncludeDir_Server :=
+     external ("PG_CONFIG_INCLUDEDIR_SERVER", "/usr/include/pgsql/server");
+   --  A Path to server extensions header files reported by
+   --
+   --  $ pg_config --includedir-server
 
    for Languages use ("C", "Ada");
    for Object_Dir use "../.objs/module";

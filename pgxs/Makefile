@@ -1,7 +1,7 @@
 
 all: setup
-	gprbuild -p -P example/module.gpr
-	gprbuild -p -P testsuite/module.gpr
+	gprbuild -p -P example/module.gpr -XPG_CONFIG_INCLUDEDIR_SERVER=`pg_config --includedir-server`
+	gprbuild -p -P testsuite/module.gpr -XPG_CONFIG_INCLUDEDIR_SERVER=`pg_config --includedir-server`
 
 setup:
 	sed "s/@MODULEDIR@/`pwd | sed 's/\\//\\\\\\//g'`\/.libs/" example/module.sql.in > example/module.sql
