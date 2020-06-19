@@ -14,18 +14,20 @@ inside source code of his own project.
 Binding structure
 =================
 
-PGXS                - declaration of internal types
-PGXS.ABI            - the function to declare the version of calling convention of extension functions
-PGXS.Call_Info      - subprograms to get values of arguments and set the return value
-PGXS.Composites     - subprograms to manipulate by composite types
-PGXS.Datums         - subprograms to get value of Datum and create Datum from value
-PGXS.Generic_Bytea  - generic package to manipulate with BYTEA values as Ada record
-PGXS.Logs           - error reporting and logging
-PGXS.Pools          - memory management
-PGXS.Pools.Defaults - default memory pool
-PGXS.Return_Sets    - subprograms and utilities to return sets
-PGXS.Types          - declarations of types used as representation of SQL types
-PGXS.Varlen         - subprograms to manipulate by varlena objects
+ Package            | Description
+--------------------|-------------------------
+PGXS                | declaration of internal types
+PGXS.ABI            | the function to declare the version of calling convention of extension functions
+PGXS.Call_Info      | subprograms to get values of arguments and set the return value
+PGXS.Composites     | subprograms to manipulate by composite types
+PGXS.Datums         | subprograms to get value of Datum and create Datum from value
+PGXS.Generic_Bytea  | generic package to manipulate with BYTEA values as Ada record
+PGXS.Logs           | error reporting and logging
+PGXS.Pools          | memory management
+PGXS.Pools.Defaults | default memory pool
+PGXS.Return_Sets    | subprograms and utilities to return sets
+PGXS.Types          | declarations of types used as representation of SQL types
+PGXS.Varlen         | subprograms to manipulate by varlena objects
 
 Declaring exported functions
 ============================
