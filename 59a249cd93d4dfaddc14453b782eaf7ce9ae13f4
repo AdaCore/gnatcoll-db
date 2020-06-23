@@ -1,0 +1,7 @@
+Code-Review+2: Vasiliy Fofanov <fofanov@adacore.com>
+Code-Review+1: CI Builder <ci-builder@adacore.com>
+Submitted-by: Vadim Godunko <godunko@adacore.com>
+Submitted-at: Tue, 23 Jun 2020 17:41:48 +0200
+Reviewed-on: https://git.adacore.com/74733
+Project: gnatcoll-db
+Branch: refs/heads/master
