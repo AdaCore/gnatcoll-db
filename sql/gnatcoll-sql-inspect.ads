@@ -171,9 +171,11 @@ package GNATCOLL.SQL.Inspect is
       For_Database : Boolean := True) return String with Inline;
    overriding function Type_From_SQL
      (Self : in out Field_Mapping_Timestamp; Str : String) return Boolean
-     is (Str = "timestamp without time zone"
-         or else Str = "timestamp with time zone"
-         or else Str = "timestamp");
+   is
+     (Str in "timestamp without time zone"
+           | "timestamp with time zone"
+           | "timestamp"
+           | "datetime");
    overriding function Parameter_Type
      (Self : Field_Mapping_Timestamp) return SQL_Parameter_Type'Class
      is (SQL_Parameter_Time'(others => <>));

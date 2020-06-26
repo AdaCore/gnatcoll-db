@@ -808,7 +808,11 @@ package body GNATCOLL.SQL.Sqlite.Builder is
       Kind  : Relation_Kind;
    begin
       R.Fetch
-        (Connection, "SELECT name, type FROM sqlite_master ORDER BY name");
+        (Connection,
+         "SELECT name, type FROM sqlite_master"
+         & " WHERE type in ('table', 'view') and name not like 'sqlite_%'"
+         & " ORDER BY name");
+
       while Has_Row (R) loop
          if Value (R, 1) = "table" then
             Kind := Kind_Table;
@@ -927,6 +931,10 @@ package body GNATCOLL.SQL.Sqlite.Builder is
                   Pos := Pos + 1;
                end loop;
 
+               pragma Assert
+                 (Pos2 in Sql'Range and then Pos in Sql'Range,
+                  Pos2'Img & Pos'Img & ": " & Sql & "; '"  & Table_Name & ''');
+
                Is_PK := Fixed.Index
                  (To_Lower (Sql (Pos2 .. Pos)), "primary key") >= 1;
 
@@ -935,7 +943,9 @@ package body GNATCOLL.SQL.Sqlite.Builder is
 
                --  Ignore constraints declarations
 
-               if To_Lower (Sql (Pos2 .. Pos3)) /= "constraint" then
+               if To_Lower (Sql (Pos2 .. Pos3)) /= "constraint"
+                 and then To_Lower (Sql (Pos4 .. Pos5 - 1)) /= "key"
+               then
                   Callback
                     (Name           => Sql (Pos2 .. Pos3),
                      Typ            => Sql (Pos4 .. Pos5 - 1),

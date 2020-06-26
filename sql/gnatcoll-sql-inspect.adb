@@ -622,43 +622,49 @@ package body GNATCOLL.SQL.Inspect is
    overriding function Type_From_SQL
       (Self : in out Field_Mapping_Text; Str : String) return Boolean
    is
+      function Process_Max_Length (Kind : String) return Boolean;
+      --  Try to take max length from sql type like varchar(123), returns True
+      --  on success, raises Invalid_Schema is value in brackets is not an
+      --  number.
+
+      ------------------------
+      -- Process_Max_Length --
+      ------------------------
+
+      function Process_Max_Length (Kind : String) return Boolean is
+      begin
+         if Str'Length > Kind'Length
+           and then Str (Str'First .. Str'First + Kind'Length) = Kind & '('
+           and then Str (Str'Last) = ')'
+         then
+            begin
+               Self.Max_Length := Integer'Value
+                 (Str (Str'First + Kind'Length + 1 .. Str'Last - 1));
+
+               return True;
+
+            exception
+               when Constraint_Error =>
+                  Put_Line
+                    ("Missing max length after '" & Kind & "' in " & Str);
+                  raise Invalid_Schema;
+            end;
+         end if;
+
+         return False;
+      end Process_Max_Length;
+
    begin
-      if Str = "text"
-         or else Str = "varchar"
+      if Str in "text" | "varchar" | "nvarchar"
          or else (Str'Length >= 10    --  "character varying(...)"
                   and then Str (Str'First .. Str'First + 9) = "character ")
       then
          Self.Max_Length := Integer'Last;
          return True;
-
-      elsif Str'Length >= 8
-         and then Str (Str'First .. Str'First + 7) = "varchar("
-      then
-         begin
-            Self.Max_Length := Integer'Value
-               (Str (Str'First + 8 .. Str'Last - 1));
-            return  True;
-         exception
-            when Constraint_Error =>
-               Put_Line ("Missing max length after 'varchar' in " & Str);
-               raise Invalid_Schema;
-         end;
-
-      elsif Str'Length >= 10
-        and then Str (Str'First .. Str'First + 9) = "character("
-      then
-         begin
-            Self.Max_Length :=
-               Integer'Value (Str (Str'First + 10 .. Str'Last - 1));
-            return True;
-         exception
-            when Constraint_Error =>
-               Put_Line ("Missing max length after 'Character' in " & Str);
-               raise Invalid_Schema;
-         end;
-
       else
-         return False;
+         return Process_Max_Length ("varchar")
+           or else Process_Max_Length ("character")
+           or else Process_Max_Length ("nvarchar");
       end if;
    end Type_From_SQL;
 
