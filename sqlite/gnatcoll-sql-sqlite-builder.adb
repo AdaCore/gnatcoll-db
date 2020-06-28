@@ -872,6 +872,14 @@ package body GNATCOLL.SQL.Sqlite.Builder is
       Paren_Count : Natural;
       Is_PK       : Boolean;
       Is_Not_Null : Boolean;
+
+      function No_Square_Brackets (Item : String) return String is
+        (if Item'Length > 1
+           and then Item (Item'First) = '['
+           and then Item (Item'Last) = ']'
+         then Item (Item'First + 1 .. Item'Last - 1)
+         else Item);
+
    begin
       R.Fetch
         (Connection,
@@ -903,9 +911,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
 
                while Pos <= Sql'Last
                  and then not Is_Whitespace (Sql (Pos))
-                 and then Sql (Pos) /= ','
-                 and then (Sql (Pos) /= ')'
-                           or else Paren_Count /= 0)
+                 and then (Paren_Count > 0 or else Sql (Pos) not in ',' | ')')
                loop
                   if Sql (Pos) = '(' then
                      Paren_Count := Paren_Count + 1;
@@ -919,9 +925,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
                Pos5 := Pos;
 
                while Pos <= Sql'Last
-                 and then
-                   (Paren_Count /= 0
-                    or else (Sql (Pos) /= ',' and then Sql (Pos) /= ')'))
+                 and then (Paren_Count > 0 or else Sql (Pos) not in ',' | ')')
                loop
                   if Sql (Pos) = '(' then
                      Paren_Count := Paren_Count + 1;
@@ -947,7 +951,7 @@ package body GNATCOLL.SQL.Sqlite.Builder is
                  and then To_Lower (Sql (Pos4 .. Pos5 - 1)) /= "key"
                then
                   Callback
-                    (Name           => Sql (Pos2 .. Pos3),
+                    (Name           => No_Square_Brackets (Sql (Pos2 .. Pos3)),
                      Typ            => Sql (Pos4 .. Pos5 - 1),
                      Index          => Index,
                      Description    => "",

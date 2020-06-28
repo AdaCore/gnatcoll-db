@@ -677,18 +677,20 @@ package body GNATCOLL.SQL.Inspect is
    is
       pragma Unreferenced (Self);
    begin
-      if Str = "integer" or else Str = "smallint" or else Str = "oid" then
+      if Str in "integer" | "smallint" | "oid" then
          return True;
 
-      elsif Str'Length >= 7
-         and then Str (Str'First .. Str'First + 6) = "numeric"
+      elsif Str'Length > 7
+         and then Str (Str'First .. Str'First + 6) in "numeric" | "decimal"
       then
          --  Check the scale
+
          for Comma in reverse Str'Range loop
             if Str (Comma) = ',' then
                return Str (Comma + 1 .. Str'Last - 1) = "0";
             end if;
          end loop;
+
          return True;
 
       else
@@ -705,13 +707,14 @@ package body GNATCOLL.SQL.Inspect is
    is
       pragma Unreferenced (Self);
    begin
-      if Str = "float" then
+      if Str in "float" | "numeric" | "decimal" then
          return True;
 
-      elsif Str'Length >= 7
-         and then Str (Str'First .. Str'First + 6) = "numeric"
+      elsif Str'Length > 7
+        and then Str (Str'First .. Str'First + 6) in "numeric" | "decimal"
       then
          --  Check the scale
+
          for Comma in reverse Str'Range loop
             if Str (Comma) = ',' then
                return Str (Comma + 1 .. Str'Last - 1) /= "0";

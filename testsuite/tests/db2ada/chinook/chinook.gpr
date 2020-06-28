@@ -1,0 +1,8 @@
+with "gnatcoll";
+with "gnatcoll_sqlite";
+
+project Chinook is
+   for Main use ("test.adb");
+   for Source_Dirs use (".", "../../../support");
+   for Object_Dir use "obj";
+end Chinook;
