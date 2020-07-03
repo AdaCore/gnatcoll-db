@@ -22,6 +22,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Calendar;               use Ada.Calendar;
+with Ada.Calendar.Time_Zones;    use Ada.Calendar.Time_Zones;
 with Ada.Strings.Fixed;          use Ada.Strings.Fixed;
 with Ada.Strings.Hash;           use Ada.Strings;
 with Ada.Strings.Maps;           use Ada.Strings.Maps;
@@ -1671,12 +1672,12 @@ package body GNATCOLL.SQL_Impl is
               (if Value /= "" and then Value (Value'Last) = '.'
                then Value (Value'First .. Value'Last - 1)
                else Value);
-
+               
             Value_Str : constant String :=
                           No_Trailing_Dot
                             (Trim
                                (GNAT.Calendar.Time_IO.Image
-                                  (Value - UTC_Time_Offset (Value),
+                                  (Value - Duration (UTC_Time_Offset (Value)*60),
                                    "%Y-%m-%d %H:%M:%S.%o"),
                                 Left => Null_Set, Right => To_Set ("0")))
                           & (if Supports_Timezone (Self) then " +00:00"
@@ -1703,7 +1704,8 @@ package body GNATCOLL.SQL_Impl is
       if Value /= No_Time then
          declare
             Date_Str : constant String :=
-                         Image (Value - UTC_Time_Offset (Value), ISO_Date);
+              Image (Value - Duration(UTC_Time_Offset (Value)*60), 
+                     ISO_Date);
          begin
             return (if Quote then ''' & Date_Str & ''' else Date_Str);
          end;
