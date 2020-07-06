@@ -6,7 +6,7 @@ import sys
 import os
 import subprocess
 import copy
-
+from functools import cmp_to_key
 pkg_name = "Orm"
 
 store_connections = True
@@ -130,6 +130,10 @@ class Subprogram(object):
         self.overriding = overriding
         self.abstract = abstract
         self.inline = inline
+
+
+def cmp(a, b):
+    return (a > b) - (a < b)
 
 
 def _subprogram_sorter(sub1, sub2):
@@ -373,7 +377,7 @@ class Pretty_Printer(object):
             self.out.write("\n")
 
         # Sort subprograms within the section
-        subprograms.sort(cmp=_subprogram_sorter)
+        subprograms.sort(key=cmp_to_key(_subprogram_sorter))
 
         comment = ""
 

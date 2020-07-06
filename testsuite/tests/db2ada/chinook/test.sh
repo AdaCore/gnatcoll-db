@@ -5,3 +5,6 @@ sqlite3 -cmd ".read chinook.sql" db.db
 gnatcoll_sqlite2ada -dbname db.db
 gprbuild -p
 obj/test
+
+gnatcoll_sqlite2ada -dbname db.db -text > schema.txt
+gnatcoll_sqlite2ada -dbmodel schema.txt -orm orm
