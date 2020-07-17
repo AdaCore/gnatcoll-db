@@ -32,7 +32,7 @@ project Gnatinspect is
    Name    := "gnatinspect";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD");
+   Build : Build_Type := External ("BUILD", "PROD");
 
    for Languages use ("Ada");
 
