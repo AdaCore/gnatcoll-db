@@ -29,7 +29,8 @@ project GNATCOLL_DB2Ada is
    Name    := "gnatcoll_db2ada";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD", "PROD");
+   Build : Build_Type :=
+       External ("GNATCOLL_DB2ADA_BUILD", External ("BUILD", "PROD"));
 
    for Languages use ("Ada");
 

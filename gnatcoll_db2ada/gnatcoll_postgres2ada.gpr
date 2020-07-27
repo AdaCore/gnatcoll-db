@@ -31,7 +31,8 @@ project gnatcoll_Postgres2ada is
    Name    := "gnatcoll_postgres2ada";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD", "PROD");
+   Build : Build_Type :=
+       External ("GNATCOLL_POSTGRES2ADA_BUILD", External ("BUILD", "PROD"));
 
    for Languages use ("Ada");
 

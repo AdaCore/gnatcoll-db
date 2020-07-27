@@ -31,7 +31,8 @@ project gnatcoll_sqlite2ada is
    Name    := "gnatcoll_sqlite2ada";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD", "PROD");
+   Build : Build_Type :=
+       External ("GNATCOLL_SQLITE2ADA_BUILD", External ("BUILD", "PROD"));
 
    for Languages use ("Ada");
 

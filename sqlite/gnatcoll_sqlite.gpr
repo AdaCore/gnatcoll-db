@@ -31,7 +31,8 @@ project GnatColl_Sqlite is
    Name    := "gnatcoll_sqlite";
 
    type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type := External ("BUILD", "PROD");
+   Build : Build_Type :=
+       External ("GNATCOLL_SQLITE_BUILD", External ("BUILD", "PROD"));
 
    type Library_Type_Type is ("relocatable", "static", "static-pic");
    Library_Type : Library_Type_Type := External ("LIBRARY_TYPE", "static");
