@@ -30,7 +30,7 @@ project GNATCOLL_DB2Ada is
 
    type Build_Type is ("DEBUG", "PROD");
    Build : Build_Type :=
-       External ("GNATCOLL_BUILD", External ("BUILD", "PROD"));
+       External ("GNATCOLL_BUILD_MODE", External ("BUILD", "PROD"));
 
    for Languages use ("Ada");
 
