@@ -28,9 +28,9 @@
 --  ??? sqlalchemy provides a SingletonThreadPool where a connection is only
 --      returned in the thread that was used to create it (for sqlite)
 
-with Ada.Containers.Vectors;
-use Ada.Containers;
+with Ada.Containers; use Ada.Containers;
 with Ada.Unchecked_Deallocation;
+
 with GNATCOLL.SQL;        use GNATCOLL.SQL;
 with GNATCOLL.SQL.Orm;
 with GNATCOLL.Traces;     use GNATCOLL.Traces;
@@ -81,9 +81,6 @@ package body GNATCOLL.SQL.Sessions is
       E   : Detached_Element_Access;
       Msg : String := "");
    --  Print information on C
-
-   package Hash_Lists is new Ada.Containers.Vectors
-      (Natural, Ada.Containers.Hash_Type);
 
    procedure Add_To_Cache (Self : Session_Type; E : Detached_Element'Class);
    --  Add the element into the cache. We want the element to outlive the

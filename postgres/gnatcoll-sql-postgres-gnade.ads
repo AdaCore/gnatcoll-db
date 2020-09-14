@@ -3,7 +3,7 @@
 --                      GNADE  : GNu Ada Database Environment                --
 --                                                                           --
 --  Copyright (C) 2000-2003, Juergen Pfeifer <juergen.pfeifer@gmx.net>       --
---  Copyright (C) 2004-2019, AdaCore                                         --
+--  Copyright (C) 2004-2020, AdaCore                                         --
 --                                                                           --
 --  GNADE is free software;  you can redistribute it  and/or modify it under --
 --  terms of the  GNU General Public License as published  by the Free Soft- --
@@ -40,7 +40,6 @@
 with Ada.Finalization;
 with Interfaces.C.Strings;
 with GNATCOLL.SQL_Impl;
-with GNATCOLL.Strings;
 with System;
 
 package GNATCOLL.SQL.Postgres.Gnade is

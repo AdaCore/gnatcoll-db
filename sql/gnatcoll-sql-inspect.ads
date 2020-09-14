@@ -41,7 +41,6 @@ with Ada.Strings.Equal_Case_Insensitive;
 with Ada.Strings.Hash_Case_Insensitive;
 with GNATCOLL.SQL.Exec;           use GNATCOLL.SQL.Exec;
 with GNATCOLL.VFS;
-with GNATCOLL.Strings;            use GNATCOLL.Strings;
 with GNAT.Regexp;                 use GNAT.Regexp;
 private with GNATCOLL.Refcount;
 private with GNAT.Strings;

@@ -22,7 +22,6 @@
 ------------------------------------------------------------------------------
 
 with GNATCOLL.SQL.Sqlite.Builder;
-with GNATCOLL.Strings; use GNATCOLL.Strings;
 
 package body GNATCOLL.SQL.Sqlite is
 

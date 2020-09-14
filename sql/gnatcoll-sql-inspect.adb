@@ -32,6 +32,7 @@ with Ada.Text_IO;                 use Ada.Text_IO;
 with Ada.Unchecked_Deallocation;
 with GNAT.Strings;                use GNAT.Strings;
 with GNATCOLL.Mmap;               use GNATCOLL.Mmap;
+with GNATCOLL.Strings;            use GNATCOLL.Strings;
 with GNATCOLL.Traces;             use GNATCOLL.Traces;
 with GNATCOLL.VFS;                use GNATCOLL.VFS;
 with GNATCOLL.Utils;              use GNATCOLL.Utils;
