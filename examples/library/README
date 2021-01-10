@@ -1,0 +1,9 @@
+This is the library example declared in the GNATCOLL.SQL documentation.
+
+To build example execute:
+
+gprbuild -p
+
+To run example execute:
+
+obj/library

@@ -341,8 +341,8 @@ provide that information:
 
     | TABLE | customers     | customer        || The customer for the library |
     | id    | AUTOINCREMENT | PK              || Auto-generated id            |
-    | first | TEXT          | NOT NULL        || Customers' first name        |
-    | last  | TEXT          | NOT NULL, INDEX || Customers' last name         |
+    | first | TEXT          | NOT NULL        || Customer's first name        |
+    | last  | TEXT          | NOT NULL, INDEX || Customer's last name         |
 
   We highly recommend to set a primary key on all tables.
   This is a field whose value is
