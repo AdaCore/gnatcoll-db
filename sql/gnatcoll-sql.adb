@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2020, AdaCore                     --
+--                     Copyright (C) 2005-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -739,7 +739,7 @@ package body GNATCOLL.SQL is
    is
       Result : When_List;
    begin
-      Append (Result.List, (Criteria, +Field));
+      Append (Result.List, When_List_Item'(Criteria, +Field));
       return Result;
    end SQL_When;
 
