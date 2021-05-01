@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2020, AdaCore                     --
+--                     Copyright (C) 2005-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -189,14 +189,17 @@ package body GNATCOLL.SQL_Impl is
          To           : in out SQL_Field_List'Class;
          Is_Aggregate : in out Boolean)
       is
-         FC : access SQL_Field_Internal'Class;
       begin
          if not Self.Data.Is_Null then
             --  !!! Could not use Element call result in the
             --  Append_If_Not_Aggregate parameter because of GNAT bug OB03-009
 
-            FC := Self.Data.Get.Element;
-            Append_If_Not_Aggregate (FC, To, Is_Aggregate);
+            declare
+               FC : constant access SQL_Field_Internal'Class :=
+                      Self.Data.Get.Element;
+            begin
+               Append_If_Not_Aggregate (FC, To, Is_Aggregate);
+            end;
          end if;
       end Append_If_Not_Aggregate;
    end Data_Fields;
