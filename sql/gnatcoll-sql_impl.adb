@@ -191,15 +191,7 @@ package body GNATCOLL.SQL_Impl is
       is
       begin
          if not Self.Data.Is_Null then
-            --  !!! Could not use Element call result in the
-            --  Append_If_Not_Aggregate parameter because of GNAT bug OB03-009
-
-            declare
-               FC : constant access SQL_Field_Internal'Class :=
-                      Self.Data.Get.Element;
-            begin
-               Append_If_Not_Aggregate (FC, To, Is_Aggregate);
-            end;
+            Append_If_Not_Aggregate (Self.Data.Get.Element, To, Is_Aggregate);
          end if;
       end Append_If_Not_Aggregate;
    end Data_Fields;
