@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --               PostgreSQL server extension modules binding                --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,7 +21,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with PGXS.ABI;
+with PGXS.Call_Info;
+with PGXS.Types;
 
 package body Sample is
 
