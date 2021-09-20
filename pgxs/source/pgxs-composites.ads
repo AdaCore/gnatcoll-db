@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --               PostgreSQL server extension modules binding                --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 --  Subprograms to obtain and to construct values of composite types.
 
-with Interfaces.C.Extensions;
+with Interfaces.C;
 
 private with PGXS.Pools.Defaults;
 with PGXS.Types;
@@ -87,8 +87,7 @@ private
    type Attributes_Arrays (Size : Attribute_Count) is record
       Descriptor : PGXS.Tuple_Desc;
       Datums     : Datum_Array (1 .. Size);
-      Nulls      : Bool_Array (1 .. Size) :=
-        (others => Interfaces.C.Extensions.True);
+      Nulls      : Bool_Array (1 .. Size) := (others => Interfaces.C.True);
    end record;
 
    type Attributes is access all Attributes_Arrays

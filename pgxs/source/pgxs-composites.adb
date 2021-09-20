@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --               PostgreSQL server extension modules binding                --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -75,7 +75,7 @@ package body PGXS.Composites is
      (Self  : in out Attributes;
       Index : Attribute_Number) is
    begin
-      Self.Nulls (Index) := Interfaces.C.Extensions.True;
+      Self.Nulls (Index) := Interfaces.C.True;
    end Set_Null;
 
    ---------------
@@ -87,7 +87,7 @@ package body PGXS.Composites is
       Index : Attribute_Number;
       To    : PGXS.Datum) is
    begin
-      Self.Nulls (Index) := Interfaces.C.Extensions.False;
+      Self.Nulls (Index) := Interfaces.C.False;
       Self.Datums (Index) := To;
    end Set_Value;
 

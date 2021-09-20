@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --               PostgreSQL server extension modules binding                --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -33,7 +33,7 @@
 --  text                       text*     postgres.h  Text
 --  varchar                    VarChar*  postgres.h  Var_Char
 
-with Interfaces.C.Extensions;
+with Interfaces.C;
 
 with PGXS.Varlen;
 
@@ -41,7 +41,7 @@ package PGXS.Types is
 
    type Oid is private;
 
-   subtype Bool is Interfaces.C.Extensions.bool;
+   subtype Bool is Interfaces.C.C_bool;
 
    subtype Int_16 is Interfaces.Integer_16;
 
