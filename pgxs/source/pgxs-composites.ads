@@ -77,6 +77,10 @@ package PGXS.Composites is
    --  Complete tuple descriptor by initially missing information to return
    --  values from the user defined extension function.
 
+   function Relation_Name_Get_Tuple_Desc
+     (Relname : String) return PGXS.Tuple_Desc;
+   --  Given a (possibly qualified) relation name, build a TupleDesc.
+
 private
 
    type Datum_Array is array (Attribute_Number range <>) of aliased PGXS.Datum;

@@ -38,6 +38,21 @@ package body PGXS.Composites is
               (Size => Size, Descriptor => Descriptor, others => <>);
    end Allocate;
 
+   ----------------------------------
+   -- Relation_Name_Get_Tuple_Desc --
+   ----------------------------------
+
+   function Relation_Name_Get_Tuple_Desc
+     (Relname : String) return PGXS.Tuple_Desc
+   is
+      function Imported
+        (Relname : Interfaces.C.char_array) return PGXS.Tuple_Desc
+        with Import, Convention => C, Link_Name => "RelationNameGetTupleDesc";
+
+   begin
+      return Imported (Interfaces.C.To_C (Relname));
+   end Relation_Name_Get_Tuple_Desc;
+
    ------------------
    -- Return_Value --
    ------------------
