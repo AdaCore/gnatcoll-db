@@ -1,4 +1,12 @@
 
+CREATE TYPE Coord AS
+ (X float4,
+  Y float4);
+
+CREATE TYPE Pos AS
+ (C Coord,
+  H int4);
+
 CREATE OR REPLACE FUNCTION apgxs_num_args() RETURNS integer
     AS '@MODULEDIR@/libadatestmodule', 'apgxs_num_args'
     LANGUAGE C STRICT;
@@ -45,4 +53,8 @@ CREATE OR REPLACE FUNCTION apgxs_composite(integer, integer) RETURNS apgxs_compo
 
 CREATE OR REPLACE FUNCTION apgxs_set_simple(integer) RETURNS SETOF integer
     AS '@MODULEDIR@/libadatestmodule', 'apgxs_set_simple'
+    LANGUAGE C STRICT;
+
+CREATE OR REPLACE FUNCTION pos_from_bin(bytea) RETURNS pos
+    AS '@MODULEDIR@/libadatestmodule', 'pos_from_bin'
     LANGUAGE C STRICT;

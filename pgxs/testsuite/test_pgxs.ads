@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --               PostgreSQL server extension modules binding                --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -22,6 +22,8 @@
 ------------------------------------------------------------------------------
 
 with PGXS.ABI;
+with PGXS.Generic_Bytea;
+with PGXS.Types;
 
 package Test_PGXS is
 
@@ -102,5 +104,27 @@ package Test_PGXS is
      return not null access PGXS.ABI.Function_Info_Record
    is (PGXS.ABI.Ada_Function_Info_1)
      with Export, Convention => C, Link_Name => "pg_finfo_apgxs_set_simple";
+
+   --  U917-009
+
+   type Coord is record
+      X, Y : PGXS.Types.Float_4;
+   end record;
+
+   type Pos is record
+      C : Coord;
+      H : PGXS.Types.Int_32;
+   end record;
+
+   package Pos_Bytea is new PGXS.Generic_Bytea (Pos);
+
+   function Pos_From_Bin
+     (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
+         with Export, Convention => C, Link_Name => "pos_from_bin";
+
+   function Pos_From_Bin_Info
+     return not null access PGXS.ABI.Function_Info_Record
+   is (PGXS.ABI.Ada_Function_Info_1)
+     with Export, Convention => C, Link_Name  => "pg_finfo_pos_from_bin";
 
 end Test_PGXS;

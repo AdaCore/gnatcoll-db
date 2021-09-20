@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --               PostgreSQL server extension modules binding                --
 --                                                                          --
---                       Copyright (C) 2020, AdaCore                        --
+--                    Copyright (C) 2020-2021, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -29,7 +29,6 @@ with PGXS.Datums;
 with PGXS.Pools.Defaults;
 with PGXS.Return_Sets;
 with PGXS.Logs;
-with PGXS.Types;
 
 package body Test_PGXS is
 
@@ -160,6 +159,52 @@ package body Test_PGXS is
              (Args, PGXS.Types.Bool (PGXS.Datums.To_Value (Salary) > Limit));
       end if;
    end Overpaid;
+
+   ------------------
+   -- Pos_From_Bin --
+   ------------------
+
+   function Pos_From_Bin
+     (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
+   is
+      Value        : constant Pos := Pos_Bytea.Get_Arg (Args, 0);
+
+      Result_Oid   : PGXS.Types.Oid;
+      Result_Desc  : PGXS.Tuple_Desc;
+      Result_Class : PGXS.Call_Info.Func_Type_Class;
+
+      Coord_Desc   : PGXS.Tuple_Desc;
+      Result_Coord : PGXS.Composites.Attributes;
+      Result       : PGXS.Composites.Attributes;
+
+   begin
+      --  Obtain Tuple_Desc for Coord type and return types.
+
+      Result_Class :=
+        PGXS.Call_Info.Get_Call_Result_Type (Args, Result_Oid, Result_Desc);
+
+      Coord_Desc := PGXS.Composites.Relation_Name_Get_Tuple_Desc ("coord");
+      Result_Coord :=
+        PGXS.Composites.Allocate
+          (PGXS.Composites.Bless_Tuple_Desc (Coord_Desc), 2);
+      Result :=
+        PGXS.Composites.Allocate
+          (PGXS.Composites.Bless_Tuple_Desc (Result_Desc), 2);
+
+      --  Construct return value
+
+      PGXS.Composites.Set_Value
+        (Result_Coord, 1, PGXS.Datums.To_Datum (Value.C.X));
+      PGXS.Composites.Set_Value
+        (Result_Coord, 2, PGXS.Datums.To_Datum (Value.C.Y));
+
+      PGXS.Composites.Set_Value
+        (Result, 1, PGXS.Composites.Return_Value (Args, Result_Coord));
+      PGXS.Composites.Set_Value
+        (Result, 2, PGXS.Datums.To_Datum (Value.H));
+
+      return PGXS.Composites.Return_Value (Args, Result);
+   end Pos_From_Bin;
 
    ---------------
    -- Composite --

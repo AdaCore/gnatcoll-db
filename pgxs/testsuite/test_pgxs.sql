@@ -19,3 +19,5 @@ SELECT get_y(to_bytea(4, 8));
 
 SELECT apgxs_composite(5, 10);
 SELECT apgxs_set_simple(3);
+
+SELECT pos_from_bin(E'\\x00 00 80 3F  00 00 00 40  03 00 00 00');
