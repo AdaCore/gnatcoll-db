@@ -78,8 +78,10 @@ package PGXS.Composites is
    --  values from the user defined extension function.
 
    function Relation_Name_Get_Tuple_Desc
-     (Relname : String) return PGXS.Tuple_Desc;
+     (Relname : Interfaces.C.char_array) return PGXS.Tuple_Desc
+     with Import, Convention => C, Link_Name => "RelationNameGetTupleDesc";
    --  Given a (possibly qualified) relation name, build a TupleDesc.
+   --  Note, C-style nul terminated string should be used as Relname.
 
 private
 

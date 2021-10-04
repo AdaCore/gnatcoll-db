@@ -32,6 +32,7 @@ with PGXS.Logs;
 
 package body Test_PGXS is
 
+   use type Interfaces.C.char_array;
    use all type PGXS.Types.Bool;
 
    --------------
@@ -137,7 +138,6 @@ package body Test_PGXS is
    function Overpaid
      (Args : in out PGXS.Function_Call_Info) return PGXS.Datum
    is
-      use type Interfaces.C.char_array;
       use type PGXS.Types.Int_32;
 
       Emp     : PGXS.Heap_Tuple_Header := PGXS.Call_Info.Get_Arg (Args, 0);
@@ -183,7 +183,9 @@ package body Test_PGXS is
       Result_Class :=
         PGXS.Call_Info.Get_Call_Result_Type (Args, Result_Oid, Result_Desc);
 
-      Coord_Desc := PGXS.Composites.Relation_Name_Get_Tuple_Desc ("coord");
+      Coord_Desc :=
+        PGXS.Composites.Relation_Name_Get_Tuple_Desc
+          ("coord" & Interfaces.C.nul);
       Result_Coord :=
         PGXS.Composites.Allocate
           (PGXS.Composites.Bless_Tuple_Desc (Coord_Desc), 2);
