@@ -41,8 +41,6 @@ project GnatColl_Sqlite is
    for Library_Name    use Name;
    for Library_Version use "lib" & Name & Gnatcoll.So_Ext & "." & Version;
 
-   for Languages use ("Ada", "C");
-
    Thread_Lib := ();
 
    case OS is
@@ -59,8 +57,10 @@ project GnatColl_Sqlite is
    case Sqlite_Dep is
       when "embedded" =>
          for Source_Dirs use (".", "amalgamation");
+         for Languages use ("Ada", "C");
       when "external" =>
          for Source_Dirs use (".");
+         for Languages use ("Ada");
          Sqlite_Lib := ("-lsqlite3");
    end case;
 
