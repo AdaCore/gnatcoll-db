@@ -45,14 +45,6 @@ project GnatColl_Sqlite is
 
    Thread_Lib := ();
 
-   case Library_Type is
-      when "relocatable" =>
-         for Library_Interface use ("gnatcoll.sql.sqlite");
-         for Leading_Library_Options use Gnatcoll_Db_Shared.Ldflags;
-      when others =>
-         null;
-   end case;
-
    case OS is
       when "Windows_NT" =>
          null;
@@ -63,12 +55,22 @@ project GnatColl_Sqlite is
    type Sqlite_Dep_Kind is ("embedded", "external");
    Sqlite_Dep : Sqlite_Dep_Kind := External ("GNATCOLL_SQLITE", "embedded");
 
+   Sqlite_Lib := ();
    case Sqlite_Dep is
       when "embedded" =>
          for Source_Dirs use (".", "amalgamation");
       when "external" =>
          for Source_Dirs use (".");
-         for Library_Options use ("-lsqlite3") & Thread_Lib;
+         Sqlite_Lib := ("-lsqlite3");
+   end case;
+
+   case Library_Type is
+      when "relocatable" =>
+         for Library_Interface use ("gnatcoll.sql.sqlite");
+         for Leading_Library_Options use Gnatcoll_Db_Shared.Ldflags;
+         for Library_Options use Sqlite_Lib & Thread_Lib;
+      when others =>
+         null;
    end case;
 
    package Compiler extends Gnatcoll_Db_Shared.Compiler is
@@ -89,12 +91,7 @@ project GnatColl_Sqlite is
    package Ide renames Gnatcoll_Db_Shared.Ide;
 
    package Linker is
-      case Sqlite_Dep is
-         when "embedded" =>
-            for Linker_Options use Thread_Lib;
-         when "external" =>
-            for Linker_Options use ("-lsqlite3") & Thread_Lib;
-      end case;
+      for Linker_Options use Sqlite_Lib & Thread_Lib;
    end Linker;
 
 end GnatColl_Sqlite;
