@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2010-2020, AdaCore                     --
+--                     Copyright (C) 2010-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -32,7 +32,6 @@
 --  generated package contains (see gnatcoll_db2ada documentation).
 
 with GNATCOLL.SQL.Sessions; use GNATCOLL.SQL.Sessions;
-with GNATCOLL.SQL;          use GNATCOLL.SQL;
 with GNATCOLL.SQL.Exec;     use GNATCOLL.SQL.Exec;
 
 package GNATCOLL.SQL.Orm is

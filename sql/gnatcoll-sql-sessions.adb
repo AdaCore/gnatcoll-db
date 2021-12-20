@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2010-2020, AdaCore                     --
+--                     Copyright (C) 2010-2021, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -31,7 +31,6 @@
 with Ada.Containers; use Ada.Containers;
 with Ada.Unchecked_Deallocation;
 
-with GNATCOLL.SQL;        use GNATCOLL.SQL;
 with GNATCOLL.SQL.Orm;
 with GNATCOLL.Traces;     use GNATCOLL.Traces;
 with GNATCOLL.Utils;      use GNATCOLL.Utils;
