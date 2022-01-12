@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2005-2020, AdaCore                     --
+--                     Copyright (C) 2005-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -1065,7 +1065,6 @@ package body GNATCOLL.SQL.Exec is
       Params     : SQL_Parameters := No_Parameters)
    is
       R : Forward_Cursor;
-      pragma Unreferenced (R);
    begin
       Fetch (R, Connection, Query, Params);
    end Execute;
@@ -1080,7 +1079,6 @@ package body GNATCOLL.SQL.Exec is
       Params     : SQL_Parameters := No_Parameters)
    is
       R : Forward_Cursor;
-      pragma Unreferenced (R);
    begin
       Fetch (R, Connection, Query, Params);
    end Execute;
@@ -1843,7 +1841,6 @@ package body GNATCOLL.SQL.Exec is
       Params     : SQL_Parameters := No_Parameters)
    is
       R : Forward_Cursor;
-      pragma Unreferenced (R);
    begin
       Fetch (R, Connection, Stmt, Params);
    end Execute;
