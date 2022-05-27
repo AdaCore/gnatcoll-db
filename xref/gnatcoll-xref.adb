@@ -383,7 +383,7 @@ package body GNATCOLL.Xref is
                  ((Q_Parameters_Toentity => +Database.E2e.Toentity,
                    Q_Parameters_Kind     => +Database.E2e.Kind)),
              From => Database.E2e,
-             Where => Database.E2e.fromentity = Integer_Param (1)
+             Where => Database.E2e.Fromentity = Integer_Param (1)
                 and (Database.E2e.Kind = E2e_In_Parameter
                    or Database.E2e.Kind = E2e_In_Out_Parameter
                    or Database.E2e.Kind = E2e_Out_Parameter
@@ -412,12 +412,12 @@ package body GNATCOLL.Xref is
        (SQL_Select
             (Entities2_Fields,
              From => Entities2 & Database.E2e,
-             Where => Database.E2e.toEntity = Integer_Param (1)
+             Where => Database.E2e.Toentity = Integer_Param (1)
                and (Database.E2e.Kind = E2e_In_Parameter
                   or Database.E2e.Kind = E2e_In_Out_Parameter
                   or Database.E2e.Kind = E2e_Out_Parameter
                   or Database.E2e.Kind = E2e_Access_Parameter)
-               and Database.E2e.fromEntity = Entities2.Id),
+               and Database.E2e.Fromentity = Entities2.Id),
         On_Server => False, Name => "parameter_of");
 
    Query_E2E_From : constant Prepared_Statement :=
@@ -425,9 +425,9 @@ package body GNATCOLL.Xref is
        (SQL_Select
             (Entities2_Fields,
              From => Entities2 & Database.E2e,
-             Where => Database.E2e.fromEntity = Integer_Param (1)
+             Where => Database.E2e.Fromentity = Integer_Param (1)
              and Database.E2e.Kind = Integer_Param (2)
-             and Database.E2e.toEntity = Entities2.Id,
+             and Database.E2e.Toentity = Entities2.Id,
              Order_By =>
                Entities2.Name & Entities2.Decl_Line & Entities2.Decl_Column,
              Distinct => True),
@@ -439,9 +439,9 @@ package body GNATCOLL.Xref is
        (SQL_Select
             (Entities2_Fields,
              From => Entities2 & Database.E2e,
-             Where => Database.E2e.toEntity = Integer_Param (1)
+             Where => Database.E2e.Toentity = Integer_Param (1)
              and Database.E2e.Kind = Integer_Param (2)
-             and Database.E2e.fromEntity = Entities2.Id,
+             and Database.E2e.Fromentity = Entities2.Id,
              Order_By =>
                Entities2.Name & Entities2.Decl_Line & Entities2.Decl_Column,
              Distinct => True),
@@ -453,24 +453,24 @@ package body GNATCOLL.Xref is
        (SQL_Select
           (Entities2_Fields,
            From => Entities2 & Database.E2e,
-           Where => Database.E2e.fromEntity = Integer_Param (1)
+           Where => Database.E2e.Fromentity = Integer_Param (1)
            and Database.E2e.Kind = E2e_Has_Primitive
-           and Database.E2e.toEntity = Entities2.Id
+           and Database.E2e.Toentity = Entities2.Id
 
            --   Not a primitive of one of the parent types
            and SQL_Not_In
-             (Database.E2e.toEntity,
+             (Database.E2e.Toentity,
               SQL_Select
-                (Database.E2e.toEntity,
+                (Database.E2e.Toentity,
                  From  => Database.E2e,
                  Where => SQL_In
-                   (Database.E2e.fromEntity,
+                   (Database.E2e.Fromentity,
 
                     --  compute the parent types (this is Query_E2e_From
                     SQL_Select
-                      (Database.E2e.toEntity,
+                      (Database.E2e.Toentity,
                        From => Database.E2e,
-                       Where => Database.E2e.fromEntity = Integer_Param (1)
+                       Where => Database.E2e.Fromentity = Integer_Param (1)
                        and Database.E2e.Kind = E2e_Parent_Type))
 
                  and Database.E2e.Kind = E2e_Has_Primitive)),
@@ -495,10 +495,10 @@ package body GNATCOLL.Xref is
             and SQL_Not_In
               (Database.Entities.Id,
                SQL_Select
-                 (Database.E2e.toEntity,
+                 (Database.E2e.Toentity,
                   From => Database.E2e,
                   Where => Database.E2e.Kind = E2e_Has_Discriminant
-                    and Database.E2e.fromEntity = Integer_Param (1))),
+                    and Database.E2e.Fromentity = Integer_Param (1))),
             Order_By =>
              Database.Entities.Name & Database.Entities.Decl_Line),
         On_Server => False, Name => "fields");
@@ -518,16 +518,16 @@ package body GNATCOLL.Xref is
              and Entities.Id = Integer_Param (1)
 
                --  Entities3 must be the overriding subprograms
-             and Database.E2e.toEntity = Integer_Param (2)
+             and Database.E2e.Toentity = Integer_Param (2)
              and Database.E2e.Kind = E2e_Overrides
-             and Database.E2e.fromEntity = E2E2.fromEntity
+             and Database.E2e.Fromentity = E2E2.Fromentity
 
              --  The subprograms of those overriding subprograms
              and (E2E2.Kind = E2e_In_Parameter
                or E2E2.Kind = E2e_In_Out_Parameter
                or E2E2.Kind = E2e_Out_Parameter
                or E2E2.Kind = E2e_Access_Parameter)
-             and Entities2.Id = E2E2.toEntity,
+             and Entities2.Id = E2E2.Toentity,
 
              Distinct => True),
         On_Server => False, Name => "overriding_params");
@@ -545,16 +545,16 @@ package body GNATCOLL.Xref is
              and Entities.Id = Integer_Param (1)
 
                --  Entities3 must be the overriding subprograms
-             and Database.E2e.fromEntity = Integer_Param (2)
+             and Database.E2e.Fromentity = Integer_Param (2)
              and Database.E2e.Kind = E2e_Overrides
-             and Database.E2e.toEntity = E2E2.fromEntity
+             and Database.E2e.Toentity = E2E2.Fromentity
 
              --  The subprograms of those overriding subprograms
              and (E2E2.Kind = E2e_In_Parameter
                or E2E2.Kind = E2e_In_Out_Parameter
                or E2E2.Kind = E2e_Out_Parameter
                or E2E2.Kind = E2e_Access_Parameter)
-             and Entities2.Id = E2E2.toEntity,
+             and Entities2.Id = E2E2.Toentity,
 
              Distinct => True),
         On_Server => False, Name => "overridden_params");
@@ -4014,9 +4014,9 @@ package body GNATCOLL.Xref is
             & " (SELECT id FROM temp_files);");
          DB.Execute ("DROP TABLE temp_files;");
 
-         --  Information for fromEntity always come from the LI file declaring
+         --  Information for Fromentity always come from the LI file declaring
          --  the entity, so we should clean it up before parsing the LI file.
-         --  We can't do this for toEntity, since this information comes from
+         --  We can't do this for Toentity, since this information comes from
          --  other LI files, and we will try to preserve it if possible (if the
          --  entity still exists after all).
          DB.Execute
