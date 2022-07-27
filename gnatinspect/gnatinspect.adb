@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                     Copyright (C) 2012-2018, AdaCore                     --
+--                     Copyright (C) 2012-2022, AdaCore                     --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -509,7 +509,7 @@ procedure GNATInspect is
    begin
       for C in Commands'Range loop
          if Args_Length (Args) = 0
-           or else Nth_Arg (Args, 1) = Commands (C).Name.all
+           or else Standard."=" (Nth_Arg (Args, 1), Commands (C).Name.all)
          then
             Put ("  " & Commands (C).Name.all);
             if Commands (C).Args = null then
@@ -529,7 +529,7 @@ procedure GNATInspect is
 
       for C in Variables'Range loop
          if Args_Length (Args) = 0
-           or else Nth_Arg (Args, 1) = Commands (C).Name.all
+           or else Standard."=" (Nth_Arg (Args, 1), Commands (C).Name.all)
          then
             if not Display_Section then
                New_Line;
