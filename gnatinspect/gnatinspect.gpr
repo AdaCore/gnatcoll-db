@@ -27,7 +27,7 @@ with "gnatcoll_xref";
 with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 
-project Gnatinspect is
+standard project Gnatinspect is
 
    Build : Gnatcoll_Db_Shared.Build_Type :=
       External ("GNATINSPECT_BUILD", Gnatcoll_Db_Shared.Build);

@@ -27,7 +27,7 @@ with "gnatcoll_iconv";
 with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 
-project GnatColl_Xref is
+library project GnatColl_Xref is
 
    Version := External ("GNATCOLL_XREF_VERSION",
                         Gnatcoll_Db_Shared.Gnatcoll_Version);

@@ -26,7 +26,7 @@ with "gnatcoll";
 with "gnatcoll_sql";
 with "gnatcoll_postgres";
 
-project gnatcoll_Postgres2ada is
+standard project gnatcoll_Postgres2ada is
 
    for Languages use ("Ada");
 

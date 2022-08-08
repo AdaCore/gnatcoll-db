@@ -24,7 +24,7 @@
 with "../gnatcoll_db_shared.gpr";
 with "gnatcoll";
 
-project GnatColl_SQL is
+library project GnatColl_SQL is
 
    Version := External ("GNATCOLL_SQL_VERSION",
                         Gnatcoll_Db_Shared.Gnatcoll_Version);

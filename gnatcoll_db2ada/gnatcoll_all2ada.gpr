@@ -27,7 +27,7 @@ with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 with "gnatcoll_postgres";
 
-project gnatcoll_all2ada is
+standard project gnatcoll_all2ada is
 
    Name    := "gnatcoll_all2ada";
 

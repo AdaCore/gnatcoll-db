@@ -25,7 +25,7 @@ with "../gnatcoll_db_shared.gpr";
 with "gnatcoll";
 with "gnatcoll_sql";
 
-project GNATCOLL_DB2Ada is
+standard project GNATCOLL_DB2Ada is
 
    for Languages use ("Ada");
 

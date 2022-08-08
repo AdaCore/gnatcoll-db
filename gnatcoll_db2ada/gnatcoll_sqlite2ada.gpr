@@ -26,7 +26,7 @@ with "gnatcoll";
 with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 
-project gnatcoll_sqlite2ada is
+standard project gnatcoll_sqlite2ada is
 
    for Languages use ("Ada");
 
