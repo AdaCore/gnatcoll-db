@@ -29,7 +29,8 @@ with "gnatcoll_sqlite";
 
 project GnatColl_Xref is
 
-   Version := Gnatcoll_Db_Shared.Gnatcoll_Version;
+   Version := External ("GNATCOLL_XREF_VERSION",
+                        Gnatcoll_Db_Shared.Gnatcoll_Version);
    Name    := "gnatcoll_xref";
 
    Library_Type : Gnatcoll_Db_Shared.Library_Type_Type

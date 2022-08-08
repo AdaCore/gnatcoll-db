@@ -27,7 +27,8 @@ with "gnatcoll_sql";
 
 project GnatColl_Postgres is
 
-   Version := Gnatcoll_Db_Shared.Gnatcoll_Version;
+   Version := External ("GNATCOLL_POSTGRES_VERSION",
+                        Gnatcoll_Db_Shared.Gnatcoll_Version);
    Name    := "gnatcoll_postgres";
 
    Library_Type : Gnatcoll_Db_Shared.Library_Type_Type

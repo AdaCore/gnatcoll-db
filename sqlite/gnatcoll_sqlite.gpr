@@ -27,7 +27,8 @@ with "gnatcoll_sql";
 
 project GnatColl_Sqlite is
 
-   Version := Gnatcoll_Db_Shared.Gnatcoll_Version;
+   Version := External ("GNATCOLL_SQLITE_VERSION",
+                        Gnatcoll_Db_Shared.Gnatcoll_Version);
    OS      := External ("OS", "unix");
    Name    := "gnatcoll_sqlite";
 
