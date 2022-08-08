@@ -27,7 +27,8 @@ with "gnatcoll_sql";
 project GnatColl_Sqlite is
 
    Version := External ("GNATCOLL_VERSION", "0.0");
-   OS      := External ("OS", "unix");
+   type OS_Kind is ("windows", "unix", "osx");
+   OS : OS_Kind := External ("GNATCOLL_OS", "unix");
    Name    := "gnatcoll_sqlite";
 
    type Build_Type is ("DEBUG", "PROD");
@@ -46,6 +47,7 @@ project GnatColl_Sqlite is
    for Languages use ("Ada", "C");
 
    Thread_Lib := ();
+   Lib_Opt_Ext := ();
 
    case Library_Type is
       when "relocatable" =>
@@ -55,10 +57,13 @@ project GnatColl_Sqlite is
    end case;
 
    case OS is
-      when "Windows_NT" =>
+      when "windows" =>
+         Lib_Opt_Ext := ("-lsqlite3");
+      when "osx" =>
          null;
       when others =>
          Thread_Lib := ("-lpthread");
+         Lib_Opt_Ext := ("-lsqlite3") & Thread_Lib;
    end case;
 
    type Sqlite_Dep_Kind is ("embedded", "external");
@@ -69,7 +74,7 @@ project GnatColl_Sqlite is
          for Source_Dirs use (".", "amalgamation");
       when "external" =>
          for Source_Dirs use (".");
-         for Library_Options use ("-lsqlite3") & Thread_Lib;
+         for Library_Options use Lib_Opt_Ext;
    end case;
 
    package Compiler is
