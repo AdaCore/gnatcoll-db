@@ -29,11 +29,9 @@ with "gnatcoll_postgres";
 
 standard project gnatcoll_all2ada is
 
-   Name    := "gnatcoll_all2ada";
-
    for Languages use ("Ada");
 
-   for Main use (Name);
+   for Main use (project'Name);
    for Object_Dir use "obj";
    for Source_Dirs use (".");
 

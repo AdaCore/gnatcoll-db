@@ -30,7 +30,7 @@ standard project gnatcoll_Postgres2ada is
 
    for Languages use ("Ada");
 
-   for Main use ("gnatcoll_postgres2ada");
+   for Main use (project'Name);
    for Object_Dir use "obj";
 
    package Compiler renames Gnatcoll_Db_Shared.Compiler;

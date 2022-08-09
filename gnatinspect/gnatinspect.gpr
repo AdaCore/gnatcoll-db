@@ -34,8 +34,9 @@ standard project Gnatinspect is
 
    for Languages use ("Ada");
 
-   for Main use ("gnatinspect");
+   for Main use (project'Name);
    for Object_Dir use "obj";
+
    package Compiler is
       --  Use Build, which may differ from Gnatcoll_Db_Shared.Build.
       case Build is

@@ -31,26 +31,22 @@ library project GnatColl_Xref is
 
    Version := External ("GNATCOLL_XREF_VERSION",
                         Gnatcoll_Db_Shared.Gnatcoll_Version);
-   Name    := "gnatcoll_xref";
 
-   Library_Type : Gnatcoll_Db_Shared.Library_Type_Type
-     := Gnatcoll_Db_Shared.Library_Type;
-
-   for Library_Kind    use Library_Type;
+   for Library_Kind    use Gnatcoll_Db_Shared.Library_Type;
    for Source_Dirs use (".", "generated");
    for Object_Dir
       use "obj/" & Project'Library_Kind;
    for Library_Dir
       use "lib/" & Project'Library_Kind;
-   for Library_Name    use Name;
-   for Library_Version use "lib" & Name & Gnatcoll.So_Ext & "." & Version;
-
+   for Library_Name    use project'Name;
    for Languages use ("Ada");
 
-   case Library_Type is
+   case Gnatcoll_Db_Shared.Library_Type is
       when "relocatable" =>
          for Leading_Library_Options use Gnatcoll_Db_Shared.Ldflags;
-      when others =>
+         for Library_Version use
+            "lib" & project'Library_Name & Gnatcoll.So_Ext & "." & Version;
+      when "static" | "static-pic" =>
          null;
    end case;
 

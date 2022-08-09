@@ -29,25 +29,22 @@ library project GnatColl_Postgres is
 
    Version := External ("GNATCOLL_POSTGRES_VERSION",
                         Gnatcoll_Db_Shared.Gnatcoll_Version);
-   Name    := "gnatcoll_postgres";
 
-   Library_Type : Gnatcoll_Db_Shared.Library_Type_Type
-     := Gnatcoll_Db_Shared.Library_Type;
-
-   for Library_Kind    use Library_Type;
+   for Library_Kind    use Gnatcoll_Db_Shared.Library_Type;
    for Source_Dirs     use (".");
    for Object_Dir      use "obj/" & Project'Library_Kind;
    for Library_Dir     use "lib/" & Project'Library_Kind;
-   for Library_Name    use Name;
-   for Library_Version use "lib" & Name & Gnatcoll.So_Ext & "." & Version;
+   for Library_Name    use project'Name;
 
-   case Library_Type is
+   case Gnatcoll_Db_Shared.Library_Type is
       when "relocatable" =>
          for Library_Options use ("-lpq");
          for Library_Interface use
            ("gnatcoll.sql.postgres", "gnatcoll.sql.ranges");
          for Leading_Library_Options use Gnatcoll_Db_Shared.Ldflags;
-      when others =>
+         for Library_Version use
+            "lib" & project'Library_Name & Gnatcoll.So_Ext & "." & Version;
+      when "static" | "static-pic" =>
          null;
    end case;
 

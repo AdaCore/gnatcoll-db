@@ -29,7 +29,7 @@ standard project GNATCOLL_DB2Ada is
 
    for Languages use ("Ada");
 
-   for Main use ("gnatcoll_db2ada");
+   for Main use (project'Name);
    for Object_Dir use "obj";
    for Source_Dirs use (".");
 
