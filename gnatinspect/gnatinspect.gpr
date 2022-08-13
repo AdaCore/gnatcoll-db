@@ -21,34 +21,31 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with "../gnatcoll_db_shared.gpr";
 with "gnatcoll";
 with "gnatcoll_xref";
 with "gnatcoll_sql";
 with "gnatcoll_sqlite";
 
-project Gnatinspect is
+standard project Gnatinspect is
 
-   Version := External ("GNATCOLL_VERSION", "0.0");
-   Name    := "gnatinspect";
-
-   type Build_Type is ("DEBUG", "PROD");
-   Build : Build_Type :=
-       External ("GNATINSPECT_BUILD", External ("BUILD", "PROD"));
+   Build : Gnatcoll_Db_Shared.Build_Type :=
+      External ("GNATINSPECT_BUILD", Gnatcoll_Db_Shared.Build);
 
    for Languages use ("Ada");
 
-   for Main use ("gnatinspect");
+   for Main use (project'Name);
    for Object_Dir use "obj";
+
    package Compiler is
+      --  Use Build, which may differ from Gnatcoll_Db_Shared.Build.
       case Build is
          when "DEBUG" =>
             for Switches ("Ada") use
-              ("-g", "-O0", "-gnata", "-gnatVa", "-gnatQ", "-gnaty", "-gnateE",
-               "-gnatwaCJe", "-fstack-check");
-
+               Gnatcoll_Db_Shared.Adaflags_Debug & Gnatcoll_Db_Shared.Adaflags;
          when "PROD" =>
-            --  Do not use -gnatwe for production mode
-            for Switches ("Ada") use ("-O2", "-gnatn", "-gnatwaCJ");
+            for Switches ("Ada") use
+               Gnatcoll_Db_Shared.Adaflags_Prod & Gnatcoll_Db_Shared.Adaflags;
       end case;
    end Compiler;
 
@@ -65,8 +62,8 @@ project Gnatinspect is
       end case;
    end Builder;
 
-   package Ide is
-      for VCS_Kind use "Git";
-   end Ide;
+   package Ide renames Gnatcoll_Db_Shared.Ide;
+
+   package Linker renames Gnatcoll_Db_Shared.Linker;
 
 end Gnatinspect;
