@@ -48,7 +48,8 @@ copyright = get_copyright()
 
 def get_version():
     """Extract the version from configure.in"""
-    return open("../version_information").read().strip()
+    with open("../version_information", "r") as f:
+        return f.read().strip()
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
