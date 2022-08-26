@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 --                             G N A T C O L L                              --
 --                                                                          --
---                    Copyright (C) 2015-2020, AdaCore                      --
+--                    Copyright (C) 2015-2022, AdaCore                      --
 --                                                                          --
 -- This library is free software;  you can redistribute it and/or modify it --
 -- under terms of the  GNU General Public License  as published by the Free --
@@ -21,17 +21,17 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "../gnatcoll_db_shared.gpr";
+with "gnatcoll_sqlite_conf.gpr";
 with "gnatcoll";
 with "gnatcoll_sql";
 
 library project GnatColl_Sqlite is
 
    Version := External ("GNATCOLL_SQLITE_VERSION",
-                        Gnatcoll_Db_Shared.Gnatcoll_Version);
+                        GnatColl_Sqlite_Conf.Gnatcoll_Version);
    OS      := External ("OS", "unix");
 
-   for Library_Kind    use Gnatcoll_Db_Shared.Library_Type;
+   for Library_Kind    use GnatColl_Sqlite_Conf.Library_Type;
    for Object_Dir      use "obj/" & Project'Library_Kind;
    for Library_Dir     use "lib/" & Project'Library_Kind;
    for Library_Name    use project'Name;
@@ -58,10 +58,10 @@ library project GnatColl_Sqlite is
          Sqlite_Lib := ("-lsqlite3");
    end case;
 
-   case Gnatcoll_Db_Shared.Library_Type is
+   case GnatColl_Sqlite_Conf.Library_Type is
       when "relocatable" =>
          for Library_Interface use ("gnatcoll.sql.sqlite");
-         for Leading_Library_Options use Gnatcoll_Db_Shared.Ldflags;
+         for Leading_Library_Options use GnatColl_Sqlite_Conf.Ldflags;
          for Library_Options use Sqlite_Lib & Thread_Lib;
          for Library_Version use
             "lib" & project'Library_Name & Gnatcoll.So_Ext & "." & Version;
@@ -69,22 +69,22 @@ library project GnatColl_Sqlite is
          null;
    end case;
 
-   package Compiler extends Gnatcoll_Db_Shared.Compiler is
+   package Compiler extends GnatColl_Sqlite_Conf.Compiler is
       --  C switches are only used when Sqlite_Dep is "embedded".
       for Switches ("C")
-             use Gnatcoll_Db_Shared.Cflags_Mode
+             use GnatColl_Sqlite_Conf.Cflags_Mode
                & ("-DSQLITE_OMIT_LOAD_EXTENSION",
                   "-D__EXTENSIONS__",
                   "-O3")
-               & Gnatcoll_Db_Shared.Cflags
-               & Gnatcoll_Db_Shared.Cppflags;
+               & GnatColl_Sqlite_Conf.Cflags
+               & GnatColl_Sqlite_Conf.Cppflags;
    end Compiler;
 
-   package Binder renames Gnatcoll_Db_Shared.Binder;
+   package Binder renames GnatColl_Sqlite_Conf.Binder;
 
-   package Builder renames Gnatcoll_Db_Shared.Builder;
+   package Builder renames GnatColl_Sqlite_Conf.Builder;
 
-   package Ide renames Gnatcoll_Db_Shared.Ide;
+   package Ide renames GnatColl_Sqlite_Conf.Ide;
 
    package Linker is
       for Linker_Options use Sqlite_Lib & Thread_Lib;

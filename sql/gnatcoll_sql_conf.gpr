@@ -1,0 +1,98 @@
+------------------------------------------------------------------------------
+--                             G N A T C O L L                              --
+--                                                                          --
+--                    Copyright (C) 2022-2022, AdaCore                      --
+--                                                                          --
+-- This library is free software;  you can redistribute it and/or modify it --
+-- under terms of the  GNU General Public License  as published by the Free --
+-- Software  Foundation;  either version 3,  or (at your  option) any later --
+-- version. This library is distributed in the hope that it will be useful, --
+-- but WITHOUT ANY WARRANTY;  without even the implied warranty of MERCHAN- --
+-- TABILITY or FITNESS FOR A PARTICULAR PURPOSE.                            --
+--                                                                          --
+-- As a special exception under Section 7 of GPL version 3, you are granted --
+-- additional permissions described in the GCC Runtime Library Exception,   --
+-- version 3.1, as published by the Free Software Foundation.               --
+--                                                                          --
+-- You should have received a copy of the GNU General Public License and    --
+-- a copy of the GCC Runtime Library Exception along with this program;     --
+-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
+-- <http://www.gnu.org/licenses/>.                                          --
+--                                                                          --
+------------------------------------------------------------------------------
+
+abstract project GnatColl_Sql_Conf is
+
+   for Source_Files use ();
+
+   type Build_Type is ("DEBUG", "PROD");
+   Build : Build_Type := External ("BUILD", "PROD");
+   Gnatcoll_Build_Mode : Build_Type := External ("GNATCOLL_BUILD_MODE", Build);
+
+   type Library_Type_Type is ("relocatable", "static", "static-pic");
+   Library_Type : Library_Type_Type := External ("LIBRARY_TYPE", "static");
+
+   Gnatcoll_Version := External ("GNATCOLL_VERSION", "0.0");
+
+   --  User settings should come after defaults and take precedence.
+   Adaflags := External_As_List ("ADAFLAGS", " ");
+   Cflags   := External_As_List ("CFLAGS", " ");
+   Cppflags := External_As_List ("CPPFLAGS", " ");
+
+   Adaflags_Debug := ("-g", "-O0", "-gnata", "-gnatVa", "-gnatQ", "-gnaty",
+                      "-gnateE", "-gnatwaCJe", "-fstack-check");
+   Cflags_Debug := ("-g", "-Wunreachable-code");
+
+   --  Do not use -gnatwe for production mode
+   Adaflags_Prod := ("-O2", "-gnatn", "-gnatwaCJ");
+   Cflags_Prod := ("-O2", "-Wunreachable-code");
+
+   Adaflags_Mode := ();
+   Cflags_Mode := ();
+   case Gnatcoll_Build_Mode is
+      when "DEBUG" =>
+         Adaflags_Mode := Adaflags_Debug;
+         Cflags_Mode   := Cflags_Debug;
+      when "PROD" =>
+         Adaflags_Mode := Adaflags_Prod;
+         Cflags_Mode   := Cflags_Prod;
+   end case;
+
+   package Compiler is
+      for Switches ("Ada") use Adaflags_Mode & Adaflags;
+      for Switches ("C") use Cflags_Mode & Cflags & Cppflags;
+   end Compiler;
+
+   package Binder is
+      case Gnatcoll_Build_Mode is
+         when "DEBUG" =>
+            for Switches ("Ada") use ("-E");
+         when "PROD" =>
+            null;
+      end case;
+   end Binder;
+
+   package Builder is
+      case Gnatcoll_Build_Mode is
+         when "DEBUG" =>
+            for Global_Configuration_Pragmas use "gnat_debug.adc";
+         when "PROD" =>
+            null;
+      end case;
+   end Builder;
+
+   package Ide is
+      for VCS_Kind use "Git";
+   end Ide;
+
+   --  Some options for the dynamic linker need to come before the
+   --  objects they affect (for example --as-needed).
+   Ldflags := External_As_List ("LDFLAGS", " ");
+
+   --  This template is intended for standard projects.
+   --  Relocatable libraries should use Leading_Library_Options.
+   package Linker is
+      for Leading_Switches ("Ada") use Ldflags;
+   end Linker;
+
+end GnatColl_Sql_Conf;

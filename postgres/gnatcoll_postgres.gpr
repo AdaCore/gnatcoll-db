@@ -21,27 +21,27 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with "../gnatcoll_db_shared.gpr";
+with "gnatcoll_postgres_conf.gpr";
 with "gnatcoll";
 with "gnatcoll_sql";
 
 library project GnatColl_Postgres is
 
    Version := External ("GNATCOLL_POSTGRES_VERSION",
-                        Gnatcoll_Db_Shared.Gnatcoll_Version);
+                        GnatColl_Postgres_Conf.Gnatcoll_Version);
 
-   for Library_Kind    use Gnatcoll_Db_Shared.Library_Type;
+   for Library_Kind    use GnatColl_Postgres_Conf.Library_Type;
    for Source_Dirs     use (".");
    for Object_Dir      use "obj/" & Project'Library_Kind;
    for Library_Dir     use "lib/" & Project'Library_Kind;
    for Library_Name    use project'Name;
 
-   case Gnatcoll_Db_Shared.Library_Type is
+   case GnatColl_Postgres_Conf.Library_Type is
       when "relocatable" =>
          for Library_Options use ("-lpq");
          for Library_Interface use
            ("gnatcoll.sql.postgres", "gnatcoll.sql.ranges");
-         for Leading_Library_Options use Gnatcoll_Db_Shared.Ldflags;
+         for Leading_Library_Options use GnatColl_Postgres_Conf.Ldflags;
          for Library_Version use
             "lib" & project'Library_Name & Gnatcoll.So_Ext & "." & Version;
       when "static" | "static-pic" =>
@@ -53,22 +53,22 @@ library project GnatColl_Postgres is
    type Yes_No is ("yes", "no");
    Has_PQP : Yes_No := External ("GNATCOLL_HASPQPREPARE", "yes");
 
-   package Compiler extends Gnatcoll_Db_Shared.Compiler is
+   package Compiler extends GnatColl_Postgres_Conf.Compiler is
       case Has_PQP is
          when "yes" =>
             for Switches ("C") use
-               Gnatcoll_Db_Shared.Cflags_Mode & "-DHAS_PQPREPARE"
-               & Gnatcoll_Db_Shared.Cflags & Gnatcoll_Db_Shared.Cppflags;
+               GnatColl_Postgres_Conf.Cflags_Mode & "-DHAS_PQPREPARE"
+               & GnatColl_Postgres_Conf.Cflags & GnatColl_Postgres_Conf.Cppflags;
          when "no" =>
             null;
       end case;
    end Compiler;
 
-   package Binder renames Gnatcoll_Db_Shared.Binder;
+   package Binder renames GnatColl_Postgres_Conf.Binder;
 
-   package Builder renames Gnatcoll_Db_Shared.Builder;
+   package Builder renames GnatColl_Postgres_Conf.Builder;
 
-   package Ide renames Gnatcoll_Db_Shared.Ide;
+   package Ide renames GnatColl_Postgres_Conf.Ide;
 
    package Linker is
       for Linker_Options use ("-lpq");
