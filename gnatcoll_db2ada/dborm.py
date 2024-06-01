@@ -7,6 +7,7 @@ import os
 import subprocess
 import copy
 from functools import cmp_to_key
+
 pkg_name = "Orm"
 
 store_connections = True
@@ -36,7 +37,7 @@ debug = False
 
 def exec_or_fail(*args, **kwargs):
     """Same parameters as process.Process, but prints an error message in
-       case of error, and then raises an exception
+    case of error, and then raises an exception
     """
 
     try:
@@ -55,10 +56,10 @@ def exec_or_fail(*args, **kwargs):
 
 def save_dir(fn):
     """Temporarily change the current directory while running a function,
-      and restore it when the function exits. This is a decorator:
-         @save_dir
-         def my_function ():
-            ...
+    and restore it when the function exits. This is a decorator:
+       @save_dir
+       def my_function ():
+          ...
     """
 
     def do_work(*args, **kwargs):
@@ -76,7 +77,7 @@ def save_dir(fn):
 
 def unlink_if_exist(files):
     """Unlink, if they exist, the file(s).
-       No error is propagated if the files do not exist
+    No error is propagated if the files do not exist
     """
 
     if not isinstance(files, list):
@@ -117,10 +118,20 @@ def splitstr(str, maxlen):
 # Pretty-printer
 ######################################
 
-class Subprogram(object):
 
-    def __init__(self, name, params, local_vars, body, returns,
-                 comment, overriding, abstract, inline):
+class Subprogram(object):
+    def __init__(
+        self,
+        name,
+        params,
+        local_vars,
+        body,
+        returns,
+        comment,
+        overriding,
+        abstract,
+        inline,
+    ):
         self.name = name
         self.params = params
         self.local_vars = local_vars
@@ -138,7 +149,7 @@ def cmp(a, b):
 
 def _subprogram_sorter(sub1, sub2):
     """cmd for two subprograms.
-       This groups property setters/getters together
+    This groups property setters/getters together
     """
     n1 = sub1.name.replace("set_", "")
     n2 = sub2.name.replace("set_", "")
@@ -147,13 +158,13 @@ def _subprogram_sorter(sub1, sub2):
 
 class Pretty_Printer(object):
     """This class is responsible for doing the actual output of code, properly
-       formatted
+    formatted
     """
 
     def __init__(self, out, casing=[]):
         """CASING stored the casing exceptions. This is a list of names with
-           their expected formating. All names not in that list will be
-           capitalized
+        their expected formating. All names not in that list will be
+        capitalized
         """
 
         casing.extend(["out", "in", "access", "constant", "aliased"])
@@ -167,14 +178,14 @@ class Pretty_Printer(object):
         """Terminate the current file, do the output, and start a new file"""
         self.terminate_package(need_dba=True)
         self.pkg_name = pkg_name.title()
-        self.spec_withs = []     # List of packages to with+use in specs
-        self.body_withs = []     # List of packages to with+use in bodies
-        self.global_vars = []    # Global variables and constants
-        self.body_cst = []       # Constants to put in the body, same as params
+        self.spec_withs = []  # List of packages to with+use in specs
+        self.body_withs = []  # List of packages to with+use in bodies
+        self.global_vars = []  # Global variables and constants
+        self.body_cst = []  # Constants to put in the body, same as params
         self.unique_body_cst = []
-        self.private_before = ""        # Private part of the spec
-        self.private_after = ""        # Private part of the spec
-        self.body_code = ""    # Goes in body before subprograms
+        self.private_before = ""  # Private part of the spec
+        self.private_after = ""  # Private part of the spec
+        self.body_code = ""  # Goes in body before subprograms
         self.sections = []  # Sections in the specs. Contains tuples:
         #                     0 => section name
         #                     1 => types declaration for the section
@@ -184,8 +195,8 @@ class Pretty_Printer(object):
 
     def add_with(self, pkg, specs=True, do_use=True):
         """Add a with+use clause for pkg. pkg can be a list of packages.
-           Automatic casing is performed. If specs is True, the withs are
-           appended to the specs, otherwise to the body"""
+        Automatic casing is performed. If specs is True, the withs are
+        appended to the specs, otherwise to the body"""
         if type(pkg) == str:
             pkg = [pkg]
 
@@ -203,18 +214,28 @@ class Pretty_Printer(object):
             self.body_cst.append(cst)
 
     def add_unique_constants(self, cst):
-        """Same as add_constants, does nothing if the constant already exists
-        """
+        """Same as add_constants, does nothing if the constant already exists"""
         if cst:
             for c in cst:
                 if c not in self.unique_body_cst:
                     self.unique_body_cst.append(c)
 
-    def add_property(self, schema, row, field, getter, setter, type,
-                     getter_local_vars=[], setter_local_vars=[],
-                     comment=None, abstract=False, section=""):
+    def add_property(
+        self,
+        schema,
+        row,
+        field,
+        getter,
+        setter,
+        type,
+        getter_local_vars=[],
+        setter_local_vars=[],
+        comment=None,
+        abstract=False,
+        section="",
+    ):
         """Define a property for self (ie a setter and getter strongly linked
-           to each other
+        to each other
         """
         get_name = schema.subprogram_name_from_field(field)
         if isinstance(field, str):
@@ -224,32 +245,58 @@ class Pretty_Printer(object):
 
         if getter:
             self.add_subprogram(
-                get_name, body=getter,
+                get_name,
+                body=getter,
                 params=[("self", "detached_%s" % row)],
                 local_vars=getter_local_vars,
                 returns=type,
-                comment=comment, abstract=abstract, section=section)
+                comment=comment,
+                abstract=abstract,
+                section=section,
+            )
 
         if setter:
             self.add_subprogram(
-                set_name, body=setter,
+                set_name,
+                body=setter,
                 local_vars=setter_local_vars,
                 params=[("self", "detached_%s" % row), ("value", type)],
-                comment=comment, abstract=abstract, section=section)
+                comment=comment,
+                abstract=abstract,
+                section=section,
+            )
 
-    def add_subprogram(self, name, body, params=[], local_vars=[],
-                       returns=None, comment=None, overriding=False,
-                       abstract=False, inline=False,
-                       section=""):
+    def add_subprogram(
+        self,
+        name,
+        body,
+        params=[],
+        local_vars=[],
+        returns=None,
+        comment=None,
+        overriding=False,
+        abstract=False,
+        inline=False,
+        section="",
+    ):
         """Add a new subprogram. local_vars and params are lists of
-          (name, type, default) tuples.
-           The body will be pretty-printed automatically, and the required
-           pragma Unreferenced are also added automatically.
-           If the section is "body" the subprogram will not be visible in the
-           specs
+        (name, type, default) tuples.
+         The body will be pretty-printed automatically, and the required
+         pragma Unreferenced are also added automatically.
+         If the section is "body" the subprogram will not be visible in the
+         specs
         """
-        news = Subprogram(name, params, local_vars, body, returns, comment,
-                          overriding, abstract, inline)
+        news = Subprogram(
+            name,
+            params,
+            local_vars,
+            body,
+            returns,
+            comment,
+            overriding,
+            abstract,
+            inline,
+        )
 
         for index, s in enumerate(self.sections):
             if s[0] == section:
@@ -259,8 +306,8 @@ class Pretty_Printer(object):
 
     def add_section(self, name, types, comment=""):
         """Add a new section in the specs, which contains TYPES, as well as
-           any subprogram added to that section later on.
-           COMMENT is a general comment for the section
+        any subprogram added to that section later on.
+        COMMENT is a general comment for the section
         """
         for index, s in enumerate(self.sections):
             if s[0] == name:
@@ -271,12 +318,12 @@ class Pretty_Printer(object):
 
     def add_private_before(self, str):
         """Add custom contents to the private section, before the subprograms
-           in that section"""
+        in that section"""
         self.private_before += str
 
     def add_private_after(self, str):
         """Add custom contents to the private section, after the subprograms
-           in that section"""
+        in that section"""
         self.private_after += str
 
     def _title(self, name):
@@ -286,8 +333,7 @@ class Pretty_Printer(object):
             elif sep == " ":
                 return ["'".join(_title_sep("'", n)) for n in str.split(sep)]
             else:
-                return [self.casing.get(n.lower(), n.title())
-                        for n in str.split(sep)]
+                return [self.casing.get(n.lower(), n.title()) for n in str.split(sep)]
 
         return ".".join(_title_sep(".", name))
 
@@ -297,15 +343,13 @@ class Pretty_Printer(object):
             ml = max_length(list)
             for w, do_use in sorted(list):
                 if do_use:
-                    self.out.write(
-                        "with %-*s use %s;\n" % (ml + 1, w + ";", w))
+                    self.out.write("with %-*s use %s;\n" % (ml + 1, w + ";", w))
                 else:
                     self.out.write("with %-*s;\n" % (ml, w))
             self.out.write("pragma Warnings (On);\n")
 
     def _format_decl(self, list):
-        """List has the same format as params and local_vars for a subprogram
-        """
+        """List has the same format as params and local_vars for a subprogram"""
         ml = max_length([p[0] for p in list])
         result = []
         for p in list:
@@ -313,11 +357,11 @@ class Pretty_Printer(object):
                 name, type, default = p
                 result.append(
                     "%-*s : %s := %s"
-                    % (ml, self._title(name), self._title(type), default))
+                    % (ml, self._title(name), self._title(type), default)
+                )
             elif len(p) == 2:
                 name, type = p
-                result.append(
-                    "%-*s : %s" % (ml, self._title(name), self._title(type)))
+                result.append("%-*s : %s" % (ml, self._title(name), self._title(type)))
             else:
                 result.append(p[0])
 
@@ -347,7 +391,11 @@ class Pretty_Printer(object):
 
         if subp.returns:
             func = "   %sfunction %s%s\n     return %s" % (
-                prefix, self._title(subp.name), p, self._title(subp.returns))
+                prefix,
+                self._title(subp.name),
+                p,
+                self._title(subp.returns),
+            )
         else:
             func = "   %sprocedure %s%s" % (prefix, self._title(subp.name), p)
 
@@ -393,8 +441,10 @@ class Pretty_Printer(object):
             # Share the comment with the next subprogram if it has the same
             # name
 
-            if index + 1 < len(subprograms) \
-               and _subprogram_sorter(subprograms[index + 1], p) != 0:
+            if (
+                index + 1 < len(subprograms)
+                and _subprogram_sorter(subprograms[index + 1], p) != 0
+            ):
                 if comment:
                     self.out.write("   -- ")
                     self.out.write("\n   --  ".join(splitstr(comment, 72)))
@@ -425,11 +475,13 @@ class Pretty_Printer(object):
 
         for ln in body.splitlines():
             ln = ln.strip()
-            if ln.startswith("end") \
-               or ln.startswith("elsif")  \
-               or ln.startswith("else")  \
-               or ln.startswith("exception")  \
-               or ln.startswith("begin"):
+            if (
+                ln.startswith("end")
+                or ln.startswith("elsif")
+                or ln.startswith("else")
+                or ln.startswith("exception")
+                or ln.startswith("begin")
+            ):
                 indent -= 3
 
             old_parent = parent_count
@@ -437,7 +489,7 @@ class Pretty_Printer(object):
 
             if not ln:
                 pass
-            elif ln[0] == '(':
+            elif ln[0] == "(":
                 self.out.write(" " * (indent + 2))
                 if parent_count > old_parent:
                     indent += (parent_count - old_parent) * 3
@@ -456,12 +508,14 @@ class Pretty_Printer(object):
             self.out.write(ln)
             self.out.write("\n")
 
-            if ((ln.endswith("then") and not ln.endswith("and then"))
-               or ln.endswith("loop")
-               or(ln.endswith("else") and not ln.endswith("or else"))
-               or ln.endswith("begin")
-               or ln.endswith("exception")
-               or ln.endswith("declare")):
+            if (
+                (ln.endswith("then") and not ln.endswith("and then"))
+                or ln.endswith("loop")
+                or (ln.endswith("else") and not ln.endswith("or else"))
+                or ln.endswith("begin")
+                or ln.endswith("exception")
+                or ln.endswith("declare")
+            ):
                 indent += 3
 
     def _output_subprogram_bodies(self):
@@ -496,12 +550,14 @@ class Pretty_Printer(object):
                 unreferenced = []
                 for param in p.params:
                     if not re.search(
-                       r'\b%s\b' % param[0], p.body + local, re.IGNORECASE):
+                        r"\b%s\b" % param[0], p.body + local, re.IGNORECASE
+                    ):
                         unreferenced.append(self._title(param[0]))
 
                 if unreferenced:
-                    self.out.write("      pragma Unreferenced (%s);\n"
-                                   % (", ".join(unreferenced)))
+                    self.out.write(
+                        "      pragma Unreferenced (%s);\n" % (", ".join(unreferenced))
+                    )
 
                 if p.local_vars:
                     self.out.write(local)
@@ -524,8 +580,8 @@ class Pretty_Printer(object):
         if need_dba:
             self.out.write("   package DBA renames %s;\n" % database_pkg)
             self.out.write(
-                "   subtype Related_Depth is Integer range 0 .. %d;\n"
-                % max_depth)
+                "   subtype Related_Depth is Integer range 0 .. %d;\n" % max_depth
+            )
 
         self._output_subprogram_specs()
         self.out.write("\nprivate\n")
@@ -548,17 +604,14 @@ class Pretty_Printer(object):
             self.out.write("   pragma Warnings (Off);\n")
             self.out.write("   use Sessions.Pointers;\n")
             if debug:
-                self.out.write(
-                    '   Me : constant Trace_Handle := Create("ORM");')
+                self.out.write('   Me : constant Trace_Handle := Create("ORM");')
 
         for c in sorted(self.unique_body_cst):
-            self.out.write(
-                "\n   " + ";\n   ".join(self._format_decl([c])) + ";")
+            self.out.write("\n   " + ";\n   ".join(self._format_decl([c])) + ";")
 
         self.out.write("\n")
         for c in self.body_cst:
-            self.out.write(
-                "\n   " + ";\n   ".join(self._format_decl(c)) + ";")
+            self.out.write("\n   " + ";\n   ".join(self._format_decl(c)) + ";")
 
         self.out.write(self.body_code)
 
@@ -577,6 +630,7 @@ class Pretty_Printer(object):
 # Schema
 ######################################
 
+
 class Cannot_Parse_Schema(Exception):
     pass
 
@@ -590,13 +644,14 @@ class Schema(object):
 
     def __init__(self, setup, tables, pretty, all_tables, omit):
         """Connect to the database and get the schema.
-           SETUP is an object which contains the database description.
-           OMIT is the list of fields to omit in the binding"""
+        SETUP is an object which contains the database description.
+        OMIT is the list of fields to omit in the binding"""
 
         self.pretty = pretty
 
-        self.details = get_db_schema(setup, omit=omit, requires_pk=True,
-                                     all_tables=all_tables)
+        self.details = get_db_schema(
+            setup, omit=omit, requires_pk=True, all_tables=all_tables
+        )
         if not self.details:
             raise Cannot_Parse_Schema
 
@@ -610,14 +665,23 @@ class Schema(object):
         """Create the list of withs needed for table"""
 
         self.pretty.add_with(
-            ["GNATCOLL.SQL", "GNATCOLL.SQL.Exec", "GNATCOLL.Tribooleans",
-             "GNATCOLL.SQL_Fields",
-             "GNATCOLL.SQL.Orm", "GNATCOLL.SQL.Orm.Impl",
-             "GNATCOLL.SQL.Sessions",
-             "Ada.Strings.Unbounded", "GNAT.Strings", database_pkg.title(),
-             "GNAT.Calendar", "Ada.Calendar", "Ada.Finalization"])
-        self.pretty.add_with("Ada.Unchecked_Deallocation", specs=False,
-                             do_use=False)
+            [
+                "GNATCOLL.SQL",
+                "GNATCOLL.SQL.Exec",
+                "GNATCOLL.Tribooleans",
+                "GNATCOLL.SQL_Fields",
+                "GNATCOLL.SQL.Orm",
+                "GNATCOLL.SQL.Orm.Impl",
+                "GNATCOLL.SQL.Sessions",
+                "Ada.Strings.Unbounded",
+                "GNAT.Strings",
+                database_pkg.title(),
+                "GNAT.Calendar",
+                "Ada.Calendar",
+                "Ada.Finalization",
+            ]
+        )
+        self.pretty.add_with("Ada.Unchecked_Deallocation", specs=False, do_use=False)
         self.pretty.add_with("Ada.Containers", specs=False)
         self.pretty.add_with("System.Address_Image", do_use=False)
 
@@ -633,9 +697,8 @@ class Schema(object):
 
     def params_create(self, table):
         """Return the list of parameters to Create, for a given table
-           TABLE is an instance of Table"""
-        return [(f.name, f.type.ada_param, f.type.default_param)
-                for f in table.fields]
+        TABLE is an instance of Table"""
+        return [(f.name, f.type.ada_param, f.type.default_param) for f in table.fields]
 
     ##########################
     # Compute the name of the subprogram to use for a field
@@ -676,16 +739,19 @@ class Schema(object):
 
     def equal(self, table):
         """Return the comparison operators when comparing Op1 and Op2
-           TABLE is instance of Table
+        TABLE is instance of Table
         """
 
         params = []
         for pk in table.pk:
             params.append(
                 "%s'(Op1.%s) = Op2.%s"
-                % (pk.type.ada_param,
-                   self.subprogram_name_from_field(pk),
-                   self.subprogram_name_from_field(pk)))
+                % (
+                    pk.type.ada_param,
+                    self.subprogram_name_from_field(pk),
+                    self.subprogram_name_from_field(pk),
+                )
+            )
         return params
 
     #################
@@ -694,7 +760,7 @@ class Schema(object):
 
     def params_get_pk(self, table):
         """Return the list of parameters for Get.
-           TABLE is an instance of Table"""
+        TABLE is an instance of Table"""
 
         if not table.pk:
             return []
@@ -719,11 +785,9 @@ class Schema(object):
         for f in table.fields:
             if f.show:
                 data.append(
-                    "       ORM_%-*s : %s := %s" %
-                    (longuest + 3,
-                     f.name,
-                     f.type.ada_field,
-                     f.default_for_field()))
+                    "       ORM_%-*s : %s := %s"
+                    % (longuest + 3, f.name, f.type.ada_field, f.default_for_field())
+                )
 
         for f in table.fk:
             if f.foreign.show:
@@ -732,7 +796,8 @@ class Schema(object):
                 if f2 is None or f2.show:
                     data.append(
                         "       ORM_FK_%-*s : Detached_%s_Access := null"
-                        % (longuest, name, f.foreign.row))
+                        % (longuest, name, f.foreign.row)
+                    )
 
         return ";\n".join(sorted(data))
 
@@ -749,10 +814,13 @@ class Schema(object):
         for f in d.fk:
             if f.show():
                 ml.add(
-                    ("procedure Unchecked_Free is "
-                     + "new Ada.Unchecked_Deallocation\n"
-                     + "     (Detached_%(row)s'Class, Detached_%(row)s_Access)"
-                        % {"row": f.foreign.row}, ))
+                    (
+                        "procedure Unchecked_Free is "
+                        + "new Ada.Unchecked_Deallocation\n"
+                        + "     (Detached_%(row)s'Class, Detached_%(row)s_Access)"
+                        % {"row": f.foreign.row},
+                    )
+                )
 
         # The call to set() is to uniquify the elements in the list
         return list(ml)
@@ -769,8 +837,7 @@ class Schema(object):
             if f.foreign.show:
                 subp = subprogram_from_fk(f)
                 try:
-                    free_fields.append(
-                        "Unchecked_Free (Self.ORM_FK_%s);" % subp)
+                    free_fields.append("Unchecked_Free (Self.ORM_FK_%s);" % subp)
                 except KeyError:
                     print("free_fields: Invalid field: %s.%s" % (table, subp))
 
@@ -787,14 +854,15 @@ class Schema(object):
 # subprogram_from_fk
 ######################
 
+
 def subprogram_from_fk(fk):
     """Return the name of the primitive operation, for a given Foreign Key
-       Handling of multi-key foreign keys:
-         subscription(nb,type) REFERENCES contract(nb,type)
-       Should result in
-         function Contract(Self : Subscription) return Contract;
-       When the FK has a single key, we use that name for the name of the
-       subprogram, which leads to a more natural use
+    Handling of multi-key foreign keys:
+      subscription(nb,type) REFERENCES contract(nb,type)
+    Should result in
+      function Contract(Self : Subscription) return Contract;
+    When the FK has a single key, we use that name for the name of the
+    subprogram, which leads to a more natural use
     """
 
     if len(fk.pairs) == 1:
@@ -807,31 +875,37 @@ def subprogram_from_fk(fk):
 # generator for Internal_Query
 ######################################
 
+
 def internal_query(pretty, table, schema):
     joins = ""
     lj = "Table"
     body = ""
     fk_list = []
-    local_vars = [("Table",
-                   "T_Numbered_%s(Aliases(Base))" % table.name)]
+    local_vars = [("Table", "T_Numbered_%s(Aliases(Base))" % table.name)]
 
     field_list = ["Table.%s" % f.name for f in table.fields]
     fklocal = ""
 
     for index, fk in enumerate(table.fk):
         if fk.foreign.show:
-            reft = "FK%d" % (index + 1, )
+            reft = "FK%d" % (index + 1,)
 
-            fklocal += "\n%s : T_Numbered_%s(Aliases(Aliases(Base + %d)));" \
-                % (reft, fk.foreign.name, index + 1)
+            fklocal += "\n%s : T_Numbered_%s(Aliases(Aliases(Base + %d)));" % (
+                reft,
+                fk.foreign.name,
+                index + 1,
+            )
 
             # Join criteria. No need to repeat for null FK, since we already
             # use a LEFT JOIN.
 
             if not fk.can_be_null():
                 for f in fk.pairs:
-                    joins += "\nand Table.%(field)s = %(reft)s.%(reff)s" % \
-                        {"field": f[0].name, "reft": reft, "reff": f[1].name}
+                    joins += "\nand Table.%(field)s = %(reft)s.%(reff)s" % {
+                        "field": f[0].name,
+                        "reft": reft,
+                        "reff": f[1].name,
+                    }
 
             # Add possible LEFT JOIN
 
@@ -840,23 +914,23 @@ def internal_query(pretty, table, schema):
                 for f in fk.pairs:
                     criteria.append(
                         "Table.%(field)s=%(reft)s.%(reff)s"
-                        % {"reft": reft,
-                           "field": f[0].name,
-                           "reff": f[1].name})
+                        % {"reft": reft, "field": f[0].name, "reff": f[1].name}
+                    )
 
                 lj = """Left_Join(%(lj)s, %(reft)s, %(criteria)s)""" % {
                     "lj": lj,
                     "criteria": " and ".join(criteria),
-                    "reft": reft}
+                    "reft": reft,
+                }
 
             # Add fields for FK table
 
-            fk_body = ("C2 := No_Criteria;"
-                       + "Do_Query_%(ref)s(Fields, T, C2,"
-                       + "Aliases(Base + %(index)d),\n"
-                       + "Aliases, Depth - 1, Follow_LJ);") % {
-                "ref": fk.foreign.name,
-                "index": index + 1}
+            fk_body = (
+                "C2 := No_Criteria;"
+                + "Do_Query_%(ref)s(Fields, T, C2,"
+                + "Aliases(Base + %(index)d),\n"
+                + "Aliases, Depth - 1, Follow_LJ);"
+            ) % {"ref": fk.foreign.name, "index": index + 1}
 
             fk_body += "if Depth > 1 then Criteria := Criteria and C2; end if;"
 
@@ -875,41 +949,45 @@ def internal_query(pretty, table, schema):
         if lj == "Table":
             body += "From := +Table;"
         else:
-            body += (
-                "if Follow_LJ then From := +%s; else From := +Table; end if;"
-                % lj)
+            body += "if Follow_LJ then From := +%s; else From := +Table; end if;" % lj
 
         body += "%s end; end if;" % "\n\n".join(fk_list)
-        local_vars.extend([("C2", "SQL_Criteria"),
-                           ("T",  "SQL_Table_List")])
+        local_vars.extend([("C2", "SQL_Criteria"), ("T", "SQL_Table_List")])
     else:
         fk_list = "From := +Table;"
 
     pkfield_list = ["Table.%s" % f.name for f in table.fields if f.is_pk()]
 
     if table.pk != []:
-        body = """if PK_Only then
+        body = (
+            """if PK_Only then
        Fields := Fields & %(pkfields)s;
     else
        Fields := Fields & %(fields)s;
     end if;
-    From := Empty_Table_List;""" + body
+    From := Empty_Table_List;"""
+            + body
+        )
     else:
         body = """Fields := Fields & %(fields)s; """ + body
 
-    body = body % {"fields":  "\n& ".join(field_list),
-                   "pkfields": "\n& ".join(pkfield_list)}
+    body = body % {
+        "fields": "\n& ".join(field_list),
+        "pkfields": "\n& ".join(pkfield_list),
+    }
 
     if debug:
         tmp = (
-            'Trace(Me, "Do_Query_%s, Base=(" & Base\'Img & Aliases(Base)\'Img'
-            % table.name)
+            "Trace(Me, \"Do_Query_%s, Base=(\" & Base'Img & Aliases(Base)'Img"
+            % table.name
+        )
         tmp += '& ")"'
         for index, fk in enumerate(table.fk):
             if fk.foreign.show:
-                tmp += ('\n & " FK%(i)d=(" & Aliases(Base + %(i)d)\'Img'
-                        + '& Aliases(Aliases(Base + %(i)d))\'Img & ")"') % {
-                    "i": index + 1}
+                tmp += (
+                    '\n & " FK%(i)d=(" & Aliases(Base + %(i)d)\'Img'
+                    + '& Aliases(Aliases(Base + %(i)d))\'Img & ")"'
+                ) % {"i": index + 1}
 
         tmp += ");"
 
@@ -929,27 +1007,34 @@ def internal_query(pretty, table, schema):
 
     pretty.add_subprogram(
         name="internal_query_%s" % table.name,
-        params=[("fields",    "in out SQL_Field_List"),
-                ("from",      "out SQL_Table_List"),
-                ("criteria",  "in out SQL_Criteria"),
-                ("depth",     "natural"),
-                ("Follow_LJ", "Boolean"),
-                ("PK_Only", "Boolean", "False")],
+        params=[
+            ("fields", "in out SQL_Field_List"),
+            ("from", "out SQL_Table_List"),
+            ("criteria", "in out SQL_Criteria"),
+            ("depth", "natural"),
+            ("Follow_LJ", "Boolean"),
+            ("PK_Only", "Boolean", "False"),
+        ],
         section="Managers(implementation details)",
-        body=internal_body % {"cap": table.name})
+        body=internal_body % {"cap": table.name},
+    )
 
     pretty.add_subprogram(
         name="do_query_%s" % table.name,
-        params=[("fields",    "in out SQL_Field_List"),
-                ("from",      "out SQL_Table_List"),
-                ("criteria",  "in out SQL_Criteria"),
-                ("Base",      "Natural"),
-                ("Aliases",   "Alias_Array"),
-                ("depth",     "natural"),
-                ("Follow_LJ", "Boolean")] + params,
+        params=[
+            ("fields", "in out SQL_Field_List"),
+            ("from", "out SQL_Table_List"),
+            ("criteria", "in out SQL_Criteria"),
+            ("Base", "Natural"),
+            ("Aliases", "Alias_Array"),
+            ("depth", "natural"),
+            ("Follow_LJ", "Boolean"),
+        ]
+        + params,
         local_vars=local_vars,
         section="body",
-        body=body)
+        body=body,
+    )
 
 
 def create(pretty, table, schema):
@@ -958,11 +1043,13 @@ def create(pretty, table, schema):
     for f in table.fields:
         body += "if %s /= %s then " % (f.name, f.type.default_param)
         if f.type.sql_type.lower() == "boolean":
-            body += " C := C and DBA.%s.%s = To_Boolean(%s);" \
-                % (table.name, f.name, f.name)
+            body += " C := C and DBA.%s.%s = To_Boolean(%s);" % (
+                table.name,
+                f.name,
+                f.name,
+            )
         else:
-            body += " C := C and DBA.%s.%s = %s;" \
-                    % (table.name, f.name, f.name)
+            body += " C := C and DBA.%s.%s = %s;" % (table.name, f.name, f.name)
         body += "end if;"
 
     body += "Copy(Self.Filter(C), Into => Result); return Result;"
@@ -970,23 +1057,27 @@ def create(pretty, table, schema):
 
     pretty.add_subprogram(
         name="filter",
-        params=[
-            ("self", "%s_Managers'Class" % table.name)
-        ] + schema.params_create(table),
+        params=[("self", "%s_Managers'Class" % table.name)]
+        + schema.params_create(table),
         body=body,
         local_vars=[
             ("C", "SQL_Criteria", "No_Criteria"),
-            ("Result", "%s_Managers" % table.name)],
+            ("Result", "%s_Managers" % table.name),
+        ],
         section="Manager: %s" % table.name,
-        returns="%s_Managers" % table.name)
+        returns="%s_Managers" % table.name,
+    )
 
 
 def from_cache_params(schema, table, with_self=""):
     """Return the parameters passed to the Hash_%row function"""
     if with_self:
         tmp = ", ".join(
-            ["%s.%s" % (with_self, schema.subprogram_name_from_field(p))
-             for p in table.pk])
+            [
+                "%s.%s" % (with_self, schema.subprogram_name_from_field(p))
+                for p in table.pk
+            ]
+        )
     else:
         tmp = ", ".join(["%s" % p.name for p in table.pk])
     return tmp
@@ -994,15 +1085,17 @@ def from_cache_params(schema, table, with_self=""):
 
 def from_cache_hash(schema, table, with_self=""):
     if table.has_cache:
-        return "(%d, %s)" % (table.base_key,
-                             from_cache_params(schema, table, with_self))
+        return "(%d, %s)" % (
+            table.base_key,
+            from_cache_params(schema, table, with_self),
+        )
     else:
         return "(%d, No_Primary_Key)" % table.base_key
 
 
 def detach(pretty, table, schema, translate):
     """Generate Detach subprograms
-       TABLE is an instance of Table
+    TABLE is an instance of Table
     """
 
     # We return a Detached_*'Class, rather than a Detached_*_Access for the
@@ -1020,13 +1113,18 @@ def detach(pretty, table, schema, translate):
     # session, since the latter might have a shorter lifetime.
 
     if table.pk != [] and table.has_cache:
-        tr = {"row": translate["row"],
-              "fromcache": from_cache_params(schema, table, with_self="Self")}
-
-        body = ("return Detached_%(row)s'Class (Session.From_Cache ("
-                + "%(fromcache)s, No_Detached_%(row)s));") % {
+        tr = {
             "row": translate["row"],
-            "fromcache": from_cache_hash(schema, table, with_self="")}
+            "fromcache": from_cache_params(schema, table, with_self="Self"),
+        }
+
+        body = (
+            "return Detached_%(row)s'Class (Session.From_Cache ("
+            + "%(fromcache)s, No_Detached_%(row)s));"
+        ) % {
+            "row": translate["row"],
+            "fromcache": from_cache_hash(schema, table, with_self=""),
+        }
 
         pretty.add_subprogram(
             name="from_cache",
@@ -1036,11 +1134,17 @@ def detach(pretty, table, schema, translate):
             comment="""Check whether there is already an element
 with this primary key. If not, the returned value will be a null element
 (test with Is_Null)""",
-            body=body)
+            body=body,
+        )
 
-        local = [("R", "constant Detached_%(row)s'Class" % translate,
-                  "From_Cache (Self.Data.Session, %s)" %
-                  from_cache_params(schema, table, with_self="Self"))]
+        local = [
+            (
+                "R",
+                "constant Detached_%(row)s'Class" % translate,
+                "From_Cache (Self.Data.Session, %s)"
+                % from_cache_params(schema, table, with_self="Self"),
+            )
+        ]
         body = """if R.Is_Null then
               return Detach_No_Lookup (Self, Self.Data.Session);
           else
@@ -1058,16 +1162,21 @@ with this primary key. If not, the returned value will be a null element
         section="Elements: %(cap)s" % translate,
         returns="Detached_%(row)s'Class" % translate,
         local_vars=local,
-        body=body % tr)
+        body=body % tr,
+    )
 
     # Internal version of Detach
 
     long = max_length([f.name for f in table.fields])
     aggregate = []
-    decl = [("Default", "Detached_%(row)s" % translate),
-            ("Result", "Detached_%(row)s'Class" % translate,
-             "Detached_%(row)s'Class (Session.Factory (Self, Default))"
-             % translate)]
+    decl = [
+        ("Default", "Detached_%(row)s" % translate),
+        (
+            "Result",
+            "Detached_%(row)s'Class" % translate,
+            "Detached_%(row)s'Class (Session.Factory (Self, Default))" % translate,
+        ),
+    ]
     setters = ""
 
     for f in table.fields:
@@ -1084,8 +1193,15 @@ with this primary key. If not, the returned value will be a null element
     for index, f in enumerate(fk):
         subp = subprogram_from_fk(f)
         ref = f.foreign.name
-        d = dict(name=subp, ref=ref, cap=subp.title(), pkg=pkg_name,
-                 table=table.name, index=index, row=f.foreign.row)
+        d = dict(
+            name=subp,
+            ref=ref,
+            cap=subp.title(),
+            pkg=pkg_name,
+            table=table.name,
+            index=index,
+            row=f.foreign.row,
+        )
 
         if f.show():
             decl.append(("FK_" + subp, "Detached_%(row)s_Access" % d))
@@ -1098,8 +1214,7 @@ with this primary key. If not, the returned value will be a null element
 
         if f.show():
             if f.can_be_null():
-                tests.append("         if LJ then\n" + str % d
-                             + "\n         end if;\n")
+                tests.append("         if LJ then\n" + str % d + "\n         end if;\n")
             else:
                 tests.append(str % d)
 
@@ -1117,10 +1232,12 @@ with this primary key. If not, the returned value will be a null element
         name="detach_no_lookup",
         comment="Same as Detach, but does not check the session cache",
         section="body",
-        params=[("self", "%(row)s'Class" % translate),
-                ("session", database_connection)],
+        params=[
+            ("self", "%(row)s'Class" % translate),
+            ("session", database_connection),
+        ],
         returns="Detached_%(row)s'Class" % translate,
-        local_vars=decl + [('Tmp', '%(row)s_Data' % translate)],
+        local_vars=decl + [("Tmp", "%(row)s_Data" % translate)],
         body="""
   if Result.Is_Null then
      Result.Set (%(row)s_DDR'
@@ -1131,13 +1248,16 @@ with this primary key. If not, the returned value will be a null element
   %(tests)s %(aggregate)s
   %(traces)sSession.Persist (Result);
   return Result;
-""" % {
-            "cap":       table.name,
-            "tests":     tests,
-            "row":       translate["row"],
+"""
+        % {
+            "cap": table.name,
+            "tests": tests,
+            "row": translate["row"],
             "field_count": translate["field_count"],
-            "traces":    debug_msg(table, "Creating", "Result.all"),
-            "aggregate": "\n            ".join(sorted(aggregate))})
+            "traces": debug_msg(table, "Creating", "Result.all"),
+            "aggregate": "\n            ".join(sorted(aggregate)),
+        },
+    )
 
 
 ##########################
@@ -1145,20 +1265,23 @@ with this primary key. If not, the returned value will be a null element
 # so that they appear in the right order
 ##########################
 
+
 def order_sections(schema, pretty, all_tables):
     for table in list(all_tables.values()):
         if table.is_abstract:
             pretty.add_section(
-                'Elements: %s' % table.name,
-                '',
-                '--  Interfaces corresponding to abstract tables' +
-                ' in the schema')
+                "Elements: %s" % table.name,
+                "",
+                "--  Interfaces corresponding to abstract tables" + " in the schema",
+            )
 
     # First the elements declarations grouped, since their primitive ops
     # might reference each other
 
-    pretty.add_section("Types", "",
-                       """
+    pretty.add_section(
+        "Types",
+        "",
+        """
     --  Detached_* elements extract the value from the list and store them
     --  locally. As a result, they remain valid even if the list is modified,
     --  but require more memory to store.
@@ -1170,7 +1293,8 @@ def order_sections(schema, pretty, all_tables):
     --  Direct lists are stored in memory, and can be traversed in any order.
     --  Forward lists can only be iterated forward. With some database backends
     --  this is much more efficient since only the current element needs to be
-    --  stored in memory(and retrieved from the server).""")
+    --  stored in memory(and retrieved from the server).""",
+    )
 
     # Then all their primitive operations, before we freeze the types
 
@@ -1200,6 +1324,7 @@ def order_sections(schema, pretty, all_tables):
 # debug trace
 #########################
 
+
 def debug_msg(table, msg, self="Self"):
     if debug:
         return 'Debug_%s(%s, "%s");' % (table.row, self, msg)
@@ -1216,23 +1341,23 @@ def add_debug_msg(pretty, table):
            & System.Address_Image(Self.Data.all'Address)
            & ")");"""
         pretty.add_subprogram(
-            name='Debug_%s' % table.row,
-            params=[
-                ("Self", "Detached_%s'Class" % table.row),
-                ("msg", "String", '""')],
+            name="Debug_%s" % table.row,
+            params=[("Self", "Detached_%s'Class" % table.row), ("msg", "String", '""')],
             body=body,
-            section="debug")
+            section="debug",
+        )
 
 
 ##########################
 # generate_orb_one_table
 ##########################
 
+
 def generate_orb_one_table(name, schema, pretty, all_tables):
     """Generate Ada glue code for a specific table.
-       out is an instance of file, writable"""
+    out is an instance of file, writable"""
 
-    table = schema.details[name]   # instance of dbgraph.Table
+    table = schema.details[name]  # instance of dbgraph.Table
 
     add_debug_msg(pretty, table)
 
@@ -1250,15 +1375,18 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
         tagged=tagged,
         field_count=len(table.fields) + len(table.fk),
         free_fields=schema.free_fields(table),
-        equal="\n         and ".join(schema.equal(table)))
+        equal="\n         and ".join(schema.equal(table)),
+    )
 
     if table.is_abstract:
         pretty.add_section(
-            "Elements: %s" % table.name,
-            """type %(row)s is interface;""" % translate)
+            "Elements: %s" % table.name, """type %(row)s is interface;""" % translate
+        )
 
     else:
-        pretty.add_section("Types", """
+        pretty.add_section(
+            "Types",
+            """
 
    type %(row)s is new Orm_Element%(tagged)s with null record;
    type %(row)s_DDR is new Detached_Data (%(field_count)s) with private;
@@ -1266,9 +1394,13 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
       new Sessions.Detached_Element%(tagged)s with private;
    type Detached_%(row)s_Access is access all Detached_%(row)s'Class;
    No_Detached_%(row)s : constant Detached_%(row)s;
-   No_%(row)s : constant %(row)s;""" % translate)
+   No_%(row)s : constant %(row)s;"""
+            % translate,
+        )
 
-        pretty.add_section("Manager types", """
+        pretty.add_section(
+            "Manager types",
+            """
 
    type I_%(cap)s_Managers is abstract new Manager with null record;
    package I_%(cap)s is new Generic_Managers
@@ -1283,37 +1415,56 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
    Empty_Direct_%(row)s_List : constant Direct_%(row)s_List :=
      I_%(cap)s.Empty_Direct_List;
  """
-                           % translate)
+            % translate,
+        )
 
-        pretty.add_section("Managers", """
+        pretty.add_section(
+            "Managers",
+            """
    All_%(cap)s : constant %(cap)s_Managers :=
      (I_%(cap)s.All_Managers with null record);
 """
-                           % translate)
+            % translate,
+        )
 
         detach(pretty, table, schema, translate)
         internal_query(pretty, table, schema)
         create(pretty, table, schema)
 
         pretty.add_constants(
-            [("F_%s_%s" % (name, f.name), "constant", "%d" % index)
-             for index, f in enumerate(table.fields) if f.show])
+            [
+                ("F_%s_%s" % (name, f.name), "constant", "%d" % index)
+                for index, f in enumerate(table.fields)
+                if f.show
+            ]
+        )
         pretty.add_unique_constants(
-            [("""procedure Unchecked_Free is new Ada.Unchecked_Deallocation
-      ( %(row)s_DDR, %(row)s_Data)""" % translate, )]
-            + schema.unchecked_free(name, all_tables))
+            [
+                (
+                    """procedure Unchecked_Free is new Ada.Unchecked_Deallocation
+      ( %(row)s_DDR, %(row)s_Data)"""
+                    % translate,
+                )
+            ]
+            + schema.unchecked_free(name, all_tables)
+        )
 
         # Constants Counts_%s are the number of fields needed for %s and its
         # FK at each depth
 
         if table.revert_fk:
             counts = table.fields_count_array(False, max_depth=max_depth)
-            lj_counts = table.fields_count_array(True,  max_depth=max_depth)
-            counts = ["(%d,%d)" % (counts[c], lj_counts[c])
-                      for c in range(len(counts))]
+            lj_counts = table.fields_count_array(True, max_depth=max_depth)
+            counts = ["(%d,%d)" % (counts[c], lj_counts[c]) for c in range(len(counts))]
             pretty.add_constants(
-                [("Counts_%s" % table.name,
-                  "constant Counts", "(%s)" % ",".join(counts))])
+                [
+                    (
+                        "Counts_%s" % table.name,
+                        "constant Counts",
+                        "(%s)" % ",".join(counts),
+                    )
+                ]
+            )
 
         # Constants Upto_%s_%s is the index of the first fields for the second
         # %s when retrieving the fields for the first %s
@@ -1321,11 +1472,16 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
         for index, fk in enumerate(table.fk):
             counts = table.fields_count_array(False, max_depth, fk)
             lj_counts = table.fields_count_array(True, max_depth, fk)
-            counts = ["(%d,%d)" % (counts[c], lj_counts[c])
-                      for c in range(len(counts))]
+            counts = ["(%d,%d)" % (counts[c], lj_counts[c]) for c in range(len(counts))]
             pretty.add_constants(
-                [("Upto_%s_%d" % (table.name, index),
-                  "constant Counts", "(%s)" % ",".join(counts))])
+                [
+                    (
+                        "Upto_%s_%d" % (table.name, index),
+                        "constant Counts",
+                        "(%s)" % ",".join(counts),
+                    )
+                ]
+            )
 
         aliases = table.compute_table_aliases(max_depth=max_depth)
 
@@ -1335,8 +1491,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
             aliases = ",".join([str(a) for a in aliases])
 
         pretty.add_constants(
-            [("Alias_%s" % table.name, "constant Alias_Array",
-             "(%s)" % aliases)])
+            [("Alias_%s" % table.name, "constant Alias_Array", "(%s)" % aliases)]
+        )
 
         if table.pk:
             when_not_in_cache = (
@@ -1344,8 +1500,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                declare
                  M : %(name)s_Managers := Filter
                    (All_%(cap)s,
-                    """ % {"name": table.name,
-                           "cap": pretty._title(name)}
+                    """
+                % {"name": table.name, "cap": pretty._title(name)}
                 + ",".join(schema.call_create_params(name))
                 + """);
                  L : I_%(cap)s.List;
@@ -1366,63 +1522,81 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                        return E.Detach_No_Lookup (Session);
                     end;
                  end if;
-               end;""" % translate)
+               end;"""
+                % translate
+            )
 
             if table.has_cache:
-                local = [("R",
-                          "constant Detached_%s'Class" % table.row,
-                          "From_Cache (Session, %s)" %
-                          from_cache_params(schema, table, with_self=""))]
-                body = ("""if not R.Is_Null then return R; else """ +
-                        when_not_in_cache + """end if;""")
+                local = [
+                    (
+                        "R",
+                        "constant Detached_%s'Class" % table.row,
+                        "From_Cache (Session, %s)"
+                        % from_cache_params(schema, table, with_self=""),
+                    )
+                ]
+                body = (
+                    """if not R.Is_Null then return R; else """
+                    + when_not_in_cache
+                    + """end if;"""
+                )
             else:
                 local = []
                 body = when_not_in_cache
 
             pretty.add_subprogram(
                 name="get_%(row)s" % translate,
-                params=[
-                    ("Session", database_connection)
-                ] + schema.params_get_pk(table)
-                + [("Depth",            "Related_Depth", "0"),
-                   ("Follow_Left_Join", "Boolean", "False")],
+                params=[("Session", database_connection)]
+                + schema.params_get_pk(table)
+                + [
+                    ("Depth", "Related_Depth", "0"),
+                    ("Follow_Left_Join", "Boolean", "False"),
+                ],
                 local_vars=local,
                 body=body,
                 returns="detached_%(row)s'Class" % translate,
-                section="Manager: %(cap)s" % translate)
+                section="Manager: %(cap)s" % translate,
+            )
 
         if table.pk:
             pretty.add_subprogram(
                 name='"="',
-                params=[("op1", "%(row)s" % translate),
-                        ("op2", "%(row)s" % translate)],
+                params=[("op1", "%(row)s" % translate), ("op2", "%(row)s" % translate)],
                 body="return %(equal)s;" % translate,
                 returns="boolean",
-                section="Elements: %(cap)s" % translate)
+                section="Elements: %(cap)s" % translate,
+            )
 
             pretty.add_subprogram(
                 name='"="',
-                params=[("op1", "Detached_%(row)s" % translate),
-                        ("op2", "Detached_%(row)s" % translate)],
+                params=[
+                    ("op1", "Detached_%(row)s" % translate),
+                    ("op2", "Detached_%(row)s" % translate),
+                ],
                 body="""if Op1.Is_Null then return Op2.Is_Null;
                 elsif Op2.Is_Null then return False; else
-                return %(equal)s; end if;""" % translate,
+                return %(equal)s; end if;"""
+                % translate,
                 section="Elements: %(cap)s" % translate,
                 returns="boolean",
                 comment="""
                    Compares two elements using only the primary keys. All other
-                   fields are ignored""")
+                   fields are ignored""",
+            )
 
         pretty.add_subprogram(
-            name='new_%(row)s' % translate,
+            name="new_%(row)s" % translate,
             returns="Detached_%(row)s'Class" % translate,
             section="Elements: %(cap)s" % translate,
-            local_vars=[("Result", "Detached_%(row)s" % translate),
-                        ("Data", "%(row)s_DDR" % translate)],
+            local_vars=[
+                ("Result", "Detached_%(row)s" % translate),
+                ("Data", "%(row)s_DDR" % translate),
+            ],
             body="Result.Set (Data); return Result;",
             comment="""
             Create a new element, but no attribute is set. Use Set_* to
-            modify any attribute for which you need a value""")
+            modify any attribute for which you need a value""",
+        )
 
         has_pk = []
         where = []
@@ -1432,11 +1606,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
 
         for index, f in enumerate(table.fields):
             if f.is_pk():
-                has_pk.append(
-                    "D.ORM_%s = %s" % (f.name, f.default_for_field()))
-                where.append("DBA.%s.%s = %s" %
-                             (table.name, f.name,
-                              f.to_return("D")))
+                has_pk.append("D.ORM_%s = %s" % (f.name, f.default_for_field()))
+                where.append("DBA.%s.%s = %s" % (table.name, f.name, f.to_return("D")))
                 if getpk != "":
                     getpk = "null; --  Can't retrieve multi-key PK"
                     execute = "Execute"
@@ -1445,29 +1616,34 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                     execute = "Execute"
                 else:
                     getpk = (
-                        'D.ORM_%s := R.Last_Id (Self.Session.DB,'
-                        + ' DBA.%s.%s);') % (f.name, table.name, f.name)
+                        "D.ORM_%s := R.Last_Id (Self.Session.DB," + " DBA.%s.%s);"
+                    ) % (f.name, table.name, f.name)
 
             elif f.is_fk():
-                tr = {"index": index + 1,
-                      "table": table.name,
-                      "row": translate["row"],
-                      "name": f.name,
-                      "default": f.default_for_field(),
-                      "fk": f.fk.name,
-                      "fkrow": f.fk.table.row,
-                      "fkall": f.fk.to_return("D2"),
-                      "value": f.to_return("D")}
+                tr = {
+                    "index": index + 1,
+                    "table": table.name,
+                    "row": translate["row"],
+                    "name": f.name,
+                    "default": f.default_for_field(),
+                    "fk": f.fk.name,
+                    "fkrow": f.fk.table.row,
+                    "fkall": f.fk.to_return("D2"),
+                    "value": f.to_return("D"),
+                }
 
                 if translate["row"] == f.fk.table.row:
-                    self_check = """
+                    self_check = (
+                        """
                       if Detached_%(row)s'Class (Self) =
                          D.ORM_FK_%(name)s.all
                       then
                          raise Self_Referencing with
                             "%(row)s is self referencing";
                       end if;
-                      """ % tr
+                      """
+                        % tr
+                    )
                 else:
                     self_check = ""
 
@@ -1492,40 +1668,54 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                               A := A & (DBA.%(table)s.%(name)s = %(fkall)s);
                            end;
                         end if;
-                     end if;""" % tr)
+                     end if;"""
+                        % tr
+                    )
                 else:
                     assign.append(
                         """if Mask (%(index)d) then
                           A := A & (DBA.%(table)s.%(name)s = %(value)s);
-                     end if;""" % tr)
+                     end if;"""
+                        % tr
+                    )
 
             else:
                 assign.append(
                     """if Mask (%d) then
                       A := A & (DBA.%s.%s = %s);
-                    end if;""" %
-                    (index + 1, table.name, f.name, f.to_return("D")))
+                    end if;"""
+                    % (index + 1, table.name, f.name, f.to_return("D"))
+                )
 
-        tr = {"table": table.name,
-              "setassign": "\n".join(assign),
-              "getpk": getpk,
-              "execute": execute,
-              "where": " AND ".join(where)}
+        tr = {
+            "table": table.name,
+            "setassign": "\n".join(assign),
+            "getpk": getpk,
+            "execute": execute,
+            "where": " AND ".join(where),
+        }
 
-        local_vars = [("D", "constant %(row)s_Data" % translate,
-                       "%(row)s_Data (Self.Unchecked_Get)" % translate),
-                      ("Q", "SQL_Query"),
-                      ("A", "SQL_Assignment", "No_Assignment")]
+        local_vars = [
+            (
+                "D",
+                "constant %(row)s_Data" % translate,
+                "%(row)s_Data (Self.Unchecked_Get)" % translate,
+            ),
+            ("Q", "SQL_Query"),
+            ("A", "SQL_Assignment", "No_Assignment"),
+        ]
 
         if has_pk:
-            local_vars.append(("Missing_PK", "constant Boolean",
-                               " or else ".join(has_pk)))
+            local_vars.append(
+                ("Missing_PK", "constant Boolean", " or else ".join(has_pk))
+            )
 
         if execute == "R.Fetch":
             local_vars.append(("R", "Forward_Cursor"))
 
         if has_pk:
-            insert_or_update = """
+            insert_or_update = (
+                """
                 %(setassign)s
                 if Missing_PK then
                    Q := SQL_Insert (A);
@@ -1538,36 +1728,47 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                    PK_Modified := True;
                    %(getpk)s
                 end if;
-                """ % tr
+                """
+                % tr
+            )
         else:
-            insert_or_update = """
+            insert_or_update = (
+                """
                 %(setassign)s
                 Q := SQL_Insert (A);
-                %(execute)s (Self.Session.DB, Q);""" % tr
+                %(execute)s (Self.Session.DB, Q);"""
+                % tr
+            )
 
         pretty.add_subprogram(
             name="insert_or_update",
-            params=[("self", "in out detached_%(row)s" % translate),
-                    ("PK_Modified", "in out Boolean"),
-                    ("Mask", "Dirty_Mask")],
+            params=[
+                ("self", "in out detached_%(row)s" % translate),
+                ("PK_Modified", "in out Boolean"),
+                ("Mask", "Dirty_Mask"),
+            ],
             overriding=True,
             section="internal",
             local_vars=local_vars,
-            body=insert_or_update)
+            body=insert_or_update,
+        )
 
         if has_pk:
             local_vars = [
-                ('D',
-                 'constant %(row)s_Data' % translate,
-                 '%(row)s_Data (Self.Unchecked_Get)' % translate)]
+                (
+                    "D",
+                    "constant %(row)s_Data" % translate,
+                    "%(row)s_Data (Self.Unchecked_Get)" % translate,
+                )
+            ]
             delete_body = (
-                'Execute (Self.Session.DB,'
-                + ' SQL_Delete (DBA.%(table)s, %(where)s));') % tr
+                "Execute (Self.Session.DB," + " SQL_Delete (DBA.%(table)s, %(where)s));"
+            ) % tr
         else:
             local_vars = []
             delete_body = (
-                'raise Program_Error with'
-                + ' "Table %(cap)s has no primary key";') % translate
+                "raise Program_Error with" + ' "Table %(cap)s has no primary key";'
+            ) % translate
 
         pretty.add_subprogram(
             name="internal_delete",
@@ -1575,7 +1776,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
             overriding=True,
             section="internal",
             local_vars=local_vars,
-            body=delete_body)
+            body=delete_body,
+        )
 
         on_add = ""
         for f in table.fk:
@@ -1583,17 +1785,25 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 name = subprogram_from_fk(f)
                 on_add += """if D.ORM_FK_%s /= null then
                    Self.Session.Persist (D.ORM_FK_%s.all);
-                   end if;""" % (name, name)
+                   end if;""" % (
+                    name,
+                    name,
+                )
         if on_add:
             pretty.add_subprogram(
                 name="on_persist",
                 overriding=True,
                 params=[("self", "Detached_%(row)s" % translate)],
-                local_vars=[("D", "constant %(row)s_Data" % translate,
-                             "%(row)s_Data (Self.Unchecked_Get)" % translate)],
+                local_vars=[
+                    (
+                        "D",
+                        "constant %(row)s_Data" % translate,
+                        "%(row)s_Data (Self.Unchecked_Get)" % translate,
+                    )
+                ],
                 section="internal",
-                body="if Persist_Cascade (Self.Session) then "
-                        + on_add + " end if;")
+                body="if Persist_Cascade (Self.Session) then " + on_add + " end if;",
+            )
 
         translate["traces"] = debug_msg(table, "Free")
         pretty.add_subprogram(
@@ -1601,26 +1811,33 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
             params=[("self", "in out %(row)s_DDR" % translate)],
             section="internal",
             overriding=True,
-            body="""%(free_fields)s Free (Detached_Data (Self));""" %
-                    translate)
+            body="""%(free_fields)s Free (Detached_Data (Self));""" % translate,
+        )
 
         if not table.is_abstract:
             if table.has_cache:
                 unset = " or else ".join(
-                    ["Self.ORM_%s = %s" % (p.name, p.type.default_record)
-                     for p in table.pk])
+                    [
+                        "Self.ORM_%s = %s" % (p.name, p.type.default_record)
+                        for p in table.pk
+                    ]
+                )
                 tmp = ", ".join([p.to_return("Self") for p in table.pk])
                 body = (
-                    'if %s then' % unset
-                    + '  return (%d, No_Primary_Key);' % (table.base_key, )
-                    + ' else '
-                    + '  return (%d, %s);' % (table.base_key, tmp)
-                    + " end if;")
+                    "if %s then" % unset
+                    + "  return (%d, No_Primary_Key);" % (table.base_key,)
+                    + " else "
+                    + "  return (%d, %s);" % (table.base_key, tmp)
+                    + " end if;"
+                )
 
             else:
-                body = """
+                body = (
+                    """
   --  Not cachable, since the PK is not a single integer field
-  return (%s, No_Primary_Key);""" % table.base_key
+  return (%s, No_Primary_Key);"""
+                    % table.base_key
+                )
 
             pretty.add_subprogram(
                 name="key",
@@ -1628,7 +1845,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 returns="Element_Key",
                 section="internal",
                 overriding=True,
-                body=body)
+                body=body,
+            )
 
     # Prepare the getters
     # Prepare the setters for simple values. These are only available for
@@ -1644,11 +1862,13 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 section="Elements: %(cap)s" % translate,
                 abstract=table.is_abstract,
                 comment=f.comment,
-                body="return %s;" % f.ada_from_db(cursor="Self"))
+                body="return %s;" % f.ada_from_db(cursor="Self"),
+            )
 
             if not table.is_abstract:
-                getter = "return %s;" % \
-                    f.to_return("%s_Data (Self.Unchecked_Get)" % f.table.row)
+                getter = "return %s;" % f.to_return(
+                    "%s_Data (Self.Unchecked_Get)" % f.table.row
+                )
 
                 if f.is_pk():
                     # We must not change primary keys
@@ -1657,15 +1877,23 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 else:
                     free = f.free_field("D")
                     if f.is_fk() and f.fk.table.show:
-                        free += "Unchecked_Free (D.ORM_FK_%s);" \
-                                % f.name
+                        free += "Unchecked_Free (D.ORM_FK_%s);" % f.name
 
-                    local = [("D", "constant %(row)s_Data" % translate,
-                              "%(row)s_Data (Self.Unchecked_Get)" % translate)]
+                    local = [
+                        (
+                            "D",
+                            "constant %(row)s_Data" % translate,
+                            "%(row)s_Data (Self.Unchecked_Get)" % translate,
+                        )
+                    ]
                     setter = """%sD.ORM_%s := %s;
                     Self.Set_Modified (%d);
-                    """ % (free, f.name, f.to_field("Value"),
-                           index + 1)
+                    """ % (
+                        free,
+                        f.name,
+                        f.to_field("Value"),
+                        index + 1,
+                    )
 
                 pretty.add_property(
                     schema=schema,
@@ -1676,7 +1904,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                     setter_local_vars=local,
                     type=f.type.ada_return,
                     abstract=table.is_abstract,
-                    section="Elements: %(cap)s" % translate)
+                    section="Elements: %(cap)s" % translate,
+                )
 
     # Prepare the getters for foreign keys
 
@@ -1694,21 +1923,21 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
 
             for ffrom, fto in fk_field.pairs:
                 params.append(
-                    "%s => Self.%s" % (
-                        fto.name,
-                        schema.subprogram_name_from_field(ffrom)))
-                detached_params.append(
-                    "%s => %s" % (fto.name,
-                                  ffrom.to_return("D")))
+                    "%s => Self.%s"
+                    % (fto.name, schema.subprogram_name_from_field(ffrom))
+                )
+                detached_params.append("%s => %s" % (fto.name, ffrom.to_return("D")))
                 reset_fk.append(
-                    "D.ORM_%s := %s;" %
-                    (ffrom.name,
-                     fto.to_field(
-                         "Value.%s"
-                         % schema.subprogram_name_from_field(fto))))
+                    "D.ORM_%s := %s;"
+                    % (
+                        ffrom.name,
+                        fto.to_field(
+                            "Value.%s" % schema.subprogram_name_from_field(fto)
+                        ),
+                    )
+                )
                 free_fk.append(ffrom.free_field("D"))
-                is_same.append(
-                    "%s = %s" % (fto.to_return("D"), ffrom.to_return("D")))
+                is_same.append("%s = %s" % (fto.to_return("D"), ffrom.to_return("D")))
 
             body = """if Current (Self.Current) /= Self.Index then
                raise Cursor_Has_Moved;
@@ -1732,9 +1961,14 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                return Filter (All_%(ref)s, %(pk)s)
                   .Limit (1).Get (Self.Data.Session).Element;
             end if;
- """ % {"pkg_name": pkg_name, "name": table_name, "index": index,
-                "ref": fk_field.foreign.name, "cap": table.name,
-                "pk": ",".join(params)}
+ """ % {
+                "pkg_name": pkg_name,
+                "name": table_name,
+                "index": index,
+                "ref": fk_field.foreign.name,
+                "cap": table.name,
+                "pk": ",".join(params),
+            }
 
             pretty.add_subprogram(
                 name=schema.subprogram_name_from_field(table_name),
@@ -1742,13 +1976,17 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 returns="%s'Class" % fk_field.foreign.row,
                 abstract=table.is_abstract,
                 section="Elements: %(cap)s" % translate,
-                body=body)
+                body=body,
+            )
 
             if not table.is_abstract:
-                tr = {"pkg_name": pkg_name, "name": table_name,
-                      "row": fk_field.foreign.row,
-                      "is_same": " and ".join(is_same),
-                      "pk": ",".join(detached_params)}
+                tr = {
+                    "pkg_name": pkg_name,
+                    "name": table_name,
+                    "row": fk_field.foreign.row,
+                    "is_same": " and ".join(is_same),
+                    "pk": ",".join(detached_params),
+                }
 
                 if store_connections:
                     params = []
@@ -1758,7 +1996,8 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 getter = "if D.ORM_FK_%(name)s = null then " % tr
 
                 if tr["row"] == translate["row"]:
-                    getter += """
+                    getter += (
+                        """
                      if %(is_same)s then
                         --  ??? Avoid reference cycle. Perhaps we could simply
                         --  avoid the cache for all foreign keys, and only
@@ -1766,47 +2005,70 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                         --  ??? Or use a weak reference
                         return Detached_%(row)s'Class (Self);
                      end if;
-                     """ % tr
+                     """
+                        % tr
+                    )
 
-                getter += """if not Dynamic_Fetching then
+                getter += (
+                    """if not Dynamic_Fetching then
                      raise Field_Not_Available with
                         "Dynamic fetching disabled for %(name)s";
-                  end if;""" % tr
+                  end if;"""
+                    % tr
+                )
 
                 if store_connections:
-                    getter += """S := Session (Self);
+                    getter += (
+                        """S := Session (Self);
                       if S = No_Session then
                           raise Field_Not_Available with
                               "Element is detached from any session";
                       end if;
                       D.ORM_FK_%(name)s := new Detached_%(row)s'Class'
                          (Get_%(row)s (S, %(pk)s));
-                      """ % tr
+                      """
+                        % tr
+                    )
 
                 else:
-                    getter += """
+                    getter += (
+                        """
                        D.ORM_FK_%(name)s := new Detached_%(row)s'Class'
-                       (Get_%(row)s (Session, %(pk)s));""" % tr
+                       (Get_%(row)s (Session, %(pk)s));"""
+                        % tr
+                    )
 
                 getter += """end if; return D.ORM_FK_%(name)s.all;""" % tr
 
-                setlocal = [("D", "constant %(row)s_Data" % translate,
-                             "%(row)s_Data (Self.Unchecked_Get)" % translate)]
-                free = ffrom.free_field("D") \
-                    + "".join(free_fk) \
-                    + "Unchecked_Free (D.ORM_FK_%s);" % table_name \
+                setlocal = [
+                    (
+                        "D",
+                        "constant %(row)s_Data" % translate,
+                        "%(row)s_Data (Self.Unchecked_Get)" % translate,
+                    )
+                ]
+                free = (
+                    ffrom.free_field("D")
+                    + "".join(free_fk)
+                    + "Unchecked_Free (D.ORM_FK_%s);" % table_name
                     + "\n".join(reset_fk)
+                )
                 setter = ""
                 for idx, f2 in enumerate(table.fields):
                     if f2 == ffrom:
-                        setter = \
-                            """%sD.ORM_FK_%s := new Detached_%s'Class'(Value);
+                        setter = """%sD.ORM_FK_%s := new Detached_%s'Class'(Value);
 
                     Self.Set_Modified (%d);
                     if Persist_Cascade (Self.Session) then
                        Self.Session.Persist (D.ORM_FK_%s.all);
                     end if;
-                    """ % (free, table_name, tr["row"], idx + 1, table_name)
+                    """ % (
+                            free,
+                            table_name,
+                            tr["row"],
+                            idx + 1,
+                            table_name,
+                        )
 
                 pretty.add_property(
                     schema=schema,
@@ -1816,37 +2078,42 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                     setter=setter,
                     setter_local_vars=setlocal,
                     getter_local_vars=[
-                        ("D", "constant %(row)s_Data" % translate,
-                         "%(row)s_Data (Self.Unchecked_Get)" % translate),
-                        ("S", "Session_Type")],
+                        (
+                            "D",
+                            "constant %(row)s_Data" % translate,
+                            "%(row)s_Data (Self.Unchecked_Get)" % translate,
+                        ),
+                        ("S", "Session_Type"),
+                    ],
                     type="Detached_%s'Class" % fk_field.foreign.row,
                     abstract=table.is_abstract,
-                    section="Elements: %(cap)s" % translate)
+                    section="Elements: %(cap)s" % translate,
+                )
 
-#                if not table.is_abstract:
-#                    # From a table's manager, get a manager for the tables
-#                    # that are related via a FK.
-#
-#                    pretty.add_subprogram(
-#                       name=schema.subprogram_name_from_field(table_name),
-#                       params=[("self",
-#                                "I_%(row)s_Managers'Class" % translate)],
-#                       returns="%s_Managers" % fk_field.foreign.row,
-#                       section="Manager: %(cap)s" % translate,
-#                       local_vars=[("Q", "constant SQL_Query",
-#                                      "I_%s.Build_Query(Self, +DBA.%s.%s)"
-#                                    % (table.name,
-#                                       table.name,
-#                                       table_name))],
-#                       body="""return All_%s.Filter
-#        (SQL_In(DBA.%s.%s, Q));""" % (
-#                          fk_field.foreign.name,
-#                          fk_field.foreign.name,
-#                          fk.pairs[0][1].name))
+    #                if not table.is_abstract:
+    #                    # From a table's manager, get a manager for the tables
+    #                    # that are related via a FK.
+    #
+    #                    pretty.add_subprogram(
+    #                       name=schema.subprogram_name_from_field(table_name),
+    #                       params=[("self",
+    #                                "I_%(row)s_Managers'Class" % translate)],
+    #                       returns="%s_Managers" % fk_field.foreign.row,
+    #                       section="Manager: %(cap)s" % translate,
+    #                       local_vars=[("Q", "constant SQL_Query",
+    #                                      "I_%s.Build_Query(Self, +DBA.%s.%s)"
+    #                                    % (table.name,
+    #                                       table.name,
+    #                                       table_name))],
+    #                       body="""return All_%s.Filter
+    #        (SQL_In(DBA.%s.%s, Q));""" % (
+    #                          fk_field.foreign.name,
+    #                          fk_field.foreign.name,
+    #                          fk.pairs[0][1].name))
 
     # Generate revert-FK getters for elements
 
-    for fk in table.revert_fk:      # fk.foreign is always table
+    for fk in table.revert_fk:  # fk.foreign is always table
         foreign = fk.pairs[0][0].table  # revert the FK relationship
         if fk.revert and fk.foreign.show and foreign.show:
             pretty.add_subprogram(
@@ -1855,10 +2122,9 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 returns="%s_Managers" % foreign.name,
                 section="Manager: %(cap)s" % translate,
                 abstract=table.is_abstract,
-                body="return Filter (All_%s, %s => Self.%s);" % (
-                    foreign.name,
-                    fk.pairs[0][0].name,
-                    fk.pairs[0][1].name))
+                body="return Filter (All_%s, %s => Self.%s);"
+                % (foreign.name, fk.pairs[0][0].name, fk.pairs[0][1].name),
+            )
 
             if not table.is_abstract:
                 pretty.add_subprogram(
@@ -1867,10 +2133,9 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                     returns="%s_Managers" % foreign.name,
                     section="Manager: %(cap)s" % translate,
                     abstract=table.is_abstract,
-                    body="return Filter (All_%s, %s => Self.%s);" % (
-                        foreign.name,
-                        fk.pairs[0][0].name,
-                        fk.pairs[0][1].name))
+                    body="return Filter (All_%s, %s => Self.%s);"
+                    % (foreign.name, fk.pairs[0][0].name, fk.pairs[0][1].name),
+                )
 
             pretty.add_subprogram(
                 name=schema.subprogram_name_from_field(fk.revert),
@@ -1878,44 +2143,65 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                 returns="%s_Managers" % foreign.name,
                 section="Manager: %(cap)s" % translate,
                 abstract=table.is_abstract,
-                local_vars=[("Q", "constant SQL_Query",
-                             "I_%s.Build_Query(Self, +DBA.%s.%s)"
-                             % (table.name, table.name, fk.pairs[0][1].name))],
+                local_vars=[
+                    (
+                        "Q",
+                        "constant SQL_Query",
+                        "I_%s.Build_Query(Self, +DBA.%s.%s)"
+                        % (table.name, table.name, fk.pairs[0][1].name),
+                    )
+                ],
                 body="""return All_%s.Filter
-        (SQL_In(DBA.%s.%s, Q));""" % (foreign.name,
-                                      foreign.name,
-                                      fk.pairs[0][0].name))
+        (SQL_In(DBA.%s.%s, Q));"""
+                % (foreign.name, foreign.name, fk.pairs[0][0].name),
+            )
 
     if not table.is_abstract:
-        pretty.add_private_before("""
+        pretty.add_private_before(
+            """
     type %(row)s_DDR is new Detached_Data (%(field_count)s) with record
 %(detached_data_fields)s;
     end record;
     type %(row)s_Data is access all %(row)s_DDR;
-    """ % translate)
-        pretty.add_private_after("""
+    """
+            % translate
+        )
+        pretty.add_private_after(
+            """
     type Detached_%(row)s
        is new Sessions.Detached_Element%(tagged)s with null record;
     No_%(row)s : constant %(row)s :=(No_Orm_Element with null record);
     No_Detached_%(row)s : constant Detached_%(row)s :=
       (Sessions.Detached_Element with null record);
- """ % translate)
+ """
+            % translate
+        )
 
 
 #################
 # generate_orm
 #################
 
+
 def generate_orm(setup, pkg_name, tables=[], omit=[], out=sys.stdout):
     """Generate ORB packages for a set of tables.
-       SETUP is an object that contains the database description(.db_name,...)
-       Do not generate data for the fields in OMIT("table.field").
+    SETUP is an object that contains the database description(.db_name,...)
+    Do not generate data for the fields in OMIT("table.field").
     """
 
     pretty = Pretty_Printer(
-        out, casing=["Follow_LJ", "GNAT", "GNATCOLL", "SQL",
-                     "SQL_Table_List", "SQL_Query",
-                     "SQL_Field_List", "SQL_Field"])
+        out,
+        casing=[
+            "Follow_LJ",
+            "GNAT",
+            "GNATCOLL",
+            "SQL",
+            "SQL_Table_List",
+            "SQL_Query",
+            "SQL_Field_List",
+            "SQL_Field",
+        ],
+    )
     schema = Schema(setup, tables, pretty, all_tables=tables, omit=omit)
     if not tables:
         tables = schema.details
@@ -1936,7 +2222,9 @@ def generate_orm(setup, pkg_name, tables=[], omit=[], out=sys.stdout):
 
     for t in sorted(tables):
         table_image_body += ' when %d => return "%s";' % (
-            tables[t].base_key, tables[t].name)
+            tables[t].base_key,
+            tables[t].name,
+        )
         if tables[t].is_abstract:
             generate_orb_one_table(t, schema, pretty, tables)
 
@@ -1957,8 +2245,8 @@ def generate_orm(setup, pkg_name, tables=[], omit=[], out=sys.stdout):
 
 class DBSetup(object):
     """This class describes how to get the schema from a database. This
-       schema can either be read from a file, or from a live database. This
-       class abstracts those accesses.
+    schema can either be read from a file, or from a live database. This
+    class abstracts those accesses.
     """
 
     @staticmethod
@@ -1968,8 +2256,9 @@ class DBSetup(object):
         return result
 
     @staticmethod
-    def from_live_db(dbname, dbuser, dbhost="localhost",
-                     dbpassword="", dbtype='sqlite'):
+    def from_live_db(
+        dbname, dbuser, dbhost="localhost", dbpassword="", dbtype="sqlite"
+    ):
         result = DBSetup()
         result.db_name = dbname
         result.db_type = dbtype
@@ -1979,20 +2268,32 @@ class DBSetup(object):
 
     def gnatcoll_db2ada(self, args=[]):
         """Executes gnatcoll_db2ada, passing the required args to access
-           the database model, and extra arguments if needed.
+        the database model, and extra arguments if needed.
         """
         if hasattr(self, "db_model"):
             p = exec_or_fail(
                 ["gnatcoll_db2ada", "-dbmodel", self.db_model] + args,
-                stdout=subprocess.PIPE)
+                stdout=subprocess.PIPE,
+            )
 
         else:
             p = exec_or_fail(
-                ["gnatcoll_db2ada", "-dbhost", self.db_host,
-                 "-dbname", self.db_name, "dbtype", self.db_type,
-                 "-dbuser", self.db_user,
-                 "-dbpasswd", self.db_password] + args,
-                stdout=subprocess.PIPE)
+                [
+                    "gnatcoll_db2ada",
+                    "-dbhost",
+                    self.db_host,
+                    "-dbname",
+                    self.db_name,
+                    "dbtype",
+                    self.db_type,
+                    "-dbuser",
+                    self.db_user,
+                    "-dbpasswd",
+                    self.db_password,
+                ]
+                + args,
+                stdout=subprocess.PIPE,
+            )
 
         return p.stdout
 
@@ -2007,26 +2308,27 @@ class DBSetup(object):
 @save_dir
 def create_orm(setup, pkg_name, indir, tables=[], omit=[]):
     """Creates INDIR/orm-* based on the database defined in the config.
-       First remove any orm-*.ad? in that directory
-       TABLES can be used to limit the generation to a subset of the tables.
-       OMIT is used to remove some of the tables from the set.
-       Return 1 in case of error, 0 for success (exit status for the shell)
+    First remove any orm-*.ad? in that directory
+    TABLES can be used to limit the generation to a subset of the tables.
+    OMIT is used to remove some of the tables from the set.
+    Return 1 in case of error, 0 for success (exit status for the shell)
     """
 
     for dirpath, dirnames, filenames in os.walk(indir):
         for f in filenames:
-            if os.path.splitext(f)[1] in(".ads", ".adb") \
-               and f.startswith("orm-"):
+            if os.path.splitext(f)[1] in (".ads", ".adb") and f.startswith("orm-"):
                 unlink_if_exist(os.path.join(dirpath, f))
 
     os.chdir(indir)
     out = open("tmp_orm", "w")
     try:
-        generate_orm(setup,
-                     pkg_name=pkg_name,
-                     tables=tables,
-                     omit=omit,  # omit circular deps
-                     out=out)
+        generate_orm(
+            setup,
+            pkg_name=pkg_name,
+            tables=tables,
+            omit=omit,  # omit circular deps
+            out=out,
+        )
         out.close()
         exec_or_fail(["gnatchop", "-q", "-w", "tmp_orm"])
 
@@ -2038,18 +2340,20 @@ def create_orm(setup, pkg_name, indir, tables=[], omit=[]):
 
 
 class Field_Type(object):
-    def __init__(self,
-                 sql_type,        # SQL type
-                 ada_return,      # As an Ada return value
-                 ada_param,       # As an Ada subprogram parameter
-                 default_param,   # default value for the Get parameter
-                 ada_field,       # As an Ada record field
-                 default_record,  # default value for the record
-                 value_from_db,   # Ada value from db (%1=Cursor, %2=index)
-                 to_return,       # convert from field type to return type
-                 free_field,      # How to free the field
-                 img,             # From a field type to a string
-                 to_field):       # Convert from ada_param to ada_field
+    def __init__(
+        self,
+        sql_type,  # SQL type
+        ada_return,  # As an Ada return value
+        ada_param,  # As an Ada subprogram parameter
+        default_param,  # default value for the Get parameter
+        ada_field,  # As an Ada record field
+        default_record,  # default value for the record
+        value_from_db,  # Ada value from db (%1=Cursor, %2=index)
+        to_return,  # convert from field type to return type
+        free_field,  # How to free the field
+        img,  # From a field type to a string
+        to_field,
+    ):  # Convert from ada_param to ada_field
         self.sql_type = sql_type
         self.ada_return = ada_return
         self.ada_param = ada_param
@@ -2058,7 +2362,7 @@ class Field_Type(object):
         self.default_record = default_record
         self._value_from_db = value_from_db
         self._to_return = to_return  # %1 => value to convert
-        self._to_field = to_field   # %1 => entity to convert
+        self._to_field = to_field  # %1 => entity to convert
         self._img = img  # %1 => value to convert
         self._free_field = free_field
 
@@ -2073,14 +2377,31 @@ class Field_Type(object):
                 # of copy-on-write done for Unbounded_String rather than
                 # redo it ourselves (with complex support for multi-tasking)
                 text=Field_Type(
-                    "text", "String", "String", 'No_Update',
+                    "text",
+                    "String",
+                    "String",
+                    "No_Update",
                     "Unbounded_String",
-                    "Null_Unbounded_String", "String_Value (%s, %s)",
-                    "To_String (%s)", "", "%s",
-                    "To_Unbounded_String (%s)"),
+                    "Null_Unbounded_String",
+                    "String_Value (%s, %s)",
+                    "To_String (%s)",
+                    "",
+                    "%s",
+                    "To_Unbounded_String (%s)",
+                ),
                 integer=Field_Type(
-                    "integer", "Integer", "Integer", -1, "Integer", -1,
-                    "Integer_Value (%s, %s)", "%s", "", "%s'Img", "%s"),
+                    "integer",
+                    "Integer",
+                    "Integer",
+                    -1,
+                    "Integer",
+                    -1,
+                    "Integer_Value (%s, %s)",
+                    "%s",
+                    "",
+                    "%s'Img",
+                    "%s",
+                ),
                 bigint=Field_Type(
                     sql_type="bigint",
                     ada_return="Long_Long_Integer",
@@ -2092,33 +2413,82 @@ class Field_Type(object):
                     to_return="%s",
                     free_field="",
                     img="Long_Long_Integer'Image (%s)",
-                    to_field="%s"),
+                    to_field="%s",
+                ),
                 autoincrement=Field_Type(
-                    "integer", "Integer", "Integer", -1, "Integer", -1,
-                    "Integer_Value (%s, %s)", "%s", "", "%s'Img", "%s"),
+                    "integer",
+                    "Integer",
+                    "Integer",
+                    -1,
+                    "Integer",
+                    -1,
+                    "Integer_Value (%s, %s)",
+                    "%s",
+                    "",
+                    "%s'Img",
+                    "%s",
+                ),
                 time=Field_Type(
-                    "time", "Ada.Calendar.Time", "Ada.Calendar.Time",
-                    "No_Time", "Ada.Calendar.Time", "No_Time",
-                    "Time_Value (%s, %s)", "%s", "", "%s'Img", "%s"),
+                    "time",
+                    "Ada.Calendar.Time",
+                    "Ada.Calendar.Time",
+                    "No_Time",
+                    "Ada.Calendar.Time",
+                    "No_Time",
+                    "Time_Value (%s, %s)",
+                    "%s",
+                    "",
+                    "%s'Img",
+                    "%s",
+                ),
                 float=Field_Type(
-                    "float", "Float", "Float", "Float'First", "Float",
-                    "Float'First", "Float_Value (%s, %s)", "%s", "",
-                    "%s'Img", "%s"),
+                    "float",
+                    "Float",
+                    "Float",
+                    "Float'First",
+                    "Float",
+                    "Float'First",
+                    "Float_Value (%s, %s)",
+                    "%s",
+                    "",
+                    "%s'Img",
+                    "%s",
+                ),
                 boolean=Field_Type(
-                    "boolean", "Boolean", "TriBoolean", "Indeterminate",
-                    "Boolean", "False", "Boolean_Value (%s, %s)",
-                    "%s", "", "%s'Img", "%s"),
+                    "boolean",
+                    "Boolean",
+                    "TriBoolean",
+                    "Indeterminate",
+                    "Boolean",
+                    "False",
+                    "Boolean_Value (%s, %s)",
+                    "%s",
+                    "",
+                    "%s'Img",
+                    "%s",
+                ),
                 money=Field_Type(
-                    "money", "GNATCOLL.SQL.T_Money",
-                    "GNATCOLL.SQL.T_Money", "GNATCOLL.SQL.T_Money'First",
-                    "GNATCOLL.SQL.T_Money", "GNATCOLL.SQL.T_Money'First",
-                    "Money_Value (%s, %s)", "%s", "", "%s'Img", "%s"))
+                    "money",
+                    "GNATCOLL.SQL.T_Money",
+                    "GNATCOLL.SQL.T_Money",
+                    "GNATCOLL.SQL.T_Money'First",
+                    "GNATCOLL.SQL.T_Money",
+                    "GNATCOLL.SQL.T_Money'First",
+                    "Money_Value (%s, %s)",
+                    "%s",
+                    "",
+                    "%s'Img",
+                    "%s",
+                ),
+            )
 
         sql = sql.lower()
-        if sql in ("timestamp without time zone",
-                   "timestamp with time zone",
-                   "timestamp",
-                   "date"):
+        if sql in (
+            "timestamp without time zone",
+            "timestamp with time zone",
+            "timestamp",
+            "date",
+        ):
             sql = "time"
         elif sql.startswith("character") or sql == "json":
             sql = "text"
@@ -2137,7 +2507,7 @@ class Field(object):
         """SHOW is whether we should generate subprograms for it or not"""
         self.table = table  # Instance of Table
         self.name = name.title()  # Normalized name
-        self.type = type   # string, will be replaced with Field_Type
+        self.type = type  # string, will be replaced with Field_Type
         self.comment = comment
         self.null = null
         self.show = show
@@ -2147,7 +2517,7 @@ class Field(object):
 
         self.__default = default  # See default_field () instead
         if default.find("::") != -1:
-            self.__default = default[:default.find('::')]  # Remove type casts
+            self.__default = default[: default.find("::")]  # Remove type casts
 
     def __repr__(self):
         return "Field<%s.%s>" % (self.table.name, self.name)
@@ -2155,7 +2525,7 @@ class Field(object):
     @property
     def fk(self):
         """If SELF is a foreign key, return a pointer to the field in the
-           foreign table
+        foreign table
         """
         if self._fk is None:
             for f in self.table.fk:
@@ -2167,20 +2537,21 @@ class Field(object):
 
     def field_from_db(self, cursor):
         """Retrieves a field value by reading the current row from CURSOR
-           and checking the specific TABLE.FIELD
+        and checking the specific TABLE.FIELD
         """
         return self.to_field(entity=self.ada_from_db(cursor))
 
     def ada_from_db(self, cursor):
         """Retrieves an Ada value by reading the current row from CURSOR"""
         return self.type._value_from_db % (
-            cursor, "F_%s_%s" % (self.table.name, self.name))
+            cursor,
+            "F_%s_%s" % (self.table.name, self.name),
+        )
 
     def free_field(self, element):
         """Returns the string used to free ELEMENT.FIELD if needed"""
         if self.type._free_field:
-            return self.type._free_field % (
-                "%s.ORM_%s" % (element, self.name),) + ";"
+            return self.type._free_field % ("%s.ORM_%s" % (element, self.name),) + ";"
         else:
             return ""
 
@@ -2201,7 +2572,7 @@ class Field(object):
 
     def is_fk(self):
         """Whether SELF is a foreign key for its table, ie a field referencing
-           another table
+        another table
         """
         return self.fk is not None
 
@@ -2215,8 +2586,10 @@ class Field(object):
     def default_for_field(self):
         """Return the default value to use for a record field"""
         if self.__default:
-            if self.__default.lower().find("now()") != -1 \
-               or self.__default.lower() == "now":
+            if (
+                self.__default.lower().find("now()") != -1
+                or self.__default.lower() == "now"
+            ):
                 return "Clock"
 
             elif self.__default.lower().find("'now'") != -1:
@@ -2239,8 +2612,7 @@ class Field(object):
         return self.type.default_record
 
     def resolve_fk(self, all_tables):
-        """Lookup the type of field if it was unknown.
-        """
+        """Lookup the type of field if it was unknown."""
 
         if self.type.startswith("FK "):
             # Look for the actual type, recursively since the PK of
@@ -2250,9 +2622,12 @@ class Field(object):
                 descr = Foreign_Key.parse_fk_descr(self, self.name, pk)
                 if len(all_tables[descr.foreign_name].pk) > 1:
                     print(
-                        ("Error: '%s.%s' references '%s', which has more" +
-                         " than one PK") % (
-                            self.table.name, self.name, descr.foreign_name))
+                        (
+                            "Error: '%s.%s' references '%s', which has more"
+                            + " than one PK"
+                        )
+                        % (self.table.name, self.name, descr.foreign_name)
+                    )
                 pk = all_tables[descr.foreign_name].pk[0].type
 
             if isinstance(pk, str):
@@ -2266,18 +2641,18 @@ class Field(object):
 class Foreign_Key(object):
     def __init__(self, from_name, foreign_name, pairs, revert):
         """FOREIGN_NAME is the name of the foreign table we are referencing
-           PAIRS is a list of tuples (from, to), where from is the name of a
-                 field in FROM_NAME, and to is the name of a field in FOREIGN.
+        PAIRS is a list of tuples (from, to), where from is the name of a
+              field in FROM_NAME, and to is the name of a field in FOREIGN.
         """
-        self.from_name = from_name     # A string, will be deleted
+        self.from_name = from_name  # A string, will be deleted
         self.foreign_name = foreign_name  # A string, will be deleted
-        self.foreign = None   # A Table, will be resolved later
+        self.foreign = None  # A Table, will be resolved later
         self.pairs = pairs  # Initially  strings, but afterward Fields
         self.revert = revert  # Empty string if should be ignored
 
     def resolve_fk(self, all_tables):
         """Once we know all tables, complete the definition of foreign keys
-           by pointing to the right table instances and completing the pairs
+        by pointing to the right table instances and completing the pairs
         """
 
         table = all_tables[self.from_name.lower()]
@@ -2286,17 +2661,19 @@ class Foreign_Key(object):
         del self.from_name
 
         for index, p in enumerate(self.pairs):
-            if p[1] is None:   # references the PK of the foreign table
+            if p[1] is None:  # references the PK of the foreign table
                 self.pairs[index] = (table.get_field(p[0]), self.foreign.pk[0])
             else:
-                self.pairs[index] = (table.get_field(p[0]),
-                                     self.foreign.get_field(p[1]))
+                self.pairs[index] = (
+                    table.get_field(p[0]),
+                    self.foreign.get_field(p[1]),
+                )
             if self.pairs[index][0] is None:
                 print("Couldn't resolve field %s.%s" % (table, p[0]))
 
     def can_be_null(self):
         """Whether the foreign key can be NULL.
-           If it must always be set, False is returned
+        If it must always be set, False is returned
         """
         for p in self.pairs:
             if p[0].null:
@@ -2315,21 +2692,18 @@ class Foreign_Key(object):
     @staticmethod
     def parse_fk_descr(table, field_name, descr):
         """Parse a description of a foreign key in the definition of TABLE.
-           DESCR contains text like "FK table(revert)".
+        DESCR contains text like "FK table(revert)".
         """
         pairs = [(field_name, None)]
         revert = re.search("\((.*)\)", descr)
         if revert:
-            return Foreign_Key(table.name,
-                               descr[3:revert.start(1) - 1],
-                               pairs,
-                               revert.group(1))
+            return Foreign_Key(
+                table.name, descr[3 : revert.start(1) - 1], pairs, revert.group(1)
+            )
         else:
             return Foreign_Key(
-                table.name,
-                descr[3:],
-                pairs,
-                table.name + "_" + field_name + "_id")
+                table.name, descr[3:], pairs, table.name + "_" + field_name + "_id"
+            )
 
 
 class Table(object):
@@ -2337,23 +2711,22 @@ class Table(object):
 
     base_key = 0
 
-    def __init__(self, name, row, show=True, is_abstract=False,
-                 superClass=None):
+    def __init__(self, name, row, show=True, is_abstract=False, superClass=None):
         """FIELDS is a dictionary of Field, indexed by the name of the field
-           PK is a list of Field that make up the primary key
-           FK is a list of Foreign_Key
-           ROW is the name of a row instance ("book" if table is "books")
-           SHOW is true if we should do some output for self
+        PK is a list of Field that make up the primary key
+        FK is a list of Foreign_Key
+        ROW is the name of a row instance ("book" if table is "books")
+        SHOW is true if we should do some output for self
         """
         self.name = name.title()  # string
-        self.fields = []      # list of Field
-        self.fk = []      # list of Foreign_Key
-        self.pk = []      # list of Field
-        self.row = row.title()     # string
+        self.fields = []  # list of Field
+        self.fk = []  # list of Foreign_Key
+        self.pk = []  # list of Field
+        self.row = row.title()  # string
         self.is_abstract = is_abstract
         self.show = show
         self.superClass = superClass  # a Str, then will be instance of Table
-        self.revert_fk = []   # the FK from other tables that point to self
+        self.revert_fk = []  # the FK from other tables that point to self
 
         self.base_key = Table.base_key
         Table.base_key += 1000000
@@ -2371,9 +2744,9 @@ class Table(object):
 
     def fields_count(self, depth, follow_lj, until=""):
         """Remove the count of fields that in SELF and all its fk-related
-           tables up to DEPTH. If FOLLOW_LF is False, ignore those fk that can
-           be null.  Stops when we find a FK equal to UNTIL, if the latter is
-           specified.
+        tables up to DEPTH. If FOLLOW_LF is False, ignore those fk that can
+        be null.  Stops when we find a FK equal to UNTIL, if the latter is
+        specified.
         """
         result = len(self.fields)
         if depth > 0:
@@ -2386,8 +2759,8 @@ class Table(object):
 
     def fields_count_array(self, follow_lj, max_depth, until=""):
         """Same as fields_count, but returns a list with all possible fields
-           count at any depth. MAX_DEPTH is used to avoid infinite recursion
-           (a table that references itself for instance)
+        count at any depth. MAX_DEPTH is used to avoid infinite recursion
+        (a table that references itself for instance)
         """
         result = []
         depth = 0
@@ -2411,12 +2784,12 @@ class Table(object):
             pass
 
         Outscope.seen = set()  # tables already in the query
-        Outscope.alias = 0      # current alias
+        Outscope.alias = 0  # current alias
 
         def internal(table, alias, start_index, depth):
             """Compute array for table TABLE, where START_INDEX is its first
-               entry in the resulting array. ALIAS is the alias to use for
-               TABLE
+            entry in the resulting array. ALIAS is the alias to use for
+            TABLE
             """
 
             local = [alias]
@@ -2434,13 +2807,13 @@ class Table(object):
                         aliases.append(-1)
                         Outscope.seen.add(fk.foreign.name)
 
-                local += [-2] * len(table.fk)   # reserve space
+                local += [-2] * len(table.fk)  # reserve space
 
                 for index, fk in enumerate(table.fk):
                     local[index + 1] = start_index + len(local)  # Jump
                     local += internal(
-                        fk.foreign, aliases[index], local[index + 1],
-                        depth + 1)
+                        fk.foreign, aliases[index], local[index + 1], depth + 1
+                    )
 
             return local
 
@@ -2449,10 +2822,10 @@ class Table(object):
 
     def resolve_fk(self, all_tables):
         """Lookup the type of fields that were defined as "FK ..."
-           ALL_TABLES must contain the set of all tables in the database.
-           Return False in case of error.
+        ALL_TABLES must contain the set of all tables in the database.
+        Return False in case of error.
 
-           This is called immediately after parsing the database schema.
+        This is called immediately after parsing the database schema.
         """
 
         for f in self.fk:
@@ -2480,16 +2853,16 @@ class Table(object):
 
 def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
     """Parse the schema of the database (database access is described in
-       setup, which is an instance of configfile.ConfigFile).
-       If requires_pk is True, a warning is raised for all tables that have
-       no PRIMARY KEY. Views never generate a warning.
-       OMIT is the list of fields to omit (in the form "table.field").
-       ALL_TABLES, if specified, lists the tables for which we do output.
+    setup, which is an instance of configfile.ConfigFile).
+    If requires_pk is True, a warning is raised for all tables that have
+    no PRIMARY KEY. Views never generate a warning.
+    OMIT is the list of fields to omit (in the form "table.field").
+    ALL_TABLES, if specified, lists the tables for which we do output.
     """
 
     schematxt = setup.get_schema()
     tables = dict()  # Index is lower cases table name
-    table = None      # Instance of Table
+    table = None  # Instance of Table
 
     for line in schematxt.splitlines():
         if line.startswith("|") and not line.startswith("|--"):
@@ -2497,10 +2870,11 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
             fields[1] = fields[1].strip()
             fields[2] = fields[2].strip()
 
-            if fields[1].startswith("VIEW") \
-               or fields[1].startswith("TABLE") \
-               or fields[1].startswith("ABSTRACT TABLE"):
-
+            if (
+                fields[1].startswith("VIEW")
+                or fields[1].startswith("TABLE")
+                or fields[1].startswith("ABSTRACT TABLE")
+            ):
                 m = re.search("\((.*)\)", fields[1])
                 if m:
                     superclass = m.group(1)
@@ -2512,11 +2886,13 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
                 else:
                     table_row = fields[2]
 
-                table = Table(name=fields[2],
-                              row=table_row,
-                              superClass=superclass,
-                              show=all_tables == [] or fields[2] in all_tables,
-                              is_abstract=fields[1].startswith("ABSTRACT"))
+                table = Table(
+                    name=fields[2],
+                    row=table_row,
+                    superClass=superclass,
+                    show=all_tables == [] or fields[2] in all_tables,
+                    is_abstract=fields[1].startswith("ABSTRACT"),
+                )
                 tables[table.name.lower()] = table
 
             elif table and len(fields) > 3:
@@ -2530,8 +2906,7 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
                     for index, f in enumerate(fields[3].split()):
                         pairs.append((f, to[index]))
 
-                    table.fk.append(
-                        Foreign_Key(table.name, fields[2], pairs, ''))
+                    table.fk.append(Foreign_Key(table.name, fields[2], pairs, ""))
 
                 elif fields[1] in ["INDEX:", "UNIQUE:"]:
                     # Skip, no influence here
@@ -2540,20 +2915,22 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
                 else:
                     if fields[2].startswith("FK "):
                         table.fk.append(
-                            Foreign_Key.parse_fk_descr(
-                                table, fields[1], fields[2]))
+                            Foreign_Key.parse_fk_descr(table, fields[1], fields[2])
+                        )
 
-                    null = (fields[3].find("NOT NULL") == -1
-                            and fields[3].find("PK") == -1)
+                    null = (
+                        fields[3].find("NOT NULL") == -1 and fields[3].find("PK") == -1
+                    )
 
-                    field = Field(table=table,
-                                  name=fields[1],
-                                  type=fields[2],
-                                  default=fields[4].strip(),
-                                  comment=fields[5].strip(),
-                                  null=null,
-                                  show="%s.%s" % (table.name, fields[1])
-                                       not in omit)
+                    field = Field(
+                        table=table,
+                        name=fields[1],
+                        type=fields[2],
+                        default=fields[4].strip(),
+                        comment=fields[5].strip(),
+                        null=null,
+                        show="%s.%s" % (table.name, fields[1]) not in omit,
+                    )
                     table.fields.append(field)
                     if fields[3] == "PK":
                         field.pk = True
@@ -2570,6 +2947,7 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
 ##########
 # Graphs #
 ##########
+
 
 class Graph(object):
     default_color = "white"
@@ -2592,7 +2970,8 @@ class Graph(object):
 
         abs_output_file = os.path.abspath(output_file)
         output = open(abs_output_file, "w")
-        output.write("""
+        output.write(
+            """
 digraph g {
   graph [
     rankdir = "TD",
@@ -2616,11 +2995,12 @@ digraph g {
 
   "legend" [label=<<TABLE CELLBORDER="0" CELLSPACING="0">
 <TR><TD>Legend</TD></TR>
-""" % {"font": Graph.font})
+"""
+            % {"font": Graph.font}
+        )
 
         for c in sorted(clusters.keys()):
-            output.write(
-                '<TR><TD BGCOLOR="%s">%s</TD></TR>\n' % (clusters[c][0], c))
+            output.write('<TR><TD BGCOLOR="%s">%s</TD></TR>\n' % (clusters[c][0], c))
 
         output.write("""</TABLE>>, layer=0]""")
 
@@ -2632,7 +3012,8 @@ digraph g {
             if notfound:
                 print(
                     "Tables referenced in clusters, but no longer exists: %s"
-                    % " ".join(notfound))
+                    % " ".join(notfound)
+                )
             output.write(""" subgraph "%s" { %s }""" % (c, " ".join(t)))
             for col in t:
                 colors[col.lower()] = clusters[c][0]
@@ -2640,8 +3021,10 @@ digraph g {
         for table in list(tables.values()):
             attrs = ""
             for field in table.fields:
-                trans = {"bg":   Graph.bg_color,
-                         "name": field.name}  # + " : " + field.type.sql_type}
+                trans = {
+                    "bg": Graph.bg_color,
+                    "name": field.name,
+                }  # + " : " + field.type.sql_type}
 
                 if field.is_fk():
                     if field.is_pk():
@@ -2652,23 +3035,27 @@ digraph g {
                     if field.is_pk():
                         html = '<FONT FACE="bold">%(name)s</FONT>'
                     else:
-                        html = '%(name)s'
+                        html = "%(name)s"
 
-                attrs += ('<TR><TD BGCOLOR="%(bg)s">'
-                          + html + "</TD></TR>") % trans
+                attrs += ('<TR><TD BGCOLOR="%(bg)s">' + html + "</TD></TR>") % trans
 
             output.write(
                 """
  "%s" [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0"><TR>
                      <TD BGCOLOR="%s">%s</TD></TR>%s</TABLE>>]\n"""
-                % (table.name.lower(),
-                   colors.get(table.name.lower(), Graph.default_color),
-                   table.name, attrs))
+                % (
+                    table.name.lower(),
+                    colors.get(table.name.lower(), Graph.default_color),
+                    table.name,
+                    attrs,
+                )
+            )
 
         for table in list(tables.values()):
             for f in table.fk:
-                output.write('"%s" -> "%s";\n' % (
-                    table.name.lower(), f.foreign.name.lower()))
+                output.write(
+                    '"%s" -> "%s";\n' % (table.name.lower(), f.foreign.name.lower())
+                )
 
         output.write("}")
         output.close()
@@ -2676,16 +3063,14 @@ digraph g {
         abs_ps = abs_output_file.replace(".dot", ".ps")
         ps = output_file.replace(".dot", ".ps")
         try:
-            sub = subprocess.Popen(
-                ["dot", "-Tps", "-o", abs_ps, abs_output_file])
+            sub = subprocess.Popen(["dot", "-Tps", "-o", abs_ps, abs_output_file])
             status = sub.wait()
         except OSError:
             status = 1
 
         if status != 0:
             print("Created '%s'" % output_file)
-            print("Use 'dot -Tps -o %s %s' to convert to PS" % (
-                ps, output_file))
+            print("Use 'dot -Tps -o %s %s' to convert to PS" % (ps, output_file))
         else:
             print("Created '%s'" % abs_ps)
         print("Use 'ps2pdf -sPAGESIZE=a3' to convert to PDF")
@@ -2698,8 +3083,9 @@ digraph g {
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print(
-            "Usage: dborm -ada  dbschema.txt [pkg_name] [db_pkg]" +
-            " [output_dir] [tables]")
+            "Usage: dborm -ada  dbschema.txt [pkg_name] [db_pkg]"
+            + " [output_dir] [tables]"
+        )
         print("   or: dborm -graph dbschema.txt [clusters]")
         print("")
         print("Where dbschema.txt contains the description of the database")
@@ -2722,13 +3108,12 @@ if __name__ == "__main__":
             database_pkg = sys.argv[4]
         if len(sys.argv) >= 6:
             output_dir = sys.argv[5]
-        if len(sys.argv) >= 7 and sys.argv[6] != '':
+        if len(sys.argv) >= 7 and sys.argv[6] != "":
             tables = sys.argv[6].split(",")
         else:
             tables = []
 
-        sys.exit(create_orm(db, indir=output_dir, omit=[], pkg_name=pkg,
-                            tables=tables))
+        sys.exit(create_orm(db, indir=output_dir, omit=[], pkg_name=pkg, tables=tables))
 
     elif sys.argv[1] == "-graph":
         clusters = dict()

@@ -1,0 +1,9 @@
+[flake8]
+exclude = .git,__pycache__
+filename = *.py
+# See
+# https://github.com/psf/black/blob/main/docs/guides/using_black_with_other_tools.md#flake8
+# to understand the max-line-length and ignore settings.
+max-line-length = 80
+ignore = E203, E501, W503, B907
+select = ANN,B,B9,BLK,C,E,F,T4,W
