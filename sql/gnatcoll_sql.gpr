@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 with "gnatcoll_sql_conf.gpr";
-with "gnatcoll";
+with "gnatcoll_core";
 
 library project GnatColl_SQL is
 
@@ -42,7 +42,7 @@ library project GnatColl_SQL is
       when "relocatable" =>
          for Leading_Library_Options use GnatColl_Sql_Conf.Ldflags;
          for Library_Version use
-            "lib" & project'Library_Name & Gnatcoll.So_Ext & "." & Version;
+            "lib" & project'Library_Name & Gnatcoll_core.So_Ext & "." & Version;
       when "static" | "static-pic" =>
          null;
    end case;
