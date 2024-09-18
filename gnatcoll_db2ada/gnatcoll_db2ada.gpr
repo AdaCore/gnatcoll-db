@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 with "../gnatcoll_db_shared.gpr";
-with "gnatcoll";
+with "gnatcoll_core";
 with "gnatcoll_sql";
 
 standard project GNATCOLL_DB2Ada is

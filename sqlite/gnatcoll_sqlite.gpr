@@ -22,7 +22,7 @@
 ------------------------------------------------------------------------------
 
 with "gnatcoll_sqlite_conf.gpr";
-with "gnatcoll";
+with "gnatcoll_core";
 with "gnatcoll_sql";
 
 library project GnatColl_Sqlite is
@@ -64,7 +64,7 @@ library project GnatColl_Sqlite is
          for Leading_Library_Options use GnatColl_Sqlite_Conf.Ldflags;
          for Library_Options use Sqlite_Lib & Thread_Lib;
          for Library_Version use
-            "lib" & project'Library_Name & Gnatcoll.So_Ext & "." & Version;
+            "lib" & project'Library_Name & Gnatcoll_core.So_Ext & "." & Version;
       when "static" | "static-pic" =>
          null;
    end case;
