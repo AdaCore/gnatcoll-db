@@ -49,9 +49,9 @@ def exec_or_fail(*args, **kwargs):
 
         return sub
 
-    except OSError:
+    except OSError as E:
         print("Error: could not execute %s" % args[0])
-        raise subprocess.CalledProcessError(sub.returncode, args[0])
+        raise subprocess.CalledProcessError(sub.returncode, args[0]) from E
 
 
 def save_dir(fn):
@@ -119,7 +119,19 @@ def splitstr(str, maxlen):
 ######################################
 
 
-class Subprogram(object):
+class Subprogram:
+    __slots__ = (
+        "name",
+        "params",
+        "local_vars",
+        "body",
+        "returns",
+        "comment",
+        "overriding",
+        "abstract",
+        "inline",
+    )
+
     def __init__(
         self,
         name,
@@ -161,15 +173,17 @@ class Pretty_Printer(object):
     formatted
     """
 
-    def __init__(self, out, casing=[]):
+    def __init__(self, out, casing=None):
         """CASING stored the casing exceptions. This is a list of names with
         their expected formating. All names not in that list will be
         capitalized
         """
+        if casing is None:
+            casing = []
 
         casing.extend(["out", "in", "access", "constant", "aliased"])
         self.out = out
-        self.casing = dict()
+        self.casing = {}
         for c in casing:
             self.casing[c.lower()] = c
         self.pkg_name = None
@@ -228,8 +242,8 @@ class Pretty_Printer(object):
         getter,
         setter,
         type,
-        getter_local_vars=[],
-        setter_local_vars=[],
+        getter_local_vars=None,
+        setter_local_vars=None,
         comment=None,
         abstract=False,
         section="",
@@ -237,6 +251,11 @@ class Pretty_Printer(object):
         """Define a property for self (ie a setter and getter strongly linked
         to each other
         """
+        if getter_local_vars is None:
+            getter_local_vars = []
+        if setter_local_vars is None:
+            setter_local_vars = []
+
         get_name = schema.subprogram_name_from_field(field)
         if isinstance(field, str):
             set_name = "set_%s" % field
@@ -270,8 +289,8 @@ class Pretty_Printer(object):
         self,
         name,
         body,
-        params=[],
-        local_vars=[],
+        params=None,
+        local_vars=None,
         returns=None,
         comment=None,
         overriding=False,
@@ -286,6 +305,11 @@ class Pretty_Printer(object):
          If the section is "body" the subprogram will not be visible in the
          specs
         """
+        if params is None:
+            params = []
+        if local_vars is None:
+            local_vars = []
+
         news = Subprogram(
             name,
             params,
@@ -403,8 +427,8 @@ class Pretty_Printer(object):
             func = func + " is abstract"
 
         # Would we fit on a single line ?
-        if len(re.sub("\s+", " ", func)) < 79:
-            return "  " + re.sub("\s+", " ", func)
+        if len(re.sub(r"\s+", " ", func)) < 79:
+            return "  " + re.sub(r"\s+", " ", func)
         else:
             return func
 
@@ -465,11 +489,11 @@ class Pretty_Printer(object):
             return
 
         # Add newlines where needed, but preserve existing blank lines
-        body = re.sub(";(?!\s*\n)", ";\n", body)
-        body = re.sub("(?<!and )then(?!\s*\n)", "then\n", body)
-        body = re.sub("(?<!or )else(?!\s*\n)", "else\n", body)
+        body = re.sub(r";(?!\s*\n)", ";\n", body)
+        body = re.sub(r"(?<!and )then(?!\s*\n)", "then\n", body)
+        body = re.sub(r"(?<!or )else(?!\s*\n)", "else\n", body)
         body = re.sub("declare", "\ndeclare", body)
-        body = re.sub("\n\s*\n+", "\n\n", body)
+        body = re.sub(r"\n\s*\n+", "\n\n", body)
 
         parent_count = 0
 
@@ -524,7 +548,7 @@ class Pretty_Printer(object):
                 self._output_section_spec(section)
 
         subp = []
-        for name, types, subprograms, comment in self.sections:
+        for _, _, subprograms, _ in self.sections:
             subp.extend(subprograms)
 
         subp.sort(key=lambda x: x.name)
@@ -1193,15 +1217,15 @@ with this primary key. If not, the returned value will be a null element
     for index, f in enumerate(fk):
         subp = subprogram_from_fk(f)
         ref = f.foreign.name
-        d = dict(
-            name=subp,
-            ref=ref,
-            cap=subp.title(),
-            pkg=pkg_name,
-            table=table.name,
-            index=index,
-            row=f.foreign.row,
-        )
+        d = {
+            "name": subp,
+            "ref": ref,
+            "cap": subp.title(),
+            "pkg": pkg_name,
+            "table": table.name,
+            "index": index,
+            "row": f.foreign.row,
+        }
 
         if f.show():
             decl.append(("FK_" + subp, "Detached_%(row)s_Access" % d))
@@ -1250,7 +1274,6 @@ with this primary key. If not, the returned value will be a null element
   return Result;
 """
         % {
-            "cap": table.name,
             "tests": tests,
             "row": translate["row"],
             "field_count": translate["field_count"],
@@ -1367,16 +1390,16 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
     if table.superClass:
         tagged = " and %s" % table.superClass.row
 
-    translate = dict(
-        cap=table.name,
-        row=table.row,
-        pkg_name=pkg_name,
-        detached_data_fields=schema.detached_data_fields(table),
-        tagged=tagged,
-        field_count=len(table.fields) + len(table.fk),
-        free_fields=schema.free_fields(table),
-        equal="\n         and ".join(schema.equal(table)),
-    )
+    translate = {
+        "cap": table.name,
+        "row": table.row,
+        "pkg_name": pkg_name,
+        "detached_data_fields": schema.detached_data_fields(table),
+        "tagged": tagged,
+        "field_count": len(table.fields) + len(table.fk),
+        "free_fields": schema.free_fields(table),
+        "equal": "\n         and ".join(schema.equal(table)),
+    }
 
     if table.is_abstract:
         pretty.add_section(
@@ -1962,7 +1985,6 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
                   .Limit (1).Get (Self.Data.Session).Element;
             end if;
  """ % {
-                "pkg_name": pkg_name,
                 "name": table_name,
                 "index": index,
                 "ref": fk_field.foreign.name,
@@ -2183,11 +2205,16 @@ def generate_orb_one_table(name, schema, pretty, all_tables):
 #################
 
 
-def generate_orm(setup, pkg_name, tables=[], omit=[], out=sys.stdout):
+def generate_orm(setup, pkg_name, tables=None, omit=None, out=sys.stdout):
     """Generate ORB packages for a set of tables.
     SETUP is an object that contains the database description(.db_name,...)
     Do not generate data for the fields in OMIT("table.field").
     """
+
+    if tables is None:
+        tables = []
+    if omit is None:
+        omit = []
 
     pretty = Pretty_Printer(
         out,
@@ -2206,7 +2233,7 @@ def generate_orm(setup, pkg_name, tables=[], omit=[], out=sys.stdout):
     if not tables:
         tables = schema.details
     else:
-        t = dict()
+        t = {}
         for p in tables:
             t[p] = schema.details[p.lower()]
         tables = t
@@ -2266,10 +2293,14 @@ class DBSetup(object):
         result.db_host = dbhost
         result.db_password = dbpassword
 
-    def gnatcoll_db2ada(self, args=[]):
+    def gnatcoll_db2ada(self, args=None):
         """Executes gnatcoll_db2ada, passing the required args to access
         the database model, and extra arguments if needed.
         """
+
+        if args is None:
+            args = []
+
         if hasattr(self, "db_model"):
             p = exec_or_fail(
                 ["gnatcoll_db2ada", "-dbmodel", self.db_model] + args,
@@ -2306,7 +2337,7 @@ class DBSetup(object):
 
 
 @save_dir
-def create_orm(setup, pkg_name, indir, tables=[], omit=[]):
+def create_orm(setup, pkg_name, indir, tables=None, omit=None):
     """Creates INDIR/orm-* based on the database defined in the config.
     First remove any orm-*.ad? in that directory
     TABLES can be used to limit the generation to a subset of the tables.
@@ -2314,7 +2345,12 @@ def create_orm(setup, pkg_name, indir, tables=[], omit=[]):
     Return 1 in case of error, 0 for success (exit status for the shell)
     """
 
-    for dirpath, dirnames, filenames in os.walk(indir):
+    if tables is None:
+        tables = []
+    if omit is None:
+        omit = []
+
+    for dirpath, _, filenames in os.walk(indir):
         for f in filenames:
             if os.path.splitext(f)[1] in (".ads", ".adb") and f.startswith("orm-"):
                 unlink_if_exist(os.path.join(dirpath, f))
@@ -2371,12 +2407,12 @@ class Field_Type(object):
     @staticmethod
     def get(sql):
         if not Field_Type.__all_types:
-            Field_Type.__all_types = dict(
+            Field_Type.__all_types = {
                 # Map to Unbounded_String. This avoids having to do explicit
                 # memory management, and in particular we can take advantage
                 # of copy-on-write done for Unbounded_String rather than
                 # redo it ourselves (with complex support for multi-tasking)
-                text=Field_Type(
+                "text": Field_Type(
                     "text",
                     "String",
                     "String",
@@ -2389,7 +2425,7 @@ class Field_Type(object):
                     "%s",
                     "To_Unbounded_String (%s)",
                 ),
-                integer=Field_Type(
+                "integer": Field_Type(
                     "integer",
                     "Integer",
                     "Integer",
@@ -2402,7 +2438,7 @@ class Field_Type(object):
                     "%s'Img",
                     "%s",
                 ),
-                bigint=Field_Type(
+                "bigint": Field_Type(
                     sql_type="bigint",
                     ada_return="Long_Long_Integer",
                     ada_param="Long_Long_Integer",
@@ -2415,7 +2451,7 @@ class Field_Type(object):
                     img="Long_Long_Integer'Image (%s)",
                     to_field="%s",
                 ),
-                autoincrement=Field_Type(
+                "autoincrement": Field_Type(
                     "integer",
                     "Integer",
                     "Integer",
@@ -2428,7 +2464,7 @@ class Field_Type(object):
                     "%s'Img",
                     "%s",
                 ),
-                time=Field_Type(
+                "time": Field_Type(
                     "time",
                     "Ada.Calendar.Time",
                     "Ada.Calendar.Time",
@@ -2441,7 +2477,7 @@ class Field_Type(object):
                     "%s'Img",
                     "%s",
                 ),
-                float=Field_Type(
+                "float": Field_Type(
                     "float",
                     "Float",
                     "Float",
@@ -2454,7 +2490,7 @@ class Field_Type(object):
                     "%s'Img",
                     "%s",
                 ),
-                boolean=Field_Type(
+                "boolean": Field_Type(
                     "boolean",
                     "Boolean",
                     "TriBoolean",
@@ -2467,7 +2503,7 @@ class Field_Type(object):
                     "%s'Img",
                     "%s",
                 ),
-                money=Field_Type(
+                "money": Field_Type(
                     "money",
                     "GNATCOLL.SQL.T_Money",
                     "GNATCOLL.SQL.T_Money",
@@ -2480,7 +2516,7 @@ class Field_Type(object):
                     "%s'Img",
                     "%s",
                 ),
-            )
+            }
 
         sql = sql.lower()
         if sql in (
@@ -2695,7 +2731,7 @@ class Foreign_Key(object):
         DESCR contains text like "FK table(revert)".
         """
         pairs = [(field_name, None)]
-        revert = re.search("\((.*)\)", descr)
+        revert = re.search(r"\((.*)\)", descr)
         if revert:
             return Foreign_Key(
                 table.name, descr[3 : revert.start(1) - 1], pairs, revert.group(1)
@@ -2851,7 +2887,7 @@ class Table(object):
             self.has_cache = False
 
 
-def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
+def get_db_schema(setup, requires_pk=False, all_tables=None, omit=None):
     """Parse the schema of the database (database access is described in
     setup, which is an instance of configfile.ConfigFile).
     If requires_pk is True, a warning is raised for all tables that have
@@ -2860,8 +2896,13 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
     ALL_TABLES, if specified, lists the tables for which we do output.
     """
 
+    if all_tables is None:
+        all_tables = []
+    if omit is None:
+        omit = []
+
     schematxt = setup.get_schema()
-    tables = dict()  # Index is lower cases table name
+    tables = {}  # Index is lower cases table name
     table = None  # Instance of Table
 
     for line in schematxt.splitlines():
@@ -2875,7 +2916,7 @@ def get_db_schema(setup, requires_pk=False, all_tables=[], omit=[]):
                 or fields[1].startswith("TABLE")
                 or fields[1].startswith("ABSTRACT TABLE")
             ):
-                m = re.search("\((.*)\)", fields[1])
+                m = re.search(r"\((.*)\)", fields[1])
                 if m:
                     superclass = m.group(1)
                 else:
@@ -2955,7 +2996,7 @@ class Graph(object):
     font = "tahoma"
 
     @staticmethod
-    def create(setup, output_file, clusters=dict()):
+    def create(setup, output_file, clusters=None):
         # CLUSTERS can be used to group tables. Grouping is done either
         # just be settings a specific color for their title bars, but you can
         # also force graphviz to group them visually by calling the groups with
@@ -2965,6 +3006,9 @@ class Graph(object):
         # the remaining elements are the names of the database tables belonging
         # to that group. For instance:
         #    clusters ["group1"] = ("color", "table1", "table2")
+
+        if clusters is None:
+            clusters = {}
 
         tables = get_db_schema(setup)
 
@@ -3004,7 +3048,7 @@ digraph g {
 
         output.write("""</TABLE>>, layer=0]""")
 
-        colors = dict()
+        colors = {}
 
         for c in list(clusters.keys()):
             t = clusters[c][1:]
@@ -3116,7 +3160,7 @@ if __name__ == "__main__":
         sys.exit(create_orm(db, indir=output_dir, omit=[], pkg_name=pkg, tables=tables))
 
     elif sys.argv[1] == "-graph":
-        clusters = dict()
+        clusters = {}
         for s in sys.argv[3:]:
             name, bg, tables = s.split(":")
             clusters[name] = [bg] + tables.split(",")

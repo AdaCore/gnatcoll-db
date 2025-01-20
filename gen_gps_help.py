@@ -4,7 +4,7 @@ import os
 import os.path
 import re
 
-pkg_re = re.compile("^(private)?\s*package\s*(\S+)")
+pkg_re = re.compile(r"^(private)?\s*package\s*(\S+)")
 
 
 def recursive_ls(dir):
@@ -14,8 +14,8 @@ def recursive_ls(dir):
         if f.endswith(".ads") and f.startswith("gnatcoll-"):
             private = False
             pkg = ""
-            for l in file(os.path.join(dir, f)).readlines():
-                m = pkg_re.search(l)
+            for line in open(os.path.join(dir, f)).readlines():
+                m = pkg_re.search(line)
                 if m:
                     private = m.group(1)
                     pkg = m.group(2)
@@ -31,7 +31,7 @@ def recursive_ls(dir):
 
 
 list = recursive_ls("..")
-out = file("help_gnatcoll-db.py", "wb")
+out = open("help_gnatcoll-db.py", "w")
 out.write(
     """XML = r'''<?xml version="1.0"?>
 <GPS>
@@ -47,7 +47,7 @@ for pkg, f in sorted(list):
 
     # Do we have a submenu ?
     in_front = False
-    for pkg2, b in list:
+    for _, b in list:
         if b.startswith(f + "-"):
             item = menu[menu.rfind("/") + 1 :]
             menu = menu + "/&lt;" + item + "&gt;"
