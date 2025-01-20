@@ -4,20 +4,18 @@ import os
 import os.path
 import re
 
-pkg_re = re.compile("^(private)?\s*package\s*(\S+)")
+pkg_re = re.compile(r"^(private)?\s*package\s*(\S+)")
 
 
 def recursive_ls(dir):
     """Return the list of ads files in dir and its subdirs"""
     result = set()
     for f in os.listdir(dir):
-        if f.endswith(".ads") \
-           and f.startswith("gnatcoll-"):
-
+        if f.endswith(".ads") and f.startswith("gnatcoll-"):
             private = False
             pkg = ""
-            for l in file(os.path.join(dir, f)).readlines():
-                m = pkg_re.search(l)
+            for line in open(os.path.join(dir, f)).readlines():
+                m = pkg_re.search(line)
                 if m:
                     private = m.group(1)
                     pkg = m.group(2)
@@ -31,14 +29,17 @@ def recursive_ls(dir):
 
     return result
 
+
 list = recursive_ls("..")
-out = file("help_gnatcoll-db.py", "wb")
-out.write("""XML = r'''<?xml version="1.0"?>
+out = open("help_gnatcoll-db.py", "w")
+out.write(
+    """XML = r'''<?xml version="1.0"?>
 <GPS>
-""")
+"""
+)
 
 for pkg, f in sorted(list):
-    if '__' in f:
+    if "__" in f:
         # An internal package with a specific naming scheme
         continue
 
@@ -46,23 +47,28 @@ for pkg, f in sorted(list):
 
     # Do we have a submenu ?
     in_front = False
-    for pkg2, b in list:
+    for _, b in list:
         if b.startswith(f + "-"):
-            item = menu[menu.rfind("/") + 1:]
+            item = menu[menu.rfind("/") + 1 :]
             menu = menu + "/&lt;" + item + "&gt;"
             break
 
-    out.write("""  <documentation_file>
+    out.write(
+        """  <documentation_file>
      <shell>Editor.edit "%(file)s.ads"</shell>
      <descr>%(package)s</descr>
      <menu>/Help/%(menu)s</menu>
      <category>GNAT Components Collection</category>
   </documentation_file>
 
-""" % {"file": f, "menu": menu, "package": pkg})
+"""
+        % {"file": f, "menu": menu, "package": pkg}
+    )
 
-out.write("""</GPS>'''
+out.write(
+    """</GPS>'''
 import GPS
 GPS.parse_xml(XML)
-""")
+"""
+)
 out.close()

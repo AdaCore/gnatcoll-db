@@ -43,37 +43,45 @@ class DB2AdaTestDriver(TestDriver):
         :param dag: tree of test fragment to amend
         :type dag: e3.collection.dag.DAG
         """
-        self.add_fragment(dag, 'db2ada')
-        self.add_fragment(dag, 'build', after=['db2ada'])
-        self.add_fragment(dag, 'check_run', after=['build'])
+        self.add_fragment(dag, "db2ada")
+        self.add_fragment(dag, "build", after=["db2ada"])
+        self.add_fragment(dag, "check_run", after=["build"])
 
-        if 'test_exe' not in self.test_env:
-            self.test_env['test_exe'] = 'obj/test'
+        if "test_exe" not in self.test_env:
+            self.test_env["test_exe"] = "obj/test"
 
     def db2ada(self, previous_values):
         """Run db2ada."""
-        mkdir(self.test_env['working_dir'])
+        mkdir(self.test_env["working_dir"])
         db2ada_args = []
-        db2ada = 'gnatcoll_db2ada'
+        db2ada = "gnatcoll_db2ada"
 
         # If necessary initialize an sqlite database
-        if 'sqlite_db' in self.test_env:
-            check_call(self,
-                       ['sqlite3', 'db.db', '-cmd',
-                        ".read %s" % os.path.join(self.test_env['test_dir'],
-                                                  self.test_env['sqlite_db'])],
-                       input="|")
-            db2ada = 'gnatcoll_sqlite2ada'
+        if "sqlite_db" in self.test_env:
+            check_call(
+                self,
+                [
+                    "sqlite3",
+                    "db.db",
+                    "-cmd",
+                    ".read %s"
+                    % os.path.join(
+                        self.test_env["test_dir"], self.test_env["sqlite_db"]
+                    ),
+                ],
+                input="|",
+            )
+            db2ada = "gnatcoll_sqlite2ada"
             db2ada_args.append(
-                '-dbname=%s' % os.path.join(self.test_env['working_dir'],
-                                            'db.db'))
+                "-dbname=%s" % os.path.join(self.test_env["working_dir"], "db.db")
+            )
 
         # Compute db2ada arguments
-        for value in self.test_env.get('db2ada', []):
-            if value.startswith('-dbmodel='):
-                dbmodel = value.split('=', 1)[1]
-                dbmodel = os.path.join(self.test_env['test_dir'], dbmodel)
-                db2ada_args.append('-dbmodel=%s' % dbmodel)
+        for value in self.test_env.get("db2ada", []):
+            if value.startswith("-dbmodel="):
+                dbmodel = value.split("=", 1)[1]
+                dbmodel = os.path.join(self.test_env["test_dir"], dbmodel)
+                db2ada_args.append("-dbmodel=%s" % dbmodel)
             else:
                 db2ada_args.append(value)
 
@@ -81,23 +89,25 @@ class DB2AdaTestDriver(TestDriver):
 
     def build(self, previous_values):
         """Build fragment."""
-        return gprbuild(self, gcov=self.env.gcov,
-                        components=self.env.components)
+        return gprbuild(self, gcov=self.env.gcov, components=self.env.components)
 
     def check_run(self, previous_values):
         """Check status fragment."""
-        if not previous_values['build']:
+        if not previous_values["build"]:
             return
 
-        for data in self.test_env.get('data', []):
-            cp(os.path.join(self.test_env['test_dir'], data),
-               self.test_env['working_dir'], recursive=True)
+        for data in self.test_env.get("data", []):
+            cp(
+                os.path.join(self.test_env["test_dir"], data),
+                self.test_env["working_dir"],
+                recursive=True,
+            )
 
         process = check_call(
             self,
-            [os.path.join(self.test_env['working_dir'],
-                          self.test_env['test_exe'])])
-        if '<=== TEST PASSED ===>' not in process.out:
+            [os.path.join(self.test_env["working_dir"], self.test_env["test_exe"])],
+        )
+        if "<=== TEST PASSED ===>" not in process.out:
             self.result.set_status(TestStatus.FAIL)
         else:
             self.result.set_status(TestStatus.PASS)
