@@ -60,5 +60,5 @@ $ make install
 Bug reports
 -----------
 
-Please send questions and bug reports to report@adacore.com following
+Please send questions and bug reports to support@adacore.com following
 the same procedures used to submit reports with the GNAT toolset itself.
