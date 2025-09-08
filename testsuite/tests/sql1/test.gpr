@@ -1,4 +1,4 @@
-with "gnatcoll";
+with "gnatcoll_core";
 with "gnatcoll_sql";
 with "gnatcoll_postgres";
 with "gnatcoll_sqlite";
