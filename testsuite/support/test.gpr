@@ -2,7 +2,7 @@
 --
 --  The scenario variable TEST_SOURCES is automatically set by the
 --  driver to point to the test sources.
-with "gnatcoll";
+with "gnatcoll_core";
 
 project Test is
    Test_Sources := External("TEST_SOURCES");
