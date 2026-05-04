@@ -31,6 +31,7 @@ abstract project Gnatcoll_Db_Shared is
 
    type Library_Type_Type is ("relocatable", "static", "static-pic");
    Library_Type : Library_Type_Type := External ("LIBRARY_TYPE", "static");
+   for Run_Path_Option use ();
 
    Gnatcoll_Version := External ("GNATCOLL_VERSION", "0.0");
 
