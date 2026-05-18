@@ -35,6 +35,7 @@ library project GnatColl_Postgres is
    for Object_Dir      use "obj/" & Project'Library_Kind;
    for Library_Dir     use "lib/" & Project'Library_Kind;
    for Library_Name    use project'Name;
+   for Run_Path_Option use ();
 
    case GnatColl_Postgres_Conf.Library_Type is
       when "relocatable" =>

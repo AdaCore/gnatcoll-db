@@ -35,6 +35,7 @@ library project GnatColl_Sqlite is
    for Object_Dir      use "obj/" & Project'Library_Kind;
    for Library_Dir     use "lib/" & Project'Library_Kind;
    for Library_Name    use project'Name;
+   for Run_Path_Option use ();
 
    Thread_Lib := ();
    case OS is

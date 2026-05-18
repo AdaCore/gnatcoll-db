@@ -24,6 +24,7 @@ library project Module is
       "PGXS.Generic_Bytea",
       "PGXS.Types",
       "PGXS.Varlen");
+   for Run_Path_Option use ();
 
    package Compiler is
       for Switches ("Ada") use ("-g", "-fPIC");

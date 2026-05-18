@@ -41,6 +41,7 @@ library project GnatColl_Xref is
       use "lib/" & Project'Library_Kind;
    for Library_Name    use project'Name;
    for Languages use ("Ada");
+   for Run_Path_Option use ();
 
    case GnatColl_Xref_Conf.Library_Type is
       when "relocatable" =>

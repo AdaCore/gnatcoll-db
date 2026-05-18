@@ -37,6 +37,7 @@ library project GnatColl_SQL is
       use "lib/" & Project'Library_Kind;
    for Library_Name    use project'Name;
    for Languages use ("Ada");
+   for Run_Path_Option use ();
 
    case GnatColl_Sql_Conf.Library_Type is
       when "relocatable" =>
